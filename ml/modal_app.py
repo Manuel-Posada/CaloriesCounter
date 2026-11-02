@@ -19,7 +19,9 @@ HERE = Path(__file__).parent
 NUTRITION_CSV_LOCAL = HERE / "data" / "nutrition_wide_densidad.csv"
 CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:4200")
 
-if not NUTRITION_CSV_LOCAL.exists():
+if modal.is_local() and not NUTRITION_CSV_LOCAL.exists():
+    # Solo se comprueba en la máquina que despliega: dentro del contenedor de build el módulo
+    # se importa desde /root y el CSV aún no está copiado (se añade más abajo en la imagen).
     raise FileNotFoundError(f"Falta {NUTRITION_CSV_LOCAL}. Copia aquí nutrition_wide_densidad.csv antes de desplegar.")
 
 

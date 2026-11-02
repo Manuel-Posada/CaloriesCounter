@@ -18,8 +18,11 @@ MASK2FORMER_WEIGHTS = os.environ.get("MASK2FORMER_WEIGHTS", f"{MODELS_DIR}/mask2
 # pesos locales; si no hay, también los pesos.
 MASK2FORMER_ID = os.environ.get("MASK2FORMER_ID", "facebook/mask2former-swin-tiny-coco-instance")
 # Variante *métrica* de Depth Anything V2: devuelve metros (necesario para cm³).
+# Small: la validada de extremo a extremo y la que se usa en producción. La Large sobreestima
+# la distancia en primeros planos (mesa a ~0,4 m -> 1,8 m) y el volumen se dispara.
+# Se puede cambiar sin tocar código con la variable DEPTH_MODEL_ID.
 DEPTH_MODEL_ID = os.environ.get(
-    "DEPTH_MODEL_ID", "depth-anything/Depth-Anything-V2-Metric-Indoor-Large-hf"
+    "DEPTH_MODEL_ID", "depth-anything/Depth-Anything-V2-Metric-Indoor-Small-hf"
 )
 
 NUTRITION_CSV = os.environ.get("NUTRITION_CSV", "/data/nutrition_wide_densidad.csv")

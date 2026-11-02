@@ -82,7 +82,13 @@ python run_local.py ..\mi_plato.jpg --pipeline A
 
 `run_local.py` toma los pesos de la raíz del repo; se pueden sobreescribir con
 `MODELS_DIR`, `MASK2FORMER_WEIGHTS`, `INCEPTION_WEIGHTS`, `YOLO_WEIGHTS`, `DEPTH_MODEL_ID`
-y `NUTRITION_CSV`. En CPU usa la variante pequeña de profundidad para que no tarde una eternidad:
+y `NUTRITION_CSV`.
+
+> **Modelo de profundidad:** el valor por defecto es la variante *Small* (`DEPTH_MODEL_ID`), que es
+> la validada de extremo a extremo. La *Large* sobreestima la distancia en primeros planos —en la
+> foto de `samples/pizza.jpg` estima 1,8 m donde hay ~0,4 m— y el volumen se dispara (200 L en vez
+> de 0,17 L). Se puede probar con `--depth-model ...-Large-hf`, pero sin calibrar no es apta para
+> producción. Es más lenta y pesa ~1,3 GB más.
 
 ```powershell
 python run_local.py ..\mi_plato.jpg --pipeline B `
