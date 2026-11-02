@@ -28,6 +28,7 @@ DEFAULT_DENSITY_G_CM3 = 1.0
 class FoodRecord:
     idx: int
     name: str
+    name_es: str
     density_g_cm3: float
     density_assumed: bool
     kcal_100g: float
@@ -97,9 +98,12 @@ class NutritionTable:
 
                 density = _num(row.get(density_col))
                 density_assumed = density is None or density <= 0
+                name = (row.get(name_col) or "").strip() if name_col else f"class_{idx}"
                 records[idx] = FoodRecord(
                     idx=idx,
-                    name=(row.get(name_col) or "").strip() if name_col else f"class_{idx}",
+                    name=name,
+                    # Traducción opcional del CSV; si falta, se usa el nombre original.
+                    name_es=(row.get("nombre_es") or "").strip() or name,
                     density_g_cm3=DEFAULT_DENSITY_G_CM3 if density_assumed else density,
                     density_assumed=density_assumed,
                     kcal_100g=_num(row.get(COL_KCAL)) or 0.0,
@@ -119,6 +123,7 @@ class NutritionTable:
         factor = grams / 100.0  # 4.2
         return {
             "nombre": r.name,
+            "nombre_es": r.name_es,
             "densidad_g_cm3": r.density_g_cm3,
             "densidad_asumida": r.density_assumed,
             "peso_g": grams,

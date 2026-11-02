@@ -16,6 +16,8 @@ export interface NutritionPer100g {
 export interface DetectedFood {
   idx: number;
   nombre: string;
+  /** Nombre traducido del CSV nutricional; puede faltar en un Modal antiguo. */
+  nombre_es?: string;
   confianza: number;
   volumen_cm3: number;
   peso_g: number;

@@ -77,6 +77,7 @@ class FoodPipeline:
                     {
                         "idx": s.class_idx,
                         "nombre": n["nombre"],
+                        "nombre_es": n["nombre_es"],
                         "confianza": round(s.class_score if s.class_score is not None else s.score, 4),
                         "volumen_cm3": round(vol.volume_cm3, 2),
                         "peso_g": round(n["peso_g"], 2),

@@ -121,7 +121,7 @@ interface RenderedSegment {
             <li>
               <button type="button" class="food" (click)="openSheet(f, $index)">
                 <span class="food-idx" aria-hidden="true">{{ $index + 1 }}</span>
-                <span class="food-name">{{ pretty(f.nombre) }}</span>
+                <span class="food-name">{{ foodName(f) }}</span>
                 <span class="food-kcal">{{ f.nutricion.calorias_kcal | number: '1.0-0' }} kcal</span>
                 <span class="chev" aria-hidden="true">›</span>
               </button>
@@ -143,7 +143,7 @@ interface RenderedSegment {
               <header class="sheet-head">
                 <div>
                   <p class="eyebrow">{{ i18n.t('result.food', { n: selectedIndex() + 1 }) }}</p>
-                  <h2>{{ pretty(f.nombre) }}</h2>
+                  <h2>{{ foodName(f) }}</h2>
                 </div>
                 <button
                   type="button"
@@ -281,7 +281,7 @@ export class Result {
         lx,
         ly,
         below,
-        label: this.pretty(f.nombre),
+        label: this.foodName(f),
         kcal: f.nutricion.calorias_kcal,
         points: points.map((p) => `${p[0]},${p[1]}`).join(' '),
       });
@@ -356,6 +356,12 @@ export class Result {
   protected pretty(name: string): string {
     const text = name.replace(/_/g, ' ').trim();
     return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  /** Nombre del alimento en el idioma de la interfaz (español del CSV, inglés como respaldo). */
+  protected foodName(food: DetectedFood): string {
+    const raw = this.i18n.locale() === 'es' && food.nombre_es ? food.nombre_es : food.nombre;
+    return this.pretty(raw);
   }
 
   protected openSheet(food: DetectedFood, index: number): void {

@@ -107,7 +107,7 @@ Respuesta (resumen):
 ```json
 {
   "alimentos": [{
-    "idx": 12, "nombre": "arroz", "confianza": 0.91,
+    "idx": 12, "nombre": "arroz", "nombre_es": "arroz", "confianza": 0.91,
     "volumen_cm3": 210.4, "peso_g": 178.84, "densidad_g_cm3": 0.85, "densidad_asumida": false,
     "poligono": [[0.35,0.52],[0.38,0.28],[0.61,0.24],[0.66,0.55],[0.52,0.71]],
     "centroide": [0.50, 0.46],
