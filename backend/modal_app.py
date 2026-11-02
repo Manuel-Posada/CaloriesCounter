@@ -60,6 +60,19 @@ def db_check() -> None:
     print(f"modelo gemini={settings.GEMINI_MODEL} r2={bool(settings.R2_ACCOUNT_ID)}")
 
 
+@app.function(image=image, secrets=secrets, timeout=300)
+def set_staff(email: str) -> None:
+    """Marca como staff (acceso a Administración) al usuario ya registrado con ese email."""
+    sys.path.insert(0, "/app")
+    import django
+
+    django.setup()
+    from core.models import User
+
+    updated = User.objects.filter(email=email).update(is_staff=True)
+    print(f"usuarios actualizados: {updated}")
+
+
 @app.function(
     image=image,
     secrets=secrets,
