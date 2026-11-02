@@ -174,6 +174,7 @@ def alimentos_from_items(items: list[dict]) -> list[dict]:
                 "peso_manual": i.get("peso_manual", False),
                 "poligono": i.get("poligono") or [],
                 "centroide": i.get("centroide"),
+                "detalle": nutrition.details(i["idx"]),
                 "nutricion": nut,
             }
         )

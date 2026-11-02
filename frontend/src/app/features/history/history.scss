@@ -162,3 +162,22 @@
   text-decoration: underline;
 }
 
+/* Toda la tarjeta del historial abre el detalle del análisis. */
+.card.row,
+.card.text-only {
+  color: inherit;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--c-primary);
+  }
+}
+
+.chev {
+  align-self: center;
+  color: var(--c-muted);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+

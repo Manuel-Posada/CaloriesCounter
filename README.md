@@ -205,7 +205,23 @@ su suma, así que ninguna edición escribe números a mano:
 - `GET /api/foods/?q=` busca en las 323 clases (sin tildes y con sinónimos: `papa` → `patata`).
 
 El catálogo vive en `backend/core/data/nutrition_catalog.csv`, generado desde el CSV del pipeline
-con las columnas que hacen falta para recalcular (kcal y macros por 100 g + densidad).
+con las columnas que hacen falta para recalcular (kcal y macros por 100 g + densidad). Se regenera
+con:
+
+```powershell
+python ml/scripts/build_nutrition_catalog.py
+```
+
+### Historial y detalle nutricional
+
+Cada tarjeta del historial enlaza a `/result/:id`, que carga el análisis guardado con
+`GET /api/food-logs/<id>/` (incluye los alimentos y su tabla). Los análisis antiguos, guardados antes
+de existir `items`, se abren igual pero sin detalle editable ni tabla por alimento.
+
+La ficha de cada alimento incluye un desplegable **«Ver todos los nutrientes (por 100 g)»** con 30
+valores agrupados en general, grasas, minerales y vitaminas. Los nombres viajan como códigos
+(`sodio_mg`, `vitamina_b12_ug`…) y se traducen en el cliente.
+
 
 
 

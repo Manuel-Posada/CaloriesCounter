@@ -11,6 +11,16 @@ from pathlib import Path
 
 CATALOG_PATH = Path(__file__).parent / "data" / "nutrition_catalog.csv"
 MACRO_FIELDS = ("proteinas_g", "carbohidratos_g", "grasas_g")
+# Detalle extendido que se muestra en la ficha (claves del CSV generado).
+DETAIL_FIELDS = (
+    "agua_g", "fibra_g", "azucares_g", "sodio_mg",
+    "grasas_saturadas_g", "grasas_mono_g", "grasas_poli_g", "grasas_trans_g", "colesterol_mg",
+    "calcio_mg", "hierro_mg", "magnesio_mg", "fosforo_mg", "potasio_mg", "zinc_mg",
+    "cobre_mg", "manganeso_mg", "selenio_ug",
+    "vitamina_c_mg", "tiamina_mg", "riboflavina_mg", "niacina_mg", "vitamina_b6_mg",
+    "folato_ug", "colina_mg", "vitamina_b12_ug", "vitamina_a_ug", "vitamina_d_ug",
+    "vitamina_e_mg", "vitamina_k_ug",
+)
 
 # Nombres de uso corriente en Colombia que no coinciden con la tabla (FDA, en español neutro).
 SYNONYMS = {
@@ -53,12 +63,23 @@ def _catalog() -> dict[int, dict]:
                     **{k: float(row[k] or 0) for k in MACRO_FIELDS},
                 },
                 "densidad_g_cm3": float(row["densidad_g_cm3"] or 1.0),
+                "detalles": {
+                    code: round(float(row[code]), 3)
+                    for code in DETAIL_FIELDS
+                    if row.get(code) not in (None, "")
+                },
             }
     return out
 
 
 def get(idx: int) -> dict | None:
     return _catalog().get(int(idx))
+
+
+def details(idx: int) -> dict:
+    """Detalle extendido por 100 g (minerales, vitaminas, grasas), vacío si no hay datos."""
+    entry = _catalog().get(int(idx))
+    return dict(entry.get("detalles") or {}) if entry else {}
 
 
 def search(query: str, limit: int = 20) -> list[dict]:

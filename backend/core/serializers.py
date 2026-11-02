@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from rest_framework import serializers
 
+from . import food_items
 from .models import FoodLog, User
 from .r2 import get_r2_client, r2_configured, user_prefix
 
@@ -132,4 +133,16 @@ class FoodLogSerializer(serializers.ModelSerializer):
         if not all(isinstance(value[k], (int, float)) and value[k] >= 0 for k in MACRO_KEYS):
             raise serializers.ValidationError("Los macros deben ser números >= 0.")
         return value
+
+
+class FoodLogDetailSerializer(FoodLogSerializer):
+    """Detalle de un análisis: añade la lista de alimentos (con su tabla nutricional)."""
+
+    alimentos = serializers.SerializerMethodField()
+
+    class Meta(FoodLogSerializer.Meta):
+        fields = [*FoodLogSerializer.Meta.fields, "alimentos"]
+
+    def get_alimentos(self, obj):
+        return food_items.alimentos_from_items(obj.items)
 

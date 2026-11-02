@@ -42,8 +42,8 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
         @for (log of items(); track log.id) {
           <li>
             @if (hasImage(log)) {
-              <!-- Reciente: imagen almacenada en R2 -->
-              <article class="card row">
+              <!-- Reciente: imagen almacenada en R2. Toda la tarjeta abre el detalle. -->
+              <a class="card row" [routerLink]="['/result', log.id]" [attr.aria-label]="i18n.t('history.openDetail')">
                 <figure class="thumb-wrap">
                   <img class="thumb" [src]="log.imagen_url!" [attr.alt]="i18n.t('history.photoAlt')" loading="lazy"
                        (load)="onThumbLoad(log.id, $event)" (error)="onImageError(log.id)" />
@@ -73,10 +73,11 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
                   <p class="macros">{{ macros(log) }}</p>
                   @if (log.consejo_nutricional) { <p class="tip">{{ log.consejo_nutricional }}</p> }
                 </div>
-              </article>
+                <span class="chev" aria-hidden="true">›</span>
+              </a>
             } @else {
               <!-- Antigua: solo texto y datos -->
-              <article class="card text-only">
+              <a class="card text-only" [routerLink]="['/result', log.id]" [attr.aria-label]="i18n.t('history.openDetail')">
                 <div class="top">
                   <time class="muted">{{ log.fecha_hora | date: i18n.longDate() : undefined : i18n.dateLocale() }}</time>
                   <span class="right">
@@ -96,7 +97,7 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
                   </dl>
                 </div>
                 @if (log.consejo_nutricional) { <p class="tip">{{ log.consejo_nutricional }}</p> }
-              </article>
+              </a>
             }
           </li>
         }

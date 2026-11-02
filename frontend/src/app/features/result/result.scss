@@ -323,6 +323,41 @@
 
 .note--error { color: var(--c-danger, #b3261e); }
 
+/* Volver al historial cuando el análisis se abre desde una tarjeta del historial. */
+.back-link {
+  align-self: flex-start;
+  color: var(--c-muted);
+  font-size: 0.9rem;
+  text-decoration: none;
+
+  &:hover { color: var(--c-primary); }
+}
+
+/* Tabla nutricional extendida: cerrada por defecto para no saturar la hoja. */
+.nutrients {
+  margin-top: var(--space-3);
+
+  summary {
+    cursor: pointer;
+    color: var(--c-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  h4 {
+    margin: var(--space-3) 0 var(--space-2);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+
+  .facts { margin-top: 0; }
+
+  .facts dd { white-space: nowrap; }
+}
+
+
 .protein { background: var(--c-protein); }
 .carbs { background: var(--c-carbs); }
 .fat { background: var(--c-fat); }

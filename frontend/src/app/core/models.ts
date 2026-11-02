@@ -26,6 +26,8 @@ export interface DetectedFood {
   densidad_asumida?: boolean;
   /** `true` si el usuario fijó los gramos a mano. */
   peso_manual?: boolean;
+  /** Valores extendidos por 100 g (minerales, vitaminas, grasas). */
+  detalle?: Record<string, number>;
   /** Contorno de la zona segmentada, normalizado a 0..1 sobre la imagen. */
   poligono?: number[][];
   /** Centro de la zona segmentada, normalizado. */
@@ -94,6 +96,11 @@ export interface FoodLogCreated extends FoodLog {
   alimentos: DetectedFood[];
   /** Los strings sueltos vienen de un Modal antiguo que aún no emitía códigos. */
   advertencias: (string | PipelineWarning)[];
+}
+
+/** Detalle de un análisis guardado (GET /food-logs/:id/). */
+export interface FoodLogDetail extends FoodLog {
+  alimentos: DetectedFood[];
 }
 
 export interface Page<T> {

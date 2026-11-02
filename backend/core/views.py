@@ -17,6 +17,7 @@ from .r2 import R2NotConfigured, get_r2_client, user_prefix
 from .serializers import (
     ALLOWED_CONTENT_TYPES,
     FoodLogCreateSerializer,
+    FoodLogDetailSerializer,
     FoodLogEditSerializer,
     FoodLogSerializer,
     GoogleLoginSerializer,
@@ -208,9 +209,9 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
 
 
 class FoodLogDetailView(generics.RetrieveUpdateAPIView):
-    """PATCH: el usuario corrige el alimento y/o los gramos de un análisis guardado."""
+    """GET: detalle de un análisis (con alimentos). PATCH: correcciones del usuario."""
 
-    serializer_class = FoodLogSerializer
+    serializer_class = FoodLogDetailSerializer
     http_method_names = ["get", "patch"]
 
     def get_queryset(self):
@@ -239,10 +240,7 @@ class FoodLogDetailView(generics.RetrieveUpdateAPIView):
             "items", "volumen_estimado", "calorias_totales", "macronutrientes",
             "clases_detectadas", "contornos", "plate_diameter_cm",
         ])
-        return Response(
-            {**self.get_serializer(obj).data, "alimentos": food_items.alimentos_from_items(obj.items)}
-        )
-
+        return Response(self.get_serializer(obj).data)
 
 class FoodCatalogView(APIView):
     """GET: catálogo de alimentos para corregir una detección (búsqueda por nombre)."""

@@ -1,14 +1,78 @@
 import { DecimalPipe, DatePipe } from '@angular/common';
 import { Component, ElementRef, OnDestroy, computed, inject, signal, viewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { FoodLogService } from '../../core/food-log/food-log.service';
 import { ResultStore } from '../../core/food-log/result.store';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { CatalogFood, DetectedFood, PipelineWarning } from '../../core/models';
+import { MessageKey } from '../../core/i18n/messages';
 import { TILT_WARN_DEG } from '../../core/tilt.service';
 
 /** Diámetros de plato ofrecidos para reescalar sin reprocesar la foto. */
 const PLATE_SIZES_CM = [22, 26, 30] as const;
+
+/** Nutrientes extendidos, agrupados como en una etiqueta nutricional. */
+const NUTRIENT_GROUPS: {
+  key: string;
+  label: MessageKey;
+  rows: { code: string; label: MessageKey; unit: string }[];
+}[] = [
+  {
+    key: 'general',
+    label: 'nutrient.groupGeneral',
+    rows: [
+      { code: 'agua_g', label: 'nutrient.water', unit: 'g' },
+      { code: 'fibra_g', label: 'nutrient.fiber', unit: 'g' },
+      { code: 'azucares_g', label: 'nutrient.sugars', unit: 'g' },
+      { code: 'sodio_mg', label: 'nutrient.sodium', unit: 'mg' },
+    ],
+  },
+  {
+    key: 'fats',
+    label: 'nutrient.groupFats',
+    rows: [
+      { code: 'grasas_saturadas_g', label: 'nutrient.saturated', unit: 'g' },
+      { code: 'grasas_mono_g', label: 'nutrient.mono', unit: 'g' },
+      { code: 'grasas_poli_g', label: 'nutrient.poly', unit: 'g' },
+      { code: 'grasas_trans_g', label: 'nutrient.trans', unit: 'g' },
+      { code: 'colesterol_mg', label: 'nutrient.cholesterol', unit: 'mg' },
+    ],
+  },
+  {
+    key: 'minerals',
+    label: 'nutrient.groupMinerals',
+    rows: [
+      { code: 'calcio_mg', label: 'nutrient.calcium', unit: 'mg' },
+      { code: 'hierro_mg', label: 'nutrient.iron', unit: 'mg' },
+      { code: 'magnesio_mg', label: 'nutrient.magnesium', unit: 'mg' },
+      { code: 'fosforo_mg', label: 'nutrient.phosphorus', unit: 'mg' },
+      { code: 'potasio_mg', label: 'nutrient.potassium', unit: 'mg' },
+      { code: 'zinc_mg', label: 'nutrient.zinc', unit: 'mg' },
+      { code: 'cobre_mg', label: 'nutrient.copper', unit: 'mg' },
+      { code: 'manganeso_mg', label: 'nutrient.manganese', unit: 'mg' },
+      { code: 'selenio_ug', label: 'nutrient.selenium', unit: 'µg' },
+    ],
+  },
+  {
+    key: 'vitamins',
+    label: 'nutrient.groupVitamins',
+    rows: [
+      { code: 'vitamina_c_mg', label: 'nutrient.vitC', unit: 'mg' },
+      { code: 'tiamina_mg', label: 'nutrient.thiamin', unit: 'mg' },
+      { code: 'riboflavina_mg', label: 'nutrient.riboflavin', unit: 'mg' },
+      { code: 'niacina_mg', label: 'nutrient.niacin', unit: 'mg' },
+      { code: 'vitamina_b6_mg', label: 'nutrient.vitB6', unit: 'mg' },
+      { code: 'folato_ug', label: 'nutrient.folate', unit: 'µg' },
+      { code: 'colina_mg', label: 'nutrient.choline', unit: 'mg' },
+      { code: 'vitamina_b12_ug', label: 'nutrient.vitB12', unit: 'µg' },
+      { code: 'vitamina_a_ug', label: 'nutrient.vitA', unit: 'µg' },
+      { code: 'vitamina_d_ug', label: 'nutrient.vitD', unit: 'µg' },
+      { code: 'vitamina_e_mg', label: 'nutrient.vitE', unit: 'mg' },
+      { code: 'vitamina_k_ug', label: 'nutrient.vitK', unit: 'µg' },
+    ],
+  },
+];
 
 /** Zona segmentada lista para pintar sobre la foto. */
 interface RenderedSegment {
@@ -34,6 +98,10 @@ interface RenderedSegment {
   template: `
     @if (result(); as r) {
       <section class="page">
+        @if (fromHistory()) {
+          <a class="back-link" routerLink="/history">← {{ i18n.t('result.backHistory') }}</a>
+        }
+
         <figure class="photo" [style.aspect-ratio]="aspect()">
           @if (photo(); as src) {
             <img [src]="src" [attr.alt]="i18n.t('result.photoAlt')" (load)="onPhotoLoad($event)" />
@@ -160,19 +228,23 @@ interface RenderedSegment {
           </div>
 
           <!-- Detalle por alimento -->
-          <h2>{{ i18n.t('result.foods', { count: r.alimentos.length }) }}</h2>
-          <ul class="foods">
-            @for (f of r.alimentos; track $index) {
-              <li class="food-item" [style.--i]="$index">
-                <button type="button" class="food" (click)="openSheet(f, $index)">
-                  <span class="food-idx" aria-hidden="true">{{ $index + 1 }}</span>
-                  <span class="food-name">{{ foodName(f) }}</span>
-                  <span class="food-kcal">{{ f.nutricion.calorias_kcal | number: '1.0-0' }} kcal</span>
-                  <span class="chev" aria-hidden="true">›</span>
-                </button>
-              </li>
-            }
-          </ul>
+          @if (r.alimentos.length) {
+            <h2>{{ i18n.t('result.foods', { count: r.alimentos.length }) }}</h2>
+            <ul class="foods">
+              @for (f of r.alimentos; track $index) {
+                <li class="food-item" [style.--i]="$index">
+                  <button type="button" class="food" (click)="openSheet(f, $index)">
+                    <span class="food-idx" aria-hidden="true">{{ $index + 1 }}</span>
+                    <span class="food-name">{{ foodName(f) }}</span>
+                    <span class="food-kcal">{{ f.nutricion.calorias_kcal | number: '1.0-0' }} kcal</span>
+                    <span class="chev" aria-hidden="true">›</span>
+                  </button>
+                </li>
+              }
+            </ul>
+          } @else if (r.contornos.length) {
+            <p class="note">{{ i18n.t('result.oldScan') }}</p>
+          }
 
           @for (w of otherWarnings(); track $index) {
             <p class="note">ℹ️ {{ warningText(w) }}</p>
@@ -253,6 +325,24 @@ interface RenderedSegment {
                 } @else {
                   <p class="note">{{ i18n.t('result.sheetNoPer100') }}</p>
                 }
+
+                @if (nutrientGroups(f).length) {
+                  <details class="nutrients">
+                    <summary>{{ i18n.t('result.allNutrients') }}</summary>
+                    @for (group of nutrientGroups(f); track group.key) {
+                      <h4>{{ i18n.t(group.label) }}</h4>
+                      <dl class="facts facts--muted">
+                        @for (row of group.rows; track row.code) {
+                          <div>
+                            <dt>{{ i18n.t(row.label) }}</dt>
+                            <dd>{{ row.value | number: '1.0-2' }} {{ row.unit }}</dd>
+                          </div>
+                        }
+                      </dl>
+                    }
+                    <p class="note">{{ i18n.t('result.per100Note') }}</p>
+                  </details>
+                }
               </section>
 
               <dl class="meta">
@@ -329,6 +419,16 @@ interface RenderedSegment {
           }
         </dialog>
       </section>
+    } @else if (loading()) {
+      <section class="page empty">
+        <span class="spinner" aria-hidden="true"></span>
+        <p class="muted">{{ i18n.t('result.loading') }}</p>
+      </section>
+    } @else if (notFound()) {
+      <section class="page empty">
+        <p class="muted">{{ i18n.t('result.notFound') }}</p>
+        <a class="btn btn--primary" routerLink="/history">{{ i18n.t('result.backHistory') }}</a>
+      </section>
     } @else {
       <section class="page empty">
         <p class="muted">{{ i18n.t('result.emptyTitle') }}</p>
@@ -341,6 +441,7 @@ interface RenderedSegment {
 export class Result implements OnDestroy {
   private readonly store = inject(ResultStore);
   private readonly logs = inject(FoodLogService);
+  private readonly route = inject(ActivatedRoute);
   protected readonly i18n = inject(I18nService);
   protected readonly result = this.store.result;
 
@@ -351,7 +452,26 @@ export class Result implements OnDestroy {
   protected readonly editError = signal<'result.editError' | 'result.editRange' | null>(null);
   protected readonly searchResults = signal<CatalogFood[]>([]);
   protected readonly searching = signal(false);
+  /** Cargando un análisis del historial (/result/:id) o no encontrado. */
+  protected readonly loading = signal(false);
+  protected readonly notFound = signal(false);
+  protected readonly fromHistory = signal(false);
   private searchTimer?: ReturnType<typeof setTimeout>;
+  private loadSub?: Subscription;
+
+  constructor() {
+    // /result/:id abre un análisis guardado (desde el historial); /result llega del store en
+    // memoria que acaba de rellenar la captura.
+    this.loadSub = this.route.paramMap.subscribe((params) => {
+      const raw = params.get('id');
+      if (!raw) {
+        this.fromHistory.set(false);
+        return;
+      }
+      this.fromHistory.set(true);
+      this.load(Number(raw));
+    });
+  }
 
   /** Proporción real de la foto, para que el contorno y la imagen coincidan exactamente. */
   protected readonly aspect = signal<string | null>(null);
@@ -489,6 +609,22 @@ export class Result implements OnDestroy {
     return this.pretty(raw);
   }
 
+  /** Nutrientes del alimento agrupados, omitiendo los que la tabla no trae. */
+  protected nutrientGroups(food: DetectedFood): {
+    key: string;
+    label: MessageKey;
+    rows: { code: string; label: MessageKey; unit: string; value: number }[];
+  }[] {
+    const detail = food.detalle ?? {};
+    return NUTRIENT_GROUPS.map((group) => ({
+      key: group.key,
+      label: group.label,
+      rows: group.rows
+        .filter((row) => detail[row.code] != null)
+        .map((row) => ({ ...row, value: detail[row.code] })),
+    })).filter((group) => group.rows.length > 0);
+  }
+
   protected openSheet(food: DetectedFood, index: number): void {
     this.selected.set(food);
     this.selectedIndex.set(index);
@@ -573,6 +709,23 @@ export class Result implements OnDestroy {
 
   ngOnDestroy(): void {
     if (this.searchTimer !== undefined) clearTimeout(this.searchTimer);
+    this.loadSub?.unsubscribe();
+  }
+
+  private load(id: number): void {
+    this.loading.set(true);
+    this.notFound.set(false);
+    this.logs.get(id).subscribe({
+      next: (detail) => {
+        // El servidor no guarda los avisos del pipeline; la ficha funciona igual sin ellos.
+        this.store.set({ ...detail, advertencias: [] }, null);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.notFound.set(true);
+      },
+    });
   }
 }
 

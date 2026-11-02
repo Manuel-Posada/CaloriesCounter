@@ -2,7 +2,7 @@ import { HttpClient, HttpEventType, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, concat, filter, map, of, startWith, switchMap, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CatalogFood, FoodLog, FoodLogCreated, Page, PresignResponse } from '../models';import { PreferencesService } from '../preferences.service';
+import { CatalogFood, FoodLog, FoodLogCreated, FoodLogDetail, Page, PresignResponse } from '../models';import { PreferencesService } from '../preferences.service';
 import { PipelineService } from './pipeline.service';
 
 export type AnalyzeEvent =
@@ -72,6 +72,11 @@ export class FoodLogService {
 
   list(page = 1): Observable<Page<FoodLog>> {
     return this.http.get<Page<FoodLog>>(`${this.api}/food-logs/`, { params: new HttpParams().set('page', page) });
+  }
+
+  /** Detalle de un análisis guardado (con los alimentos y su tabla nutricional). */
+  get(id: number): Observable<FoodLogDetail> {
+    return this.http.get<FoodLogDetail>(`${this.api}/food-logs/${id}/`);
   }
 
   /** Corrección del usuario: alimento y/o gramos de un item, o el diámetro del plato. */

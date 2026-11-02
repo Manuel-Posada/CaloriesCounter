@@ -13,6 +13,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', loadComponent: () => import('./features/capture/capture').then((m) => m.Capture) },
       { path: 'result', loadComponent: () => import('./features/result/result').then((m) => m.Result) },
+      { path: 'result/:id', loadComponent: () => import('./features/result/result').then((m) => m.Result) },
       { path: 'history', loadComponent: () => import('./features/history/history').then((m) => m.History) },
       { path: 'profile', loadComponent: () => import('./features/profile/profile').then((m) => m.Profile) },
       { path: 'settings', loadComponent: () => import('./features/settings/settings').then((m) => m.Settings) },
