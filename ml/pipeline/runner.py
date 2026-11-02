@@ -6,9 +6,18 @@ from typing import Callable
 import numpy as np
 from PIL import Image
 
-from .config import MIN_MASK_AREA_FRAC, TILT_WARN_DEG
+from .config import (
+    MIN_MASK_AREA_FRAC,
+    PLATE_DIAMETER_CM,
+    PLATE_FALLBACK_DISTANCE_CM,
+    PLATE_FALLBACK_TRIGGER_CM,
+    PLATE_SCALE_MAX,
+    PLATE_SCALE_MIN,
+    TILT_WARN_DEG,
+)
 from .nutrition import NutritionTable
 from .overlay import mask_centroid, mask_to_polygon
+from .plate import detect_plate, resolve_depth_scale
 from .types import Segment
 from .volume import camera_tilt_deg, estimate_volume_cm3, resolve_focal_px
 
@@ -63,6 +72,25 @@ class FoodPipeline:
             focal_px = resolve_focal_px(image.width, image.height, fov_deg, f35_mm)
             food_union = np.logical_or.reduce([s.mask for s in segments])
 
+            # La profundidad monocular se queda corta en primeros planos: se reescala con el
+            # diámetro del plato antes de medir nada.
+            plate = detect_plate(image, food_union)
+            scale, scale_source = resolve_depth_scale(
+                depth_m,
+                plate,
+                focal_px,
+                diameter_cm=PLATE_DIAMETER_CM,
+                k_min=PLATE_SCALE_MIN,
+                k_max=PLATE_SCALE_MAX,
+                fallback_trigger_cm=PLATE_FALLBACK_TRIGGER_CM,
+                fallback_distance_cm=PLATE_FALLBACK_DISTANCE_CM,
+            )
+            if scale != 1.0:
+                depth_m = (depth_m * scale).astype(np.float32)
+            log.info("escala de profundidad x%.3f (%s)", scale, scale_source)
+            if scale_source != "plate":
+                warnings.append({"code": "no_plate_reference"})
+
             for s in segments:
                 if s.class_idx not in self.nutrition:
                     warnings.append({"code": "class_missing", "params": {"idx": s.class_idx}})
@@ -95,6 +123,9 @@ class FoodPipeline:
                         },
                         "debug_volumen": {
                             "plano": vol.plane_source,
+                            "escala": round(scale, 3),
+                            "escala_origen": scale_source,
+                            "area_frac": round(float(s.mask.mean()), 4),
                             "altura_media_cm": round(vol.mean_height_cm, 2),
                             "altura_max_cm": round(vol.max_height_cm, 2),
                             "saturado_frac": round(vol.saturated_frac, 3),

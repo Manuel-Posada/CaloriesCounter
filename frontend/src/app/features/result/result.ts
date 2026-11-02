@@ -75,6 +75,16 @@ interface RenderedSegment {
 
         <div class="results-panel">
           <!-- Aviso de foto no cenital: el volumen puede estar sobreestimado -->
+          @if (scaleWarning()) {
+            <aside class="card tilt-warn" role="status">
+              <span class="icon" aria-hidden="true">📏</span>
+              <div>
+                <strong>{{ i18n.t('result.scaleTitle') }}</strong>
+                <p>{{ i18n.t('result.scaleBody') }}</p>
+              </div>
+            </aside>
+          }
+
           @if (tiltWarning(); as t) {
             <aside class="card tilt-warn" role="status">
               <span class="icon" aria-hidden="true">📐</span>
@@ -341,7 +351,19 @@ export class Result {
    */
   protected readonly otherWarnings = computed(() =>
     (this.store.result()?.advertencias ?? []).filter((w) =>
-      typeof w === 'string' ? !w.includes('poco cenital') : w.code !== 'tilt',
+      typeof w === 'string'
+        ? !w.includes('poco cenital')
+        : w.code !== 'tilt' && w.code !== 'no_plate_reference',
+    ),
+  );
+
+  /**
+   * Sin borde de plato no hay escala: el volumen que da el modelo de profundidad en primeros
+   * planos puede estar muy desviado, así que se avisa arriba, no en la letra pequeña.
+   */
+  protected readonly scaleWarning = computed(() =>
+    (this.store.result()?.advertencias ?? []).some(
+      (w) => typeof w !== 'string' && w.code === 'no_plate_reference',
     ),
   );
 

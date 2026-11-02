@@ -90,6 +90,9 @@ export const ES = {
   'result.tiltBody':
     'El volumen y las calorías pueden estar sobreestimados. Repite la foto con la cámara guiada para afinarlos.',
   'result.centered': 'Cenital · {deg}°',
+  'result.scaleTitle': 'Cantidades orientativas',
+  'result.scaleBody':
+    'No reconocimos el borde del plato, que es lo que nos da la escala. Repite la foto desde arriba con el plato completo en el encuadre para medirlas bien.',
   'result.kcalTotal': 'kcal totales',
   'result.splitLabel': 'Energía: {p}% proteínas, {c}% carbohidratos, {f}% grasas',
   'result.protein': 'Proteínas',
@@ -285,6 +288,9 @@ export const EN: Record<MessageKey, string> = {
   'result.tiltBody':
     'Volume and calories may be overestimated. Retake it with the guided camera to refine them.',
   'result.centered': 'Top-down · {deg}°',
+  'result.scaleTitle': 'Indicative amounts',
+  'result.scaleBody':
+    'We could not detect the plate rim, which is what gives us the scale. Retake the photo from above with the whole plate in frame for a better measurement.',
   'result.kcalTotal': 'total kcal',
   'result.splitLabel': 'Energy: {p}% protein, {c}% carbs, {f}% fat',
   'result.protein': 'Protein',

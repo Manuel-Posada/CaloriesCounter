@@ -164,6 +164,34 @@ focal es lo que más afecta al volumen, la captura lee `FocalLengthIn35mmFilm` d
 
 Prioridad del pipeline para la focal (`resolve_focal_px`): `fov_deg` explícito > `f35_mm` > 65°.
 
+### Escala: el plato como referencia
+
+El modelo de profundidad (Depth Anything V2 métrico) **no es fiable en primeros planos**: una foto de
+plato tomada a 30 cm la sitúa a 1,5 m. Como el volumen va con la distancia al cubo, el error se
+multiplica (~130×) y 300 g de comida salían como 57 litros / 120 000 kcal.
+
+El plato es el único objeto de tamaño conocido de la escena, así que `pipeline/plate.py` detecta su
+borde (Hough + validación: el círculo tiene que ser grande y contener toda la comida) y recalcula la
+distancia real con geometría pinhole:
+
+```
+z_cm = f_px · PLATE_DIAMETER_CM / diámetro_plato_px
+```
+
+Ese factor corrige toda la profundidad antes de medir. Diámetro asumido: **26 cm**
+(`PLATE_DIAMETER_CM`). Validación con una foto de pesos conocidos (34 g plátano + 163 g cerdo +
+105 g papa):
+
+| | Antes | Con el plato | Real |
+|---|---|---|---|
+| Peso total | 45 kg | 305 g | 302 g |
+| Volumen | 57 L | 390 cm³ | ~0,3 L |
+
+Si no se detecta el plato se aplica una distancia de foto de plato (35 cm) cuando el modelo dice que
+la mesa está a más de 80 cm, y el resultado se marca como **«Cantidades orientativas»** en la
+pantalla de resultados: sin referencia, el volumen sigue siendo poco fiable.
+
+
 - Si el formato no expone EXIF (PNG, captura de pantalla, HEIC sin metadatos), no se envía nada y se
   usa el FOV de Configuración o el valor por defecto.
 - `modal_app.predict()` acepta `f35_mm`, pero si el fichero que llega trae EXIF, **manda el del

@@ -41,6 +41,19 @@ MIN_MASK_AREA_FRAC = 0.001  # descarta máscaras < 0.1 % de la imagen
 DEFAULT_HFOV_DEG = 65.0  # si no hay EXIF ni fov_deg del cliente
 MAX_FOOD_HEIGHT_CM = 20.0
 
+# Escala. La profundidad monocular sobreestima la distancia en primeros planos (una foto de
+# plato a 30-40 cm la sitúa a 1,5 m), así que el volumen se dispara. El plato es la
+# referencia de tamaño: con su borde detectado se recalcula la distancia real.
+PLATE_DIAMETER_CM = float(os.environ.get("PLATE_DIAMETER_CM", "26.0"))
+# Corrección admisible. Fuera de este rango se considera que el plato detectado no es el
+# plato (un aro del mantel, un reflejo) y no se corrige.
+PLATE_SCALE_MIN = 0.05
+PLATE_SCALE_MAX = 1.6
+# Sin plato: si el modelo sitúa la mesa más allá de esto, es el sesgo típico de primer plano
+# y se acota a una distancia de foto de plato (con aviso al usuario).
+PLATE_FALLBACK_TRIGGER_CM = 80.0
+PLATE_FALLBACK_DISTANCE_CM = 35.0
+
 # Inclinación de cámara (respecto a la vertical) a partir de la cual se avisa de que la foto
 # no es cenital. A ≤8° apunta el modo guiado; a partir de 15° el volumen empieza a desviarse.
 TILT_WARN_DEG = float(os.environ.get("TILT_WARN_DEG", 15.0))
