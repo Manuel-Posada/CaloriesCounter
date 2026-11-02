@@ -78,7 +78,8 @@ no hay sensor de inclinación).
 - [x] Nivel de confianza (alta/media/baja) con sus motivos, recalculado al corregir
 - [x] Aviso «?» en los alimentos que el clasificador no tenía claros
 - [x] Aro direccional: cada lado se abre por el lado bajo (ejes de inclinación y balanceo)
-- [x] Guía clásica de nivel (cruz, círculo, burbuja y grados) opcional en Configuración → Cámara
+- [x] El obturador es el nivel: burbuja que se desplaza y crece al centrarse
+- [x] Guía clásica opcional dentro del obturador (cruz y grados), sin recuadro
 - [x] Topes de cordura del pipeline (altura media y peso total) con el aviso `volume_clamped`
 
 ## Sesión (2026-11)

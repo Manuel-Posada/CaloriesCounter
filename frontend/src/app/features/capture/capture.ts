@@ -10,7 +10,6 @@ import { MessageKey } from '../../core/i18n/messages';
 import { compressImage } from '../../core/image.util';
 import { TiltService } from '../../core/tilt.service';
 import { PreferencesService } from '../../core/preferences.service';
-import { LevelGauge } from './level-gauge';
 
 type Step = 'presign' | 'upload' | 'infer';
 type Mode = 'idle' | 'camera' | 'working';
@@ -45,7 +44,7 @@ const ARC_FULL_DEG = 30;
 
 @Component({
   selector: 'app-capture',
-  imports: [LevelGauge],
+  imports: [],
   template: `
     <section
       class="page capture"
@@ -137,18 +136,6 @@ const ARC_FULL_DEG = 30;
             <span class="arc arc--bl"></span>
           </div>
 
-          @if (prefs.bubbleLevel()) {
-            <app-level-gauge
-              class="classic-gauge"
-              [tilt]="tilt.tilt()"
-              [beta]="tilt.beta()"
-              [gamma]="tilt.gamma()"
-              [bubble]="tilt.bubble()"
-              [level]="isLevel()"
-              [exitDeg]="prefs.levelExit()"
-            />
-          }
-
           @if (isCounting() && countdown() > 0) {
             <div class="countdown" aria-live="assertive">
               <span class="countdown__num">{{ countdown() }}</span>
@@ -166,17 +153,33 @@ const ARC_FULL_DEG = 30;
           <div class="camera-bar">
             <span class="camera-bar__spacer" aria-hidden="true"></span>
 
-            <button
-              type="button"
-              class="shutter"
-              [class.shutter--ready]="canShoot()"
-              [class.shutter--counting]="isCounting()"
-              [disabled]="isCounting()"
-              [attr.aria-label]="canShoot() ? i18n.t('capture.shoot') : i18n.t('capture.shootDisabled')"
-              (click)="triggerCapture()"
-            >
-              <span class="shutter__dot"></span>
-            </button>
+            <div class="shutter-box">
+              <button
+                type="button"
+                class="shutter"
+                [class.shutter--ready]="canShoot()"
+                [class.shutter--counting]="isCounting()"
+                [disabled]="isCounting()"
+                [attr.aria-label]="canShoot() ? i18n.t('capture.shoot') : i18n.t('capture.shootDisabled')"
+                (click)="triggerCapture()"
+              >
+                @if (prefs.bubbleLevel()) {
+                  <span class="shutter__cross" aria-hidden="true"></span>
+                }
+                <span class="shutter__bubble" [style.transform]="bubbleStyle()"></span>
+              </button>
+
+              @if (prefs.bubbleLevel()) {
+                <div class="shutter-readout" [class.shutter-readout--ok]="isLevel()" aria-hidden="true">
+                  @if (tilt.tilt() !== null) {
+                    <strong>{{ levelDegrees() }}°</strong>
+                  }
+                  @if (levelHint(); as hint) {
+                    <span>{{ i18n.t(hint) }}</span>
+                  }
+                </div>
+              }
+            </div>
 
             <label class="gallery-btn" [attr.aria-label]="i18n.t('capture.gallery')">
               <input class="sr-only" type="file" accept="image/*" (change)="onFile($event)" />
@@ -296,6 +299,37 @@ export class Capture implements OnDestroy {
 
     // bubble.y < 0: el borde superior está alto (el bajo es el de abajo), y viceversa.
     return { up: open(y), down: open(-y), left: open(x), right: open(-x) };
+  });
+
+  /**
+   * Burbuja del obturador: se desplaza hacia el lado alto y crece al centrarse, así que el
+   * propio botón hace de nivel sin ocupar más pantalla.
+   */
+  protected readonly bubbleStyle = computed(() => {
+    const tilt = this.tilt.tilt();
+    const { x, y } = this.tilt.bubble();
+    const magnitude = Math.hypot(x, y);
+    const k = Math.min(1, magnitude / 25);
+    const angle = magnitude > 0 ? Math.atan2(y, x) : 0;
+    const px = Math.cos(angle) * k * 9;
+    const py = Math.sin(angle) * k * 9;
+    // 1.2 cuando está centrada; 0.7 cuando va muy torcida (o sin lectura).
+    const scale = tilt === null ? 0.85 : 1.2 - 0.5 * Math.min(1, tilt / 20);
+    return `translate(-50%, -50%) translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) scale(${scale.toFixed(2)})`;
+  });
+
+  protected readonly levelDegrees = computed(() => Math.round(this.tilt.tilt() ?? 0));
+
+  /** Instrucción de la guía clásica: se corrige primero el eje más desviado. */
+  protected readonly levelHint = computed<MessageKey | null>(() => {
+    if (this.tilt.tilt() === null) return null;
+    if (this.isLevel()) return 'gauge.perfect';
+    const beta = this.tilt.beta() ?? 0;
+    const gamma = this.tilt.gamma() ?? 0;
+    if (Math.abs(beta) >= Math.abs(gamma)) {
+      return beta > 0 ? 'gauge.lowerBottom' : 'gauge.lowerTop';
+    }
+    return gamma > 0 ? 'gauge.lowerRight' : 'gauge.lowerLeft';
   });
 
   constructor() {

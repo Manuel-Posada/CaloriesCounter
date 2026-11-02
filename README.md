@@ -128,8 +128,12 @@ no se concede el permiso, cae a la guía estática y a la cámara del sistema.
 El aro está partido en cuatro arcos y **cada lado se abre por el lado bajo**, que es el que hay que
 levantar: los arcos de arriba/abajo siguen el eje de inclinación y los de izquierda/derecha el de
 balanceo (usando `bubble`, que ya viene rotado con la pantalla). Así se ve de un vistazo qué eje
-corregir. La guía clásica (cruz, círculo, burbuja y grados) sigue disponible como opción en
-**Configuración → Cámara → Guía de nivel clásica**, y se pinta encima del visor con `app-level-gauge`.
+corregir.
+
+El propio **obturador es el nivel**: su burbuja se desplaza hacia el lado alto y crece al centrarse
+(de 0,7× a 1,2×), así que no hace falta mirar a otro sitio. La guía clásica es opcional en
+**Configuración → Cámara → Guía de nivel clásica** y añade la cruz y los grados dentro del botón
+(«23°», «Levanta el borde inferior»), sin recuadro ni fondo.
 
 ### Aviso de foto no cenital
 

@@ -242,7 +242,7 @@ export const ES = {
     'Dispara solo cuando el móvil se mantiene nivelado medio segundo. Si está desactivado, pulsas tú el obturador.',
   'settings.classicLevel': 'Guía de nivel clásica',
   'settings.classicLevelHint':
-    'Muestra la cruz con el círculo de alineación y los grados sobre la cámara, además del aro que se abre por el lado que hay que levantar.',
+    'Añade la cruz y los grados dentro del obturador, y te dice qué borde levantar. Sin recuadro: todo pasa en el botón.',
   'settings.language': 'Idioma',
   'settings.languageHint': 'Se aplica a toda la app y al consejo nutricional.',
   'settings.notices': 'Avisos',
@@ -514,7 +514,7 @@ export const EN: Record<MessageKey, string> = {
     'Shoots by itself when the phone stays level for half a second. If off, you press the shutter.',
   'settings.classicLevel': 'Classic level guide',
   'settings.classicLevelHint':
-    'Shows the crosshair with the alignment circle and degrees over the camera, in addition to the ring that opens on the side to lift.',
+    'Adds the crosshair and degrees inside the shutter, and tells you which edge to lift. No card: everything happens in the button.',
   'settings.language': 'Language',
   'settings.languageHint': 'Applies to the whole app and to the nutrition advice.',
   'settings.notices': 'Reminders',
