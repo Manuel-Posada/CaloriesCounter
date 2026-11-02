@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, catchError, finalize, map, of, shareReplay, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PipelineService } from '../food-log/pipeline.service';
+import { I18nService } from '../i18n/i18n.service';
 import { TokenPair, UserProfile } from '../models';
 
 const ACCESS_KEY = 'cc.access';
@@ -19,6 +20,7 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly zone = inject(NgZone);
   private readonly pipelines = inject(PipelineService);
+  private readonly i18n = inject(I18nService);
 
   private readonly access = signal<string | null>(localStorage.getItem(ACCESS_KEY));
   private readonly refreshToken = signal<string | null>(localStorage.getItem(REFRESH_KEY));
@@ -176,7 +178,8 @@ export class AuthService {
     if (typeof google !== 'undefined' && google.accounts?.id) return Promise.resolve();
     return new Promise((resolve, reject) => {
       const s = document.createElement('script');
-      s.src = GIS_SRC;
+      // `hl` fija el idioma del botón oficial de Google.
+      s.src = `${GIS_SRC}?hl=${this.i18n.locale()}`;
       s.async = true;
       s.onload = () => resolve();
       s.onerror = () => reject(new Error('No se pudo cargar Google Identity Services'));
