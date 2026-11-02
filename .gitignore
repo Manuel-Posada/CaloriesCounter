@@ -1,0 +1,31 @@
+# Entorno y secretos
+.env
+.venv/
+.venv_test/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Pesos de los modelos: van al Volume de Modal, no a Git (159-181 MB cada uno)
+*.pt
+*.pth
+*.onnx
+*.safetensors
+
+# Frontend
+node_modules/
+dist/
+.angular/
+*.log
+
+# Django
+staticfiles/
+media/
+*.sqlite3
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
