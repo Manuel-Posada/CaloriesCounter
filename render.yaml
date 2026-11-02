@@ -1,0 +1,66 @@
+# Blueprint de Render: backend Django de CaloriesCounter.
+#
+# 1. https://dashboard.render.com → New → Blueprint → elige este repo.
+# 2. Rellena las variables marcadas con `sync: false` (están en backend/.env).
+# 3. Al terminar, la API queda en https://caloriescounter-api.onrender.com
+#
+# La inferencia (GPU) sigue en Modal; aquí solo corre Django.
+services:
+  - type: web
+    name: caloriescounter-api
+    runtime: python
+    plan: free
+    region: virginia # la más cercana a Neon (us-east-2) y a la GPU de Modal (us-east)
+    rootDir: backend
+    # collectstatic necesita importar settings, que exige DJANGO_SECRET_KEY.
+    buildCommand: pip install -r requirements.txt && DJANGO_SECRET_KEY=build-only python manage.py collectstatic --noinput
+    # El timeout de gunicorn tiene que superar la latencia de la inferencia (hasta ~2 min en frío).
+    startCommand: python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 180
+    healthCheckPath: /health
+    autoDeploy: true
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "caloriescounter-api.onrender.com,api.caloriescounter.app"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://caloriescounter.app,https://www.caloriescounter.app"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://caloriescounter.app,https://www.caloriescounter.app,https://caloriescounter-api.onrender.com,https://api.caloriescounter.app"
+      - key: FOOD_LOG_RETENTION_DAYS
+        value: "30"
+
+      # --- Secretos: se pegan en el dashboard (sync: false) ---
+      - key: DATABASE_URL
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false
+      - key: MODAL_ENDPOINT_URL
+        sync: false
+      - key: MODAL_SHARED_SECRET
+        sync: false
+      - key: MODAL_TIMEOUT
+        value: "180"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-flash-lite-latest
+
+      # --- Cloudflare R2 ---
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET_NAME
+        sync: false
+      - key: R2_PRESIGN_EXPIRES
+        value: "300"
+      - key: R2_RETENTION_HOURS
+        value: "72"

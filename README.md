@@ -251,5 +251,31 @@ Usa `HttpClientModule`/`provideHttpClient()` de `@angular/common/http` (ya inclu
 
 ## 3. Archivo de requirements
 
-Ver [backend/requirements.txt](backend/requirements.txt): Django, djangorestframework, django-cors-headers, psycopg (v3), python-decouple, gunicorn.
+Ver [backend/requirements.txt](backend/requirements.txt): Django, djangorestframework, django-cors-headers, psycopg (v3), python-decouple, gunicorn, dj-database-url y whitenoise.
+
+## 4. Despliegue en producción
+
+Arquitectura: **Vercel** (Angular) → **Render** (Django) → **Modal** (inferencia GPU) + **Neon** (Postgres) + **Cloudflare R2** (imágenes).
+
+| Pieza | Dónde | Dominio | Config |
+|---|---|---|---|
+| Frontend | Vercel | `caloriescounter.app` / `www` | `frontend/vercel.json` |
+| API Django | Render (free) | `caloriescounter-api.onrender.com` | `render.yaml` en la raíz |
+| Inferencia | Modal GPU | `…calories-counter-inference-…modal.run` | `ml/modal_app.py` |
+| Base de datos | Neon (free) | — | `DATABASE_URL` |
+| Imágenes | Cloudflare R2 | — | `R2_*` |
+
+- **Vercel** despliega automáticamente cada push a `main` (y crea previews por PR).
+- **Render** también re-despliega desde `main`; el blueprint está en [`render.yaml`](render.yaml) y las variables marcadas con `sync: false` se pegan una vez en el dashboard.
+- **Modal** solo se toca cuando cambia el pipeline: `cd ml && modal deploy modal_app.py`.
+- `backend/modal_app.py` queda como alternativa (Django en Modal) pero en producción el API vive en Render.
+
+DNS (Cloudflare, registros **DNS only**):
+
+```
+A      @    76.76.21.21            → Vercel
+CNAME  www  cname.vercel-dns.com   → Vercel
+```
+
+Falta un registro más si se quiere el API en un subdominio propio (`api.caloriescounter.app` → CNAME del servicio de Render).
 
