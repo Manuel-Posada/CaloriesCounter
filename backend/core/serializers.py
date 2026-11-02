@@ -53,11 +53,30 @@ class FoodLogCreateSerializer(serializers.Serializer):
         return value
 
 
+class FoodLogEditSerializer(serializers.Serializer):
+    """Body del PATCH: correcciones del usuario sobre un análisis ya guardado."""
+
+    items = serializers.ListField(child=serializers.DictField(), required=False)
+    plate_diameter_cm = serializers.FloatField(required=False, min_value=15, max_value=40)
+
+    def validate_items(self, value):
+        for edit in value:
+            if "index" not in edit:
+                raise serializers.ValidationError("Cada corrección necesita 'index'.")
+            if "idx" not in edit and "peso_g" not in edit:
+                raise serializers.ValidationError(
+                    "Cada corrección necesita 'idx' (alimento) o 'peso_g' (gramos)."
+                )
+        return value
+
+
 class FoodLogSerializer(serializers.ModelSerializer):
     imagen_url = serializers.SerializerMethodField()
     clases_detectadas = serializers.ListField(child=serializers.IntegerField(min_value=0))
     volumen_estimado = serializers.FloatField(min_value=0)
     calorias_totales = serializers.FloatField(min_value=0)
+    peso_total = serializers.SerializerMethodField()
+    editable = serializers.SerializerMethodField()
 
     class Meta:
         model = FoodLog
@@ -69,13 +88,23 @@ class FoodLogSerializer(serializers.ModelSerializer):
             "clases_detectadas",
             "volumen_estimado",
             "calorias_totales",
+            "peso_total",
             "macronutrientes",
             "consejo_nutricional",
             "angulo_camara_deg",
             "contornos",
+            "plate_diameter_cm",
+            "escala_origen",
+            "editable",
             "imagen_eliminada_en",
         ]
         read_only_fields = ["id", "fecha_hora", "imagen_eliminada_en"]
+
+    def get_peso_total(self, obj):
+        return round(sum(float(i.get("peso_g") or 0) for i in obj.items or []), 2)
+
+    def get_editable(self, obj):
+        return bool(obj.items)
 
     def get_imagen_url(self, obj):
         """URL prefirmada de lectura (1 h) mientras la imagen siga en R2; None si ya expiró."""

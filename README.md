@@ -191,6 +191,23 @@ Si no se detecta el plato se aplica una distancia de foto de plato (35 cm) cuand
 la mesa está a más de 80 cm, y el resultado se marca como **«Cantidades orientativas»** en la
 pantalla de resultados: sin referencia, el volumen sigue siendo poco fiable.
 
+### Correcciones del usuario
+
+El detalle por alimento se guarda en `FoodLog.items` (JSON) y los totales del registro son siempre
+su suma, así que ninguna edición escribe números a mano:
+
+- `PATCH /api/food-logs/<id>/` con `{"items": [{"index": 0, "idx": 205}]}` cambia el alimento (el
+  peso sale del volumen medido × la densidad nueva) y `{"index": 0, "peso_g": 163}` fija los gramos
+  (y ajusta el volumen).
+- `{"plate_diameter_cm": 30}` reescala el análisis entero: el volumen va con el diámetro al cubo, así
+  que un plato de 30 cm en vez de 26 multiplica por 1,54 **sin reprocesar la foto**. Los elementos
+  con gramos puestos a mano no se tocan.
+- `GET /api/foods/?q=` busca en las 323 clases (sin tildes y con sinónimos: `papa` → `patata`).
+
+El catálogo vive en `backend/core/data/nutrition_catalog.csv`, generado desde el CSV del pipeline
+con las columnas que hacen falta para recalcular (kcal y macros por 100 g + densidad).
+
+
 
 - Si el formato no expone EXIF (PNG, captura de pantalla, HEIC sin metadatos), no se envía nada y se
   usa el FOV de Configuración o el valor por defecto.

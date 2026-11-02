@@ -208,6 +208,121 @@
   }
 }
 
+/* Peso total y tamaño del plato (el plato reescala el análisis sin reprocesar la foto). */
+.grams-total {
+  margin: calc(var(--space-2) * -1) 0 0;
+  color: var(--c-muted);
+  font-size: 0.9rem;
+}
+
+.plate-size {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+
+  &__label {
+    color: var(--c-muted);
+    font-size: 0.85rem;
+  }
+
+  &__btn {
+    padding: 4px 12px;
+    border: 1px solid var(--c-border);
+    border-radius: 99px;
+    background: transparent;
+    color: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:disabled { opacity: 0.5; cursor: progress; }
+
+    &.is-active {
+      border-color: var(--c-primary);
+      background: var(--c-primary-soft, var(--c-border));
+      color: var(--c-primary);
+      font-weight: 600;
+    }
+  }
+}
+
+/* Corrección del alimento y los gramos, dentro de la hoja de detalle. */
+.edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--c-border);
+
+  &-grams {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.9rem;
+    color: var(--c-muted);
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 12px;
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-sm);
+      background: var(--c-surface, transparent);
+      color: inherit;
+      font-size: 1rem;
+    }
+  }
+
+  &-search {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-size: 0.9rem;
+    color: var(--c-muted);
+
+    input {
+      padding: 8px 12px;
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-sm);
+      background: var(--c-surface, transparent);
+      color: inherit;
+      font-size: 1rem;
+    }
+  }
+}
+
+.search-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+
+  button {
+    display: flex;
+    width: 100%;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: 10px 12px;
+    border: 0;
+    border-bottom: 1px solid var(--c-border);
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    span { color: var(--c-muted); font-size: 0.8rem; white-space: nowrap; }
+    &:hover, &:focus-visible { background: var(--c-primary-soft, rgba(0, 0, 0, 0.04)); }
+  }
+
+  li:last-child button { border-bottom: 0; }
+}
+
+.note--error { color: var(--c-danger, #b3261e); }
+
 .protein { background: var(--c-protein); }
 .carbs { background: var(--c-carbs); }
 .fat { background: var(--c-fat); }

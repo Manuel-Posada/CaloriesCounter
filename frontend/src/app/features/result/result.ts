@@ -1,10 +1,14 @@
 import { DecimalPipe, DatePipe } from '@angular/common';
-import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { FoodLogService } from '../../core/food-log/food-log.service';
 import { ResultStore } from '../../core/food-log/result.store';
 import { I18nService } from '../../core/i18n/i18n.service';
-import { DetectedFood, PipelineWarning } from '../../core/models';
+import { CatalogFood, DetectedFood, PipelineWarning } from '../../core/models';
 import { TILT_WARN_DEG } from '../../core/tilt.service';
+
+/** Diámetros de plato ofrecidos para reescalar sin reprocesar la foto. */
+const PLATE_SIZES_CM = [22, 26, 30] as const;
 
 /** Zona segmentada lista para pintar sobre la foto. */
 interface RenderedSegment {
@@ -109,6 +113,29 @@ interface RenderedSegment {
               <strong>{{ r.calorias_totales | number: '1.0-0' }}</strong>
               <span>{{ i18n.t('result.kcalTotal') }}</span>
             </div>
+
+            @if (r.peso_total) {
+              <p class="grams-total">
+                {{ i18n.t('result.totalWeight', { grams: (r.peso_total | number: '1.0-0') ?? '' }) }}
+              </p>
+            }
+
+            @if (r.escala_origen === 'plate') {
+              <div class="plate-size" role="group" [attr.aria-label]="i18n.t('result.plateSize')">
+                <span class="plate-size__label">{{ i18n.t('result.plateSize') }}</span>
+                @for (cm of plateSizes; track cm) {
+                  <button
+                    type="button"
+                    class="plate-size__btn"
+                    [class.is-active]="r.plate_diameter_cm === cm"
+                    [disabled]="saving()"
+                    (click)="setPlate(cm)"
+                  >
+                    {{ cm }} cm
+                  </button>
+                }
+              </div>
+            }
 
             <div class="split" role="img" [attr.aria-label]="splitLabel()">
               <span class="seg protein" [style.flex-grow]="split().p"></span>
@@ -246,6 +273,58 @@ interface RenderedSegment {
               @if (f.densidad_asumida) {
                 <p class="note">{{ i18n.t('result.densityAssumed') }}</p>
               }
+
+              @if (result()?.editable) {
+                <section class="edit">
+                  <h3>{{ i18n.t('result.editTitle') }}</h3>
+
+                  <label class="edit-grams">
+                    <span>{{ i18n.t('result.gramsLabel') }}</span>
+                    <input
+                      type="number"
+                      inputmode="numeric"
+                      min="1"
+                      max="5000"
+                      step="1"
+                      [value]="f.peso_g | number: '1.0-0' : i18n.dateLocale()"
+                      [disabled]="saving()"
+                      (change)="setGrams($event)"
+                    />
+                    <span>g</span>
+                  </label>
+
+                  <div class="edit-search">
+                    <label for="food-search">{{ i18n.t('result.changeFood') }}</label>
+                    <input
+                      id="food-search"
+                      type="search"
+                      autocomplete="off"
+                      [placeholder]="i18n.t('result.changeFoodPlaceholder')"
+                      [disabled]="saving()"
+                      (input)="onSearch($event)"
+                    />
+                    @if (searching()) {
+                      <p class="note">{{ i18n.t('result.searching') }}</p>
+                    }
+                    @if (searchResults().length) {
+                      <ul class="search-results">
+                        @for (c of searchResults(); track c.idx) {
+                          <li>
+                            <button type="button" [disabled]="saving()" (click)="chooseFood(c)">
+                              <b>{{ c.nombre_es }}</b>
+                              <span>{{ c.por_100g.calorias_kcal | number: '1.0-0' }} kcal / 100 g</span>
+                            </button>
+                          </li>
+                        }
+                      </ul>
+                    }
+                  </div>
+
+                  @if (editError(); as key) {
+                    <p class="note note--error" role="alert">{{ i18n.t(key) }}</p>
+                  }
+                </section>
+              }
             </article>
           }
         </dialog>
@@ -259,12 +338,20 @@ interface RenderedSegment {
   `,
   styleUrl: './result.scss',
 })
-export class Result {
+export class Result implements OnDestroy {
   private readonly store = inject(ResultStore);
+  private readonly logs = inject(FoodLogService);
   protected readonly i18n = inject(I18nService);
   protected readonly result = this.store.result;
 
   private readonly sheet = viewChild<ElementRef<HTMLDialogElement>>('sheet');
+
+  protected readonly plateSizes = PLATE_SIZES_CM;
+  protected readonly saving = signal(false);
+  protected readonly editError = signal<'result.editError' | 'result.editRange' | null>(null);
+  protected readonly searchResults = signal<CatalogFood[]>([]);
+  protected readonly searching = signal(false);
+  private searchTimer?: ReturnType<typeof setTimeout>;
 
   /** Proporción real de la foto, para que el contorno y la imagen coincidan exactamente. */
   protected readonly aspect = signal<string | null>(null);
@@ -405,6 +492,8 @@ export class Result {
   protected openSheet(food: DetectedFood, index: number): void {
     this.selected.set(food);
     this.selectedIndex.set(index);
+    this.editError.set(null);
+    this.searchResults.set([]);
     this.sheet()?.nativeElement.showModal();
   }
 
@@ -412,9 +501,78 @@ export class Result {
     this.sheet()?.nativeElement.close();
   }
 
+  /** Corrige los gramos del alimento abierto. */
+  protected setGrams(event: Event): void {
+    const value = Number((event.target as HTMLInputElement).value);
+    if (!Number.isFinite(value) || value < 1 || value > 5000) {
+      this.editError.set('result.editRange');
+      return;
+    }
+    this.patch({ items: [{ index: this.selectedIndex(), peso_g: Math.round(value) }] });
+  }
+
+  /** Busca en el catálogo para corregir un alimento mal clasificado (con retardo al teclear). */
+  protected onSearch(event: Event): void {
+    const query = (event.target as HTMLInputElement).value.trim();
+    if (this.searchTimer !== undefined) clearTimeout(this.searchTimer);
+    if (query.length < 2) {
+      this.searchResults.set([]);
+      this.searching.set(false);
+      return;
+    }
+    this.searching.set(true);
+    this.searchTimer = setTimeout(() => {
+      this.logs.searchFoods(query).subscribe({
+        next: (res) => {
+          this.searchResults.set(res.resultados);
+          this.searching.set(false);
+        },
+        error: () => this.searching.set(false),
+      });
+    }, 250);
+  }
+
+  protected chooseFood(food: CatalogFood): void {
+    this.searchResults.set([]);
+    this.patch({ items: [{ index: this.selectedIndex(), idx: food.idx }] });
+  }
+
+  /** Reescala el análisis completo con el diámetro real del plato (26 cm por defecto). */
+  protected setPlate(cm: number): void {
+    const current = this.result();
+    if (!current || current.escala_origen !== 'plate' || current.plate_diameter_cm === cm) return;
+    this.patch({ plate_diameter_cm: cm });
+  }
+
+  private patch(body: {
+    items?: { index: number; idx?: number; peso_g?: number }[];
+    plate_diameter_cm?: number;
+  }): void {
+    const current = this.result();
+    if (!current || this.saving()) return;
+    this.saving.set(true);
+    this.editError.set(null);
+    this.logs.update(current.id, body).subscribe({
+      next: (updated) => {
+        // El servidor devuelve los totales y el detalle ya recalculados.
+        this.store.set(updated, this.store.preview() ?? updated.imagen_url);
+        this.selected.set(updated.alimentos[this.selectedIndex()] ?? null);
+        this.saving.set(false);
+      },
+      error: () => {
+        this.saving.set(false);
+        this.editError.set('result.editError');
+      },
+    });
+  }
+
   /** Cierra al tocar el fondo (fuera del contenido), no al tocar la hoja. */
   protected onSheetClick(event: MouseEvent): void {
     if (event.target === this.sheet()?.nativeElement) this.closeSheet();
+  }
+
+  ngOnDestroy(): void {
+    if (this.searchTimer !== undefined) clearTimeout(this.searchTimer);
   }
 }
 

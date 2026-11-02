@@ -24,6 +24,8 @@ export interface DetectedFood {
   densidad_g_cm3: number;
   /** `true` si el CSV no traía densidad y se asumió 1 g/cm³. */
   densidad_asumida?: boolean;
+  /** `true` si el usuario fijó los gramos a mano. */
+  peso_manual?: boolean;
   /** Contorno de la zona segmentada, normalizado a 0..1 sobre la imagen. */
   poligono?: number[][];
   /** Centro de la zona segmentada, normalizado. */
@@ -47,6 +49,15 @@ export interface FoodContour {
   centroide: [number, number] | null;
 }
 
+/** Entrada del catálogo de clases, para corregir un alimento mal clasificado. */
+export interface CatalogFood {
+  idx: number;
+  nombre: string;
+  nombre_es: string;
+  por_100g: NutritionPer100g;
+  densidad_g_cm3: number;
+}
+
 export interface FoodLog {
   id: number;
   id_imagen_r2: string;
@@ -62,6 +73,13 @@ export interface FoodLog {
   angulo_camara_deg: number | null;
   /** Contornos por alimento; vacío cuando la imagen ya no existe. */
   contornos: FoodContour[];
+  /** Peso total en gramos (suma del detalle por alimento). */
+  peso_total: number;
+  /** Diámetro del plato con el que se fijó la escala y su origen (plate/prior/raw). */
+  plate_diameter_cm: number;
+  escala_origen: 'plate' | 'prior' | 'raw';
+  /** false en análisis antiguos, guardados antes de que existiera el detalle editable. */
+  editable: boolean;
   imagen_eliminada_en: string | null;
 }
 

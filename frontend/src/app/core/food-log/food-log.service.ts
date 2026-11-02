@@ -2,8 +2,7 @@ import { HttpClient, HttpEventType, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, concat, filter, map, of, startWith, switchMap, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { FoodLog, FoodLogCreated, Page, PresignResponse } from '../models';
-import { PreferencesService } from '../preferences.service';
+import { CatalogFood, FoodLog, FoodLogCreated, Page, PresignResponse } from '../models';import { PreferencesService } from '../preferences.service';
 import { PipelineService } from './pipeline.service';
 
 export type AnalyzeEvent =
@@ -73,6 +72,21 @@ export class FoodLogService {
 
   list(page = 1): Observable<Page<FoodLog>> {
     return this.http.get<Page<FoodLog>>(`${this.api}/food-logs/`, { params: new HttpParams().set('page', page) });
+  }
+
+  /** Corrección del usuario: alimento y/o gramos de un item, o el diámetro del plato. */
+  update(
+    id: number,
+    body: { items?: { index: number; idx?: number; peso_g?: number }[]; plate_diameter_cm?: number },
+  ): Observable<FoodLogCreated> {
+    return this.http.patch<FoodLogCreated>(`${this.api}/food-logs/${id}/`, body);
+  }
+
+  /** Busca en el catálogo de 323 clases para cambiar un alimento mal clasificado. */
+  searchFoods(query: string): Observable<{ resultados: CatalogFood[] }> {
+    return this.http.get<{ resultados: CatalogFood[] }>(`${this.api}/foods/`, {
+      params: new HttpParams().set('q', query).set('limit', '12'),
+    });
   }
 }
 

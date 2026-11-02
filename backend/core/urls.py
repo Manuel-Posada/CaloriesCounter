@@ -9,5 +9,7 @@ urlpatterns = [
     path("me/", views.MeView.as_view()),
     path("uploads/presign/", views.PresignedUploadView.as_view()),
     path("food-logs/", views.FoodLogListCreateView.as_view()),
+    path("food-logs/<int:pk>/", views.FoodLogDetailView.as_view()),
+    path("foods/", views.FoodCatalogView.as_view()),
 ]
 

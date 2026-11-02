@@ -70,6 +70,13 @@ class FoodLog(models.Model):
     volumen_estimado = models.FloatField(help_text="cm³")
     calorias_totales = models.FloatField(help_text="kcal")
     macronutrientes = models.JSONField(default=dict)  # {"proteinas_g":..,"carbohidratos_g":..,"grasas_g":..}
+    # Detalle editable por alimento: lo que el usuario puede corregir (clase y gramos).
+    # [{idx, nombre, nombre_es, volumen_cm3, densidad_g_cm3, por_100g, peso_g, peso_manual,
+    #   poligono, centroide}]. Los totales de arriba siempre son la suma de esto.
+    items = models.JSONField(default=list, blank=True)
+    # Diámetro del plato con el que se fijó la escala y de dónde salió (plate/prior/raw).
+    plate_diameter_cm = models.FloatField(default=26.0)
+    escala_origen = models.CharField(max_length=10, default="raw")
     consejo_nutricional = models.TextField(blank=True)
     # Inclinación estimada de la cámara respecto a la vertical, en grados, calculada por el
     # pipeline a partir del plano de apoyo. NULL = no se pudo determinar (nunca 0 por defecto).

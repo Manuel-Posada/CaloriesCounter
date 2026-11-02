@@ -65,6 +65,7 @@ class FoodPipeline:
 
         foods, warnings = [], []
         angles: list[float] = []
+        scale, scale_source = 1.0, "raw"
         t_depth = t_seg
         if segments:
             depth_m = self.depth.predict(image)
@@ -156,6 +157,11 @@ class FoodPipeline:
             "imagen": {"ancho": image.width, "alto": image.height},
             "alimentos": foods,
             "totales": totals,
+            "escala": {
+                "origen": scale_source,
+                "factor": round(scale, 4),
+                "plate_diameter_cm": PLATE_DIAMETER_CM,
+            },
             "angulo_camara_deg": angulo,
             "advertencias": warnings,
             "tiempos_ms": {

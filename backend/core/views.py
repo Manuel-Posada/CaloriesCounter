@@ -11,12 +11,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from . import services
+from . import food_items, nutrition, services
 from .models import FoodLog, User
 from .r2 import R2NotConfigured, get_r2_client, user_prefix
 from .serializers import (
     ALLOWED_CONTENT_TYPES,
     FoodLogCreateSerializer,
+    FoodLogEditSerializer,
     FoodLogSerializer,
     GoogleLoginSerializer,
     PresignRequestSerializer,
@@ -171,6 +172,8 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
             for a in inference["alimentos"]
             if a.get("poligono")
         ]
+        items = food_items.items_from_inference(inference["alimentos"])
+        escala = inference.get("escala") or {}
 
         ser = self.get_serializer(
             data={
@@ -186,13 +189,67 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
                 "consejo_nutricional": consejo,
                 "angulo_camara_deg": inference.get("angulo_camara_deg"),
                 "contornos": contornos,
+                "items": items,
+                "escala_origen": escala.get("origen", "raw"),
+                "plate_diameter_cm": escala.get("plate_diameter_cm", 26.0),
             }
         )
         ser.is_valid(raise_exception=True)
         ser.save(usuario=request.user)
 
         return Response(
-            {**ser.data, "alimentos": inference["alimentos"], "advertencias": inference.get("advertencias", [])},
+            {
+                **ser.data,
+                "alimentos": food_items.alimentos_from_items(items),
+                "advertencias": inference.get("advertencias", []),
+            },
             status=status.HTTP_201_CREATED,
         )
+
+
+class FoodLogDetailView(generics.RetrieveUpdateAPIView):
+    """PATCH: el usuario corrige el alimento y/o los gramos de un análisis guardado."""
+
+    serializer_class = FoodLogSerializer
+    http_method_names = ["get", "patch"]
+
+    def get_queryset(self):
+        return FoodLog.objects.filter(usuario=self.request.user)
+
+    def patch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        inp = FoodLogEditSerializer(data=request.data)
+        inp.is_valid(raise_exception=True)
+        data = inp.validated_data
+
+        try:
+            if data.get("plate_diameter_cm") is not None:
+                if obj.escala_origen != "plate":
+                    return Response(
+                        {"detail": "Este análisis no usó el plato como referencia de escala."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                food_items.apply_plate_diameter(obj, data["plate_diameter_cm"])
+            if data.get("items"):
+                food_items.apply_edits(obj, data["items"])
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+        obj.save(update_fields=[
+            "items", "volumen_estimado", "calorias_totales", "macronutrientes",
+            "clases_detectadas", "contornos", "plate_diameter_cm",
+        ])
+        return Response(
+            {**self.get_serializer(obj).data, "alimentos": food_items.alimentos_from_items(obj.items)}
+        )
+
+
+class FoodCatalogView(APIView):
+    """GET: catálogo de alimentos para corregir una detección (búsqueda por nombre)."""
+
+    def get(self, request):
+        query = request.query_params.get("q", "")
+        limit = min(int(request.query_params.get("limit", 20) or 20), 50)
+        return Response({"resultados": nutrition.search(query, limit)})
+
 
