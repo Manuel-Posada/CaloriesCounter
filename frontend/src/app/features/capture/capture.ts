@@ -10,7 +10,6 @@ import { MessageKey } from '../../core/i18n/messages';
 import { compressImage } from '../../core/image.util';
 import { TiltService } from '../../core/tilt.service';
 import { PreferencesService } from '../../core/preferences.service';
-import { LevelGauge } from './level-gauge';
 
 type Step = 'presign' | 'upload' | 'infer';
 type Mode = 'idle' | 'camera' | 'working';
@@ -39,7 +38,7 @@ const NOTICE_TIMEOUT_MS = 3500;
 
 @Component({
   selector: 'app-capture',
-  imports: [LevelGauge],
+  imports: [],
   template: `
     <section class="page capture" [class.capture--camera]="mode() === 'camera'">
       @if (mode() === 'idle') {
@@ -80,33 +79,20 @@ const NOTICE_TIMEOUT_MS = 3500;
         <div class="viewfinder">
           <video #video playsinline muted autoplay></video>
 
-          <button type="button" class="close" [attr.aria-label]="i18n.t('capture.closeCamera')" (click)="closeCamera()">✕</button>
-
-          <div
-            class="frame"
-            [class.frame--ready]="isLevel()"
-            [class.frame--counting]="isCounting()"
-            aria-hidden="true"
+          <button
+            type="button"
+            class="close"
+            [attr.aria-label]="i18n.t('capture.closeCamera')"
+            (click)="closeCamera()"
           >
-            <svg class="guide" viewBox="0 0 240 240" fill="none">
-              <path
-                class="bracket bracket--tl"
-                d="M 24 72 L 24 42 A 18 18 0 0 1 42 24 L 72 24"
-              />
-              <path
-                class="bracket bracket--tr"
-                d="M 168 24 L 198 24 A 18 18 0 0 1 216 42 L 216 72"
-              />
-              <path
-                class="bracket bracket--br"
-                d="M 216 168 L 216 198 A 18 18 0 0 1 198 216 L 168 216"
-              />
-              <path
-                class="bracket bracket--bl"
-                d="M 72 216 L 42 216 A 18 18 0 0 1 24 198 L 24 168"
-              />
-              <circle class="target-ring" cx="120" cy="120" r="86" />
-            </svg>
+            ✕
+          </button>
+
+          <div class="frame" [class.frame--ready]="isLevel()" aria-hidden="true">
+            <div class="corner corner--tl"></div>
+            <div class="corner corner--tr"></div>
+            <div class="corner corner--br"></div>
+            <div class="corner corner--bl"></div>
           </div>
 
           @if (isCounting() && countdown() > 0) {
@@ -123,29 +109,31 @@ const NOTICE_TIMEOUT_MS = 3500;
             <p class="notice">{{ i18n.t('capture.noSensor') }}</p>
           }
 
-          <button
-            type="button"
-            class="shutter"
-            [class.shutter--ready]="canShoot()"
-            [class.shutter--counting]="isCounting()"
-            [disabled]="isCounting()"
-            [attr.aria-label]="canShoot() ? i18n.t('capture.shoot') : i18n.t('capture.shootDisabled')"
-            (click)="triggerCapture()"
-          >
-            <span class="shutter__dot"></span>
-          </button>
+          <div class="camera-bar">
+            <span class="camera-bar__spacer" aria-hidden="true"></span>
+
+            <button
+              type="button"
+              class="shutter"
+              [class.shutter--ready]="canShoot()"
+              [class.shutter--counting]="isCounting()"
+              [disabled]="isCounting()"
+              [attr.aria-label]="canShoot() ? i18n.t('capture.shoot') : i18n.t('capture.shootDisabled')"
+              (click)="triggerCapture()"
+            >
+              <span class="shutter__dot"></span>
+            </button>
+
+            <label class="gallery-btn" [attr.aria-label]="i18n.t('capture.gallery')">
+              <input class="sr-only" type="file" accept="image/*" (change)="onFile($event)" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="3" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <path d="m21 15-5-5L5 21" />
+              </svg>
+            </label>
+          </div>
         </div>
-
-        <p class="tip">{{ i18n.t('capture.holdTip') }}</p>
-
-        <app-level-gauge
-          [tilt]="tilt.tilt()"
-          [beta]="tilt.beta()"
-          [gamma]="tilt.gamma()"
-          [bubble]="tilt.bubble()"
-          [level]="isLevel()"
-          [exitDeg]="prefs.levelExit()"
-        />
       } @else {
         <div class="preview">
           @if (previewUrl()) {
@@ -340,7 +328,10 @@ export class Capture implements OnDestroy {
     const input = ev.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = ''; // permite volver a elegir la misma foto
-    if (file) void this.analyze(file);
+    if (file) {
+      if (this.mode() === 'camera') this.closeCamera();
+      void this.analyze(file);
+    }
   }
 
   ngOnDestroy(): void {
