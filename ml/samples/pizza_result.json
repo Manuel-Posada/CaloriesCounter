@@ -1,0 +1,210 @@
+{
+  "pipeline": "B",
+  "imagen": {
+    "ancho": 900,
+    "alto": 600
+  },
+  "alimentos": [
+    {
+      "idx": 216,
+      "nombre": "pizza_margherita_baked",
+      "confianza": 0.4863,
+      "volumen_cm3": 121.45,
+      "peso_g": 94.85,
+      "densidad_g_cm3": 0.781,
+      "densidad_asumida": false,
+      "poligono": [
+        [
+          0.9661,
+          0.0842
+        ],
+        [
+          0.8617,
+          0.0375
+        ],
+        [
+          0.6806,
+          0.0558
+        ],
+        [
+          0.5761,
+          0.1475
+        ],
+        [
+          0.4739,
+          0.2992
+        ],
+        [
+          0.3839,
+          0.3508
+        ],
+        [
+          0.3528,
+          0.5358
+        ],
+        [
+          0.3528,
+          0.7242
+        ],
+        [
+          0.4694,
+          0.9458
+        ],
+        [
+          0.685,
+          0.9692
+        ],
+        [
+          0.9561,
+          0.9342
+        ],
+        [
+          0.9839,
+          0.8542
+        ],
+        [
+          0.9872,
+          0.1742
+        ]
+      ],
+      "centroide": [
+        0.699,
+        0.5309
+      ],
+      "nutricion": {
+        "calorias_kcal": 249.47,
+        "proteinas_g": 11.3,
+        "carbohidratos_g": 27.32,
+        "grasas_g": 10.5,
+        "por_100g": {
+          "calorias_kcal": 263.0,
+          "proteinas_g": 11.91,
+          "carbohidratos_g": 28.8,
+          "grasas_g": 11.07
+        }
+      },
+      "debug_volumen": {
+        "plano": "fallback",
+        "altura_media_cm": 0.01,
+        "altura_max_cm": 9.4,
+        "saturado_frac": 0.0
+      }
+    },
+    {
+      "idx": 216,
+      "nombre": "pizza_margherita_baked",
+      "confianza": 0.2429,
+      "volumen_cm3": 46.45,
+      "peso_g": 36.28,
+      "densidad_g_cm3": 0.781,
+      "densidad_asumida": false,
+      "poligono": [
+        [
+          0.7117,
+          0.1192
+        ],
+        [
+          0.6439,
+          0.1625
+        ],
+        [
+          0.6361,
+          0.1808
+        ],
+        [
+          0.6394,
+          0.2375
+        ],
+        [
+          0.6706,
+          0.2925
+        ],
+        [
+          0.6761,
+          0.3192
+        ],
+        [
+          0.6728,
+          0.3908
+        ],
+        [
+          0.6806,
+          0.4458
+        ],
+        [
+          0.7072,
+          0.4875
+        ],
+        [
+          0.7683,
+          0.5175
+        ],
+        [
+          0.7894,
+          0.4975
+        ],
+        [
+          0.7994,
+          0.4742
+        ],
+        [
+          0.7839,
+          0.3042
+        ],
+        [
+          0.7661,
+          0.2658
+        ],
+        [
+          0.7739,
+          0.1675
+        ],
+        [
+          0.7339,
+          0.1208
+        ]
+      ],
+      "centroide": [
+        0.6402,
+        0.3979
+      ],
+      "nutricion": {
+        "calorias_kcal": 95.41,
+        "proteinas_g": 4.32,
+        "carbohidratos_g": 10.45,
+        "grasas_g": 4.02,
+        "por_100g": {
+          "calorias_kcal": 263.0,
+          "proteinas_g": 11.91,
+          "carbohidratos_g": 28.8,
+          "grasas_g": 11.07
+        }
+      },
+      "debug_volumen": {
+        "plano": "fallback",
+        "altura_media_cm": 0.05,
+        "altura_max_cm": 1.67,
+        "saturado_frac": 0.0
+      }
+    }
+  ],
+  "totales": {
+    "volumen_cm3": 167.9,
+    "peso_g": 131.13,
+    "calorias_kcal": 344.88,
+    "proteinas_g": 15.62,
+    "carbohidratos_g": 37.77,
+    "grasas_g": 14.52,
+    "clases_detectadas": [
+      216,
+      216
+    ]
+  },
+  "angulo_camara_deg": null,
+  "advertencias": [],
+  "tiempos_ms": {
+    "segmentacion": 1668,
+    "profundidad": 1278,
+    "total": 3637
+  }
+}
