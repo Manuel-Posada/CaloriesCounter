@@ -191,6 +191,23 @@ Si no se detecta el plato se aplica una distancia de foto de plato (35 cm) cuand
 la mesa está a más de 80 cm, y el resultado se marca como **«Cantidades orientativas»** en la
 pantalla de resultados: sin referencia, el volumen sigue siendo poco fiable.
 
+### Sesión e inactividad
+
+- **Cierre por inactividad**: a los 30 min sin actividad (`IdleService`) se cierra la sesión; un
+  minuto antes aparece un aviso con «Seguir conectado», que reinicia la cuenta. Cuentan como
+  actividad puntero, teclado, rueda, scroll, toque y volver a la pestaña.
+- **Por qué no basta el JWT**: el refresh dura 14 días, así que un móvil olvidado seguiría con
+  sesión abierta.
+- **Reentrada rápida**: los tokens viven en `localStorage` y al arrancar se renueva el access si ya
+  caducó (`ensureFreshToken`, leyendo el `exp` del propio JWT), antes de que falle la primera
+  petición.
+- **Un fallo de red ya no saca la sesión**: solo un `401/403` del endpoint de refresh la cierra
+  (motivo «Tu sesión caducó»). Un corte de red se propaga y se reintenta en la siguiente petición.
+- **Auto-acceso de Google** (`auto_select`) en la pantalla de login: tras una caducidad por tiempo
+  se entra sin tocar nada; tras un cierre manual o por inactividad **no**, para que el cierre siga
+  significando algo.
+- Si el script de Google no carga, el login ofrece «Reintentar» en lugar de quedarse en blanco.
+
 ### Correcciones del usuario
 
 El detalle por alimento se guarda en `FoodLog.items` (JSON) y los totales del registro son siempre

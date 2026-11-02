@@ -1,7 +1,8 @@
-import { Component, HostListener, inject, signal, viewChild } from '@angular/core';
+import { Component, HostListener, effect, inject, signal, viewChild } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { warmUpApi } from './core/api-warmup';
 import { AuthService } from './core/auth/auth.service';
+import { IdleService } from './core/auth/idle.service';
 import { I18nService } from './core/i18n/i18n.service';
 import { PreferencesSync } from './core/preferences-sync.service';
 import { PreferencesService } from './core/preferences.service';
@@ -56,11 +57,21 @@ import { Drawer } from './core/ui/drawer';
 
       <app-drawer />
     }
+
+    @if (idle.warning()) {
+      <div class="idle-warning" role="alertdialog" aria-live="assertive">
+        <p>{{ i18n.t('session.idleWarning') }}</p>
+        <button type="button" class="btn btn--primary" (click)="idle.keepAlive()">
+          {{ i18n.t('session.keepAlive') }}
+        </button>
+      </div>
+    }
   `,
   styleUrl: './app.scss',
 })
 export class App {
   protected readonly auth = inject(AuthService);
+  protected readonly idle = inject(IdleService);
   protected readonly i18n = inject(I18nService);
   protected readonly isScrolled = signal(false);
 
@@ -75,7 +86,16 @@ export class App {
     warmUpApi();
     // Tras recargar, los tokens vienen de localStorage y nadie ha pedido aún el perfil.
     // Aquí AuthService ya está construido: pedirlo desde su constructor sería circular.
-    if (this.auth.isAuthenticated()) this.auth.loadProfile();
+    if (this.auth.isAuthenticated()) {
+      // Si el access token ya caducó, se renueva antes de que falle la primera petición
+      // (el refresco ya pide el perfil al guardar el token nuevo).
+      if (!this.auth.ensureFreshToken()) this.auth.loadProfile();
+    }
+    // Cierra la sesión tras 30 min sin actividad (con aviso un minuto antes).
+    effect(() => {
+      if (this.auth.isAuthenticated()) this.idle.start();
+      else this.idle.stop();
+    });
   }
 
   protected openAccountMenu(): void {

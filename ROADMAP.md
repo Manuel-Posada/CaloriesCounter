@@ -79,3 +79,10 @@ no hay sensor de inclinación).
 - [x] Aviso «?» en los alimentos que el clasificador no tenía claros
 - [x] Topes de cordura del pipeline (altura media y peso total) con el aviso `volume_clamped`
 
+## Sesión (2026-11)
+
+- [x] Cierre de sesión por inactividad (30 min, con aviso un minuto antes y «Seguir conectado»)
+- [x] Reentrada rápida: refresh al arrancar si el access caducó, y la red caída ya no cierra sesión
+- [x] Aviso del motivo en el login («Cerramos tu sesión por inactividad» / «Tu sesión caducó»)
+- [ ] Recordar el dispositivo más allá de los 14 días del refresh (requiere rotación + lista negra)
+

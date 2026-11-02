@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, NgZone, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, catchError, finalize, map, of, shareReplay, tap } from 'rxjs';
+import { Observable, catchError, finalize, map, of, shareReplay, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PipelineService } from '../food-log/pipeline.service';
 import { I18nService } from '../i18n/i18n.service';
@@ -10,6 +10,9 @@ import { TokenPair, UserProfile } from '../models';
 const ACCESS_KEY = 'cc.access';
 const REFRESH_KEY = 'cc.refresh';
 const GIS_SRC = 'https://accounts.google.com/gsi/client';
+
+/** Por qué se cerró la sesión; la pantalla de login lo explica. */
+export type LogoutReason = 'manual' | 'idle' | 'expired';
 
 // Google Identity Services se carga dinámicamente; se tipa mínimamente.
 declare const google: any;
@@ -26,6 +29,9 @@ export class AuthService {
   private readonly refreshToken = signal<string | null>(localStorage.getItem(REFRESH_KEY));
   private refreshInFlight$?: Observable<string>;
   private profileRequest$?: Observable<UserProfile | null>;
+
+  /** Motivo del último cierre de sesión, para avisar en la pantalla de login. */
+  readonly logoutReason = signal<LogoutReason | null>(null);
 
   readonly isAuthenticated = computed(() => !!this.access() && !!this.refreshToken());
 
@@ -77,7 +83,12 @@ export class AuthService {
       );
   }
 
-  /** Renueva el access token. Las llamadas concurrentes comparten una sola petición. */
+  /**
+   * Renueva el access token. Las llamadas concurrentes comparten una sola petición.
+   *
+   * Un fallo de red **no** cierra la sesión: el refresh token sigue siendo válido y se
+   * reintentará en la siguiente petición. Solo un 401/403 significa que caducó.
+   */
   refresh(): Observable<string> {
     if (!this.refreshInFlight$) {
       this.refreshInFlight$ = this.http
@@ -87,6 +98,11 @@ export class AuthService {
         .pipe(
           tap((t) => this.store(t.access, t.refresh ?? this.refreshToken()!)),
           map((t) => t.access),
+          catchError((err: unknown) => {
+            const status = (err as HttpErrorResponse)?.status;
+            if (status === 401 || status === 403) this.logout('expired');
+            return throwError(() => err);
+          }),
           finalize(() => (this.refreshInFlight$ = undefined)),
           shareReplay({ bufferSize: 1, refCount: false }),
         );
@@ -94,7 +110,22 @@ export class AuthService {
     return this.refreshInFlight$;
   }
 
-  logout(): void {
+  /**
+   * Arranque: si el access token ya caducó (o está a punto), lo renueva antes de que la
+   * primera petición tenga que hacerlo. Silencioso: si falla por red, no pasa nada.
+   * Devuelve `true` si lanzó el refresco (que ya pedirá el perfil al guardar el token).
+   */
+  ensureFreshToken(): boolean {
+    if (!this.isAuthenticated()) return false;
+    const exp = tokenExpiry(this.access());
+    if (exp !== null && exp - Date.now() > 60_000) return false;
+    this.refresh().subscribe({ error: () => undefined });
+    return true;
+  }
+
+  logout(reason: LogoutReason = 'manual'): void {
+    // Solo se anota el motivo si había sesión: cerrar dos veces no debe reescribirlo.
+    if (this.isAuthenticated()) this.logoutReason.set(reason);
     localStorage.removeItem(ACCESS_KEY);
     localStorage.removeItem(REFRESH_KEY);
     this.access.set(null);
@@ -102,7 +133,9 @@ export class AuthService {
     this.profile.set(null);
     // La preferencia de pipeline es del dispositivo, pero no debe heredarla el siguiente usuario.
     this.pipelines.reset();
-    if (typeof google !== 'undefined') google.accounts.id.disableAutoSelect();
+    // Cierre manual o por inactividad: no se vuelve a entrar solo. Solo una caducidad por
+    // tiempo permite el auto-acceso, que es lo que hace rápida la reentrada normal.
+    if (reason !== 'expired' && typeof google !== 'undefined') google.accounts.id.disableAutoSelect();
     this.router.navigate(['/login']);
   }
 
@@ -163,6 +196,9 @@ export class AuthService {
     await this.loadGis();
     google.accounts.id.initialize({
       client_id: environment.googleClientId,
+      // Si la cuenta de Google sigue activa en este navegador, entra sin tocar nada (la
+      // velocidad de reentrada que se nota). Tras un cierre manual se desactiva.
+      auto_select: true,
       // El callback llega fuera de la zona de Angular.
       callback: (r: { credential: string }) => this.zone.run(() => onCredential(r.credential)),
     });
@@ -181,6 +217,8 @@ export class AuthService {
     localStorage.setItem(REFRESH_KEY, refresh);
     this.access.set(access);
     this.refreshToken.set(refresh);
+    // Al entrar (o renovar) ya no hay motivo que explicar en el login.
+    this.logoutReason.set(null);
     // Tras un login (o un refresh) el perfil puede faltar todavía.
     this.loadProfile();
   }
@@ -196,6 +234,18 @@ export class AuthService {
       s.onerror = () => reject(new Error('No se pudo cargar Google Identity Services'));
       document.head.appendChild(s);
     });
+  }
+}
+
+/** `exp` del JWT en milisegundos, o `null` si el token no se puede leer. */
+function tokenExpiry(token: string | null): number | null {
+  if (!token) return null;
+  try {
+    const payload = token.split('.')[1];
+    const json = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    return typeof json.exp === 'number' ? json.exp * 1000 : null;
+  } catch {
+    return null;
   }
 }
 

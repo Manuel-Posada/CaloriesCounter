@@ -29,6 +29,11 @@ export const ES = {
   'login.noClient': 'Login con Google sin configurar: falta el OAuth Client ID en environment.ts.',
   'login.gisError': 'No se pudo cargar el inicio de sesión de Google. Revisa tu conexión.',
   'login.invalid': 'No pudimos validar tu cuenta de Google. Inténtalo de nuevo.',
+  'login.retry': 'Reintentar',
+  'session.idleWarning': 'Tu sesión se cerrará en un minuto por inactividad.',
+  'session.keepAlive': 'Seguir conectado',
+  'session.idleLogout': 'Cerramos tu sesión por inactividad.',
+  'session.expiredLogout': 'Tu sesión caducó. Vuelve a entrar.',
 
   // Captura
   'capture.title': '¿Qué vas a comer?',
@@ -299,6 +304,11 @@ export const EN: Record<MessageKey, string> = {
   'login.noClient': 'Google sign-in is not configured: missing OAuth Client ID in environment.ts.',
   'login.gisError': 'Could not load Google sign-in. Check your connection.',
   'login.invalid': 'We could not verify your Google account. Please try again.',
+  'login.retry': 'Retry',
+  'session.idleWarning': 'Your session will close in one minute due to inactivity.',
+  'session.keepAlive': 'Stay signed in',
+  'session.idleLogout': 'We closed your session due to inactivity.',
+  'session.expiredLogout': 'Your session expired. Please sign in again.',
 
   'capture.title': 'What are you eating?',
   'capture.title1': 'What are you eating today?',

@@ -31,10 +31,8 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       }
       return auth.refresh().pipe(
         switchMap((newToken) => next(withToken(req, newToken))),
-        catchError((refreshErr) => {
-          auth.logout();
-          return throwError(() => refreshErr);
-        }),
+        // El servicio ya cierra la sesión si el refresh token caducó. Un fallo de red NO debe
+        // sacar al usuario: se propaga el error y se reintentará en la siguiente petición.
       );
     }),
   );
