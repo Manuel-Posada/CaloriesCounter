@@ -1,0 +1,92 @@
+import json
+import logging
+
+import google.generativeai as genai
+import requests
+from botocore.exceptions import BotoCoreError, ClientError
+from django.conf import settings
+
+from .r2 import R2NotConfigured, get_r2_client
+
+log = logging.getLogger(__name__)
+
+GEMINI_SYSTEM_PROMPT = (
+    "Eres un experto nutricional. Recibes un JSON con alimentos, sus gramos calculados y sus "
+    "macronutrientes basados en datos del USDA. Tu objetivo es dar un consejo ultra-conciso "
+    "(máximo 3 oraciones) sobre este plato. No recalcules las calorías, asume que los datos son "
+    "exactos. Enfócate en el impacto metabólico (ej. picos de glucosa, saciedad, balance). "
+    "Tono directo y amigable."
+)
+
+
+class ServiceError(Exception):
+    """Fallo de un servicio externo (Modal / R2)."""
+
+
+# ---------------------------------------------------------------- R2 + Modal
+def download_image_from_r2(key: str) -> tuple[bytes, str]:
+    """Descarga el objeto a memoria (nada se escribe en disco). Devuelve (bytes, content_type)."""
+    try:
+        obj = get_r2_client().get_object(Bucket=settings.R2_BUCKET_NAME, Key=key)
+        return obj["Body"].read(), obj.get("ContentType", "image/jpeg")
+    except R2NotConfigured as exc:
+        raise ServiceError(str(exc)) from exc
+    except (ClientError, BotoCoreError) as exc:
+        raise ServiceError(f"No se pudo leer la imagen en R2: {exc}") from exc
+
+
+def run_inference(
+    image_bytes: bytes,
+    content_type: str,
+    pipeline: str = "B",
+    fov_deg: float | None = None,
+    f35_mm: float | None = None,
+) -> dict:
+    """Envía la imagen al endpoint de Modal con el header X-Modal-Secret.
+
+    `f35_mm` es la focal equivalente en 35 mm leída del EXIF en el navegador: la subida
+    va recomprimida (sin EXIF), así que el pipeline no puede leerla por su cuenta.
+    """
+    params = {"pipeline": pipeline}
+    if fov_deg is not None:
+        params["fov_deg"] = fov_deg
+    if f35_mm is not None:
+        params["f35_mm"] = f35_mm
+    try:
+        resp = requests.post(
+            settings.MODAL_ENDPOINT_URL,
+            params=params,
+            headers={"X-Modal-Secret": settings.MODAL_SHARED_SECRET},
+            files={"file": ("image", image_bytes, content_type)},
+            timeout=settings.MODAL_TIMEOUT,
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except (requests.RequestException, ValueError) as exc:
+        raise ServiceError(f"Fallo en la inferencia (Modal): {exc}") from exc
+
+
+# ---------------------------------------------------------------- Gemini
+def get_nutrition_advice(inference: dict) -> str:
+    """Devuelve el consejo de Gemini; ante cualquier fallo devuelve '' (no bloquea el registro)."""
+    if not inference.get("alimentos") or not settings.GEMINI_API_KEY:
+        return ""
+    # Solo lo relevante para el LLM.
+    payload = {
+        "alimentos": [
+            {"nombre": f["nombre"], "peso_g": f["peso_g"], **f["nutricion"]} for f in inference["alimentos"]
+        ],
+        "totales": {k: v for k, v in inference["totales"].items() if k != "clases_detectadas"},
+    }
+    try:
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        model = genai.GenerativeModel(settings.GEMINI_MODEL, system_instruction=GEMINI_SYSTEM_PROMPT)
+        resp = model.generate_content(
+            json.dumps(payload, ensure_ascii=False),
+            generation_config={"temperature": 0.4, "max_output_tokens": 200},
+        )
+        return resp.text.strip()
+    except Exception:  # SDK lanza varios tipos (bloqueo de seguridad, cuota, red...)
+        log.exception("Gemini no disponible")
+        return ""
+
