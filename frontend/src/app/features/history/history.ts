@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+﻿import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FoodLogService } from '../../core/food-log/food-log.service';
@@ -64,7 +64,7 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
                   <div class="top">
                     <strong>{{ log.calorias_totales | number: '1.0-0' : i18n.dateLocale() }} kcal</strong>
                     <span class="right">
-                      <time class="muted">{{ log.fecha_hora | date: 'd MMM, HH:mm' : undefined : i18n.dateLocale() }}</time>
+                      <time class="muted">{{ log.fecha_hora | date: i18n.shortDate() : undefined : i18n.dateLocale() }}</time>
                       @if (tilted(log)) {
                         <span class="chip chip--warn" [attr.title]="i18n.t('history.tilted')">📐 {{ log.angulo_camara_deg | number: '1.0-0' : i18n.dateLocale() }}°</span>
                       }
@@ -78,7 +78,7 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
               <!-- Antigua: solo texto y datos -->
               <article class="card text-only">
                 <div class="top">
-                  <time class="muted">{{ log.fecha_hora | date: 'EEEE d MMM, HH:mm' : undefined : i18n.dateLocale() }}</time>
+                  <time class="muted">{{ log.fecha_hora | date: i18n.longDate() : undefined : i18n.dateLocale() }}</time>
                   <span class="right">
                     @if (tilted(log)) {
                       <span class="chip chip--warn" [attr.title]="i18n.t('history.tilted')">📐 {{ log.angulo_camara_deg | number: '1.0-0' : i18n.dateLocale() }}°</span>
@@ -193,3 +193,4 @@ export class History implements OnInit {
     this.items.set([...current]);
   }
 }
+

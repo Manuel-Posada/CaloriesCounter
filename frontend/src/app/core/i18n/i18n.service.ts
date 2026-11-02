@@ -19,6 +19,10 @@ export class I18nService {
   /** Locale que esperan `DatePipe` / `DecimalPipe` (es | en-US). */
   readonly dateLocale = computed(() => (this.locale() === 'es' ? 'es' : 'en-US'));
 
+  /** Formatos de fecha con el orden natural de cada idioma. */
+  readonly shortDate = computed(() => (this.locale() === 'es' ? 'd MMM, HH:mm' : 'MMM d, HH:mm'));
+  readonly longDate = computed(() => (this.locale() === 'es' ? 'EEEE d MMM, HH:mm' : 'EEEE, MMM d, HH:mm'));
+
   constructor() {
     // Mantiene <html lang> sincronizado: lectores de pantalla, guiones y corrector.
     effect(() => {

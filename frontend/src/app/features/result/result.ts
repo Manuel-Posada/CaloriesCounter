@@ -60,7 +60,7 @@ interface RenderedSegment {
             }
           }
 
-          <figcaption class="chip">{{ r.fecha_hora | date: 'd MMM, HH:mm' : undefined : i18n.dateLocale() }}</figcaption>
+          <figcaption class="chip">{{ r.fecha_hora | date: i18n.shortDate() : undefined : i18n.dateLocale() }}</figcaption>
           @if (tiltOk(); as t) {
             <span class="chip tilt-ok">{{ i18n.t('result.centered', { deg: (t | number: '1.0-0') ?? '' }) }}</span>
           }
@@ -381,4 +381,5 @@ function clamp(value: number, min: number, max: number): number {
 function mean(points: number[][], axis: 0 | 1): number {
   return points.reduce((acc, p) => acc + p[axis], 0) / points.length;
 }
+
 
