@@ -284,5 +284,28 @@ A      @    76.76.21.21            → Vercel
 CNAME  www  cname.vercel-dns.com   → Vercel
 ```
 
+### CORS del bucket R2 (obligatorio)
+
+La foto se sube **del navegador directo a R2** con una URL prefirmada, así que el bucket necesita
+una política CORS; sin ella el `PUT` falla y la app muestra «sin conexión o la subida fue bloqueada».
+Se aplica con:
+
+```powershell
+python manage.py setup_r2_cors          # aplica la política
+python manage.py setup_r2_cors --show   # muestra la actual
+```
+
+Permite `GET`, `PUT` y `HEAD` desde `caloriescounter.app`, `www`, los alias
+`caloriescounter-*.vercel.app` y `localhost:4200`.
+
+### Arranque en frío del backend
+
+Render (free) duerme el servicio a los 15 min. Para que eso no sorprenda al usuario:
+
+- Al abrir la app se lanza `GET /health` en segundo plano, así el backend despierta mientras se
+  navega.
+- Si un análisis tarda más de 8 s, la pantalla de progreso avisa de que el servidor está
+  despertando y pide no cerrar la página.
+
 Falta un registro más si se quiere el API en un subdominio propio (`api.caloriescounter.app` → CNAME del servicio de Render).
 

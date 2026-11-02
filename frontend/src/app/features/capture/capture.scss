@@ -406,3 +406,15 @@ label.btn {
     transition: width 0.2s;
   }
 }
+
+/* Aviso de espera larga (backend despertando de un arranque en frío). */
+.slow {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--c-warn-soft);
+  color: var(--c-warn);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  text-align: center;
+}

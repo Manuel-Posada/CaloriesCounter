@@ -38,6 +38,8 @@ export const ES = {
   'capture.title4': 'Veamos qué hay en el menú',
   'capture.levelRequired': 'Nivela el teléfono (≤ {deg}°) antes de disparar.',
   'capture.levelLost': 'Ángulo perdido: vuelve a alinear y dispara.',
+  'capture.slowServer':
+    'El servidor está despertando tras un rato inactivo. Puede tardar hasta un minuto; no cierres la página.',
   'capture.subtitle':
     'Coloca el plato en la mesa y abre la cámara: te marcará en verde el momento exacto en el que está perfectamente cenital.',
   'capture.openCamera': 'Abrir cámara guiada',
@@ -229,6 +231,8 @@ export const EN: Record<MessageKey, string> = {
   'capture.title4': "Let's see what's on the menu",
   'capture.levelRequired': 'Level the phone (≤ {deg}°) before shooting.',
   'capture.levelLost': 'Angle lost: realign and shoot again.',
+  'capture.slowServer':
+    'The server is waking up after being idle. It can take up to a minute; please keep this page open.',
   'capture.subtitle':
     'Place the plate on the table and open the camera: it turns green at the exact moment the shot is perfectly top-down.',
   'capture.openCamera': 'Open guided camera',

@@ -35,6 +35,8 @@ const HOLD_MS = 500;
 const WATCH_MS = 100;
 /** Tiempo que permanece visible un aviso superpuesto en cámara antes de ocultarse. */
 const NOTICE_TIMEOUT_MS = 3500;
+/** Tras este tiempo analizando se avisa de que el backend puede estar despertando. */
+const SLOW_HINT_MS = 8000;
 
 @Component({
   selector: 'app-capture',
@@ -162,6 +164,10 @@ const NOTICE_TIMEOUT_MS = 3500;
           </div>
         }
 
+        @if (slowServer()) {
+          <p class="note slow" role="status">{{ i18n.t('capture.slowServer') }}</p>
+        }
+
         <!-- Skeleton del resultado que vendrá -->
         <div class="card sk">
           <div class="skeleton" style="height: 18px; width: 40%"></div>
@@ -190,6 +196,7 @@ export class Capture implements OnDestroy {
   private watchTimer?: ReturnType<typeof setInterval>;
   private countdownTimer?: ReturnType<typeof setInterval>;
   private noticeTimeout?: ReturnType<typeof setTimeout>;
+  private slowTimer?: ReturnType<typeof setTimeout>;
   private stableSince = 0;
   private capturing = false;
   private audio?: AudioContext;
@@ -206,6 +213,8 @@ export class Capture implements OnDestroy {
   protected readonly isLevel = signal(false);
   protected readonly isCounting = signal(false);
   protected readonly countdown = signal(0);
+  /** El análisis tarda más de lo normal (backend despertando de un arranque en frío). */
+  protected readonly slowServer = signal(false);
   protected readonly cameraNotice = signal<{ key: MessageKey; deg?: number } | null>(null);
   protected readonly activeIndex = computed(() => STEPS.findIndex((s) => s.key === this.step()));
   protected readonly canShoot = computed(
@@ -336,9 +345,23 @@ export class Capture implements OnDestroy {
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    this.clearSlowHint();
     this.closeCamera();
     this.revokePreview();
     void this.audio?.close();
+  }
+
+  private startSlowHint(): void {
+    this.clearSlowHint();
+    this.slowTimer = setTimeout(() => this.slowServer.set(true), SLOW_HINT_MS);
+  }
+
+  private clearSlowHint(): void {
+    if (this.slowTimer !== undefined) {
+      clearTimeout(this.slowTimer);
+      this.slowTimer = undefined;
+    }
+    this.slowServer.set(false);
   }
 
   /**
@@ -476,10 +499,12 @@ export class Capture implements OnDestroy {
     this.step.set('presign');
     this.progress.set(0);
     this.mode.set('working');
+    this.startSlowHint();
 
     this.sub = this.logs.analyze(blob, focal35).subscribe({
       next: (e) => {
         if (e.step === 'done') {
+          this.clearSlowHint();
           this.store.set(e.result, this.previewUrl());
           this.handedOver = true; // el store es ahora dueño del object URL
           this.router.navigate(['/result']);
@@ -489,6 +514,7 @@ export class Capture implements OnDestroy {
         if (e.step === 'upload') this.progress.set(e.progress);
       },
       error: (err: HttpErrorResponse) => {
+        this.clearSlowHint();
         this.mode.set('idle');
         this.error.set(this.messageFor(err));
         this.revokePreview();

@@ -1,5 +1,6 @@
 import { Component, HostListener, inject, signal, viewChild } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { warmUpApi } from './core/api-warmup';
 import { AuthService } from './core/auth/auth.service';
 import { I18nService } from './core/i18n/i18n.service';
 import { PreferencesSync } from './core/preferences-sync.service';
@@ -70,6 +71,8 @@ export class App {
     inject(PreferencesService);
     // Sincroniza idioma/tema/acento con el perfil del usuario.
     inject(PreferencesSync);
+    // Despierta el backend (Render duerme a los 15 min) mientras el usuario aún navega.
+    warmUpApi();
     // Tras recargar, los tokens vienen de localStorage y nadie ha pedido aún el perfil.
     // Aquí AuthService ya está construido: pedirlo desde su constructor sería circular.
     if (this.auth.isAuthenticated()) this.auth.loadProfile();
