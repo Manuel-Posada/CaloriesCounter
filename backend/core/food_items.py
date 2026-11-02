@@ -5,7 +5,7 @@ Los totales del `FoodLog` (volumen, kcal, macros, contornos) son siempre una pro
 """
 from __future__ import annotations
 
-from . import nutrition
+from . import confidence, nutrition
 
 MIN_WEIGHT_G = 1.0
 MAX_WEIGHT_G = 5000.0
@@ -38,6 +38,7 @@ def items_from_inference(alimentos: list[dict]) -> list[dict]:
             "peso_g": round(float(a.get("peso_g") or 0), 2),
             "peso_manual": False,
             "editado": False,
+            "clase_editada": False,
             "poligono": a.get("poligono") or [],
             "centroide": a.get("centroide"),
         }
@@ -73,6 +74,7 @@ def apply_edits(log, edits: list[dict]) -> None:
                 densidad_asumida=False,
                 por_100g=entry["por_100g"],
                 editado=True,
+                clase_editada=True,
             )
             # El volumen es lo que se midió; el peso sale de la densidad del alimento nuevo.
             item["peso_g"] = round(item["volumen_cm3"] * entry["densidad_g_cm3"], 2)
@@ -152,6 +154,12 @@ def recalc(log) -> None:
         for i in items
         if i.get("poligono")
     ]
+    attach_confidence(log)
+
+
+def attach_confidence(log) -> None:
+    """Recalcula el nivel de confianza que se muestra en la ficha."""
+    log.confianza = confidence.evaluate(log)
 
 
 def inference_like(log) -> dict:
@@ -186,6 +194,7 @@ def alimentos_from_items(items: list[dict]) -> list[dict]:
                 "densidad_g_cm3": i.get("densidad_g_cm3"),
                 "densidad_asumida": i.get("densidad_asumida", False),
                 "peso_manual": i.get("peso_manual", False),
+                "clase_editada": i.get("clase_editada", False),
                 "poligono": i.get("poligono") or [],
                 "centroide": i.get("centroide"),
                 "detalle": nutrition.details(i["idx"]),

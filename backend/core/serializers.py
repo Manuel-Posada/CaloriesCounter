@@ -78,6 +78,8 @@ class FoodLogSerializer(serializers.ModelSerializer):
     calorias_totales = serializers.FloatField(min_value=0)
     peso_total = serializers.SerializerMethodField()
     editable = serializers.SerializerMethodField()
+    advertencias = serializers.ListField(child=serializers.JSONField(), required=False)
+    confianza = serializers.JSONField(required=False)
 
     class Meta:
         model = FoodLog
@@ -96,6 +98,8 @@ class FoodLogSerializer(serializers.ModelSerializer):
             "contornos",
             "plate_diameter_cm",
             "escala_origen",
+            "advertencias",
+            "confianza",
             "editable",
             "imagen_eliminada_en",
         ]

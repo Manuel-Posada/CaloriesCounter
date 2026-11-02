@@ -26,6 +26,8 @@ export interface DetectedFood {
   densidad_asumida?: boolean;
   /** `true` si el usuario fijó los gramos a mano. */
   peso_manual?: boolean;
+  /** `true` si el usuario cambió la clase: ya no cuenta como duda del clasificador. */
+  clase_editada?: boolean;
   /** Valores extendidos por 100 g (minerales, vitaminas, grasas). */
   detalle?: Record<string, number>;
   /** Contorno de la zona segmentada, normalizado a 0..1 sobre la imagen. */
@@ -60,6 +62,14 @@ export interface CatalogFood {
   densidad_g_cm3: number;
 }
 
+/** Nivel de confianza del análisis (lo calcula el servidor con escala, inclinación y clasificador). */
+export interface Confidence {
+  score: number;
+  nivel: 'alta' | 'media' | 'baja';
+  /** Códigos de los motivos que bajan la confianza (`escala_supuesta`, `clasificacion_baja`…). */
+  motivos: string[];
+}
+
 export interface FoodLog {
   id: number;
   id_imagen_r2: string;
@@ -82,6 +92,10 @@ export interface FoodLog {
   escala_origen: 'plate' | 'prior' | 'raw';
   /** false en análisis antiguos, guardados antes de que existiera el detalle editable. */
   editable: boolean;
+  /** Avisos del pipeline; los strings sueltos vienen de un Modal antiguo. */
+  advertencias: (string | PipelineWarning)[];
+  /** Puede faltar en análisis guardados antes de existir este cálculo. */
+  confianza?: Confidence;
   imagen_eliminada_en: string | null;
 }
 
@@ -94,8 +108,6 @@ export interface PipelineWarning {
 /** Respuesta del POST /food-logs/: el registro + el detalle por alimento (no se persiste). */
 export interface FoodLogCreated extends FoodLog {
   alimentos: DetectedFood[];
-  /** Los strings sueltos vienen de un Modal antiguo que aún no emitía códigos. */
-  advertencias: (string | PipelineWarning)[];
 }
 
 /** Detalle de un análisis guardado (GET /food-logs/:id/). */

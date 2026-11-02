@@ -7,6 +7,8 @@ import numpy as np
 from PIL import Image
 
 from .config import (
+    MAX_MEAN_HEIGHT_CM,
+    MAX_TOTAL_WEIGHT_G,
     MIN_MASK_AREA_FRAC,
     PLATE_DIAMETER_CM,
     PLATE_FALLBACK_DISTANCE_CM,
@@ -42,6 +44,17 @@ def build_strategy_b(segmenter, classifier) -> Strategy:
         return segments
 
     return run
+
+
+def _scale_food(food: dict, factor: float) -> None:
+    """Reescala volumen, peso y nutrientes de un alimento (los macros son proporcionales)."""
+    food["volumen_cm3"] = round(food["volumen_cm3"] * factor, 2)
+    food["peso_g"] = round(food["peso_g"] * factor, 2)
+    for key in ("calorias_kcal", "proteinas_g", "carbohidratos_g", "grasas_g"):
+        food["nutricion"][key] = round(food["nutricion"][key] * factor, 2)
+    dbg = food["debug_volumen"]
+    dbg["altura_media_cm"] = round(dbg["altura_media_cm"] * factor, 2)
+    dbg["altura_max_cm"] = round(dbg["altura_max_cm"] * factor, 2)
 
 
 class FoodPipeline:
@@ -135,6 +148,24 @@ class FoodPipeline:
                 )
                 if n["densidad_asumida"]:
                     warnings.append({"code": "density_assumed", "params": {"idx": s.class_idx}})
+
+        # --- topes de cordura -------------------------------------------------
+        # Si la geometría sale imposible (plano mal ajustado, comida que ocupa media foto), se
+        # recorta a lo físicamente posible y se avisa en vez de devolver kilos de comida.
+        clamped = False
+        for food in foods:
+            dbg = food["debug_volumen"]
+            if dbg["altura_media_cm"] > MAX_MEAN_HEIGHT_CM:
+                _scale_food(food, MAX_MEAN_HEIGHT_CM / dbg["altura_media_cm"])
+                dbg["recortado"] = True
+                clamped = True
+        total_g = sum(f["peso_g"] for f in foods)
+        if total_g > MAX_TOTAL_WEIGHT_G:
+            for food in foods:
+                _scale_food(food, MAX_TOTAL_WEIGHT_G / total_g)
+            clamped = True
+        if clamped:
+            warnings.append({"code": "volume_clamped"})
 
         totals = {
             "volumen_cm3": sum(f["volumen_cm3"] for f in foods),

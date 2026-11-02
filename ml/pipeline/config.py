@@ -54,6 +54,11 @@ PLATE_SCALE_MAX = 1.6
 PLATE_FALLBACK_TRIGGER_CM = 80.0
 PLATE_FALLBACK_DISTANCE_CM = 35.0
 
+# Topes de cordura. Si la geometría sale disparatada (plano mal ajustado, comida que ocupa media
+# foto), se recorta a lo físicamente posible y se avisa, en vez de devolver 4 kg de pizza.
+MAX_MEAN_HEIGHT_CM = 6.0
+MAX_TOTAL_WEIGHT_G = 2000.0
+
 # Inclinación de cámara (respecto a la vertical) a partir de la cual se avisa de que la foto
 # no es cenital. A ≤8° apunta el modo guiado; a partir de 15° el volumen empieza a desviarse.
 TILT_WARN_DEG = float(os.environ.get("TILT_WARN_DEG", 15.0))

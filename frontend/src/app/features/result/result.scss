@@ -222,6 +222,7 @@
   gap: var(--space-2);
 
   &__label {
+    flex-basis: 100%;
     color: var(--c-muted);
     font-size: 0.85rem;
   }
@@ -322,6 +323,48 @@
 }
 
 .note--error { color: var(--c-danger, #b3261e); }
+
+/* Nivel de confianza del análisis: color y motivos, sin tecnicismos. */
+.confidence {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 8px;
+  font-size: 0.9rem;
+
+  &__dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--c-primary);
+  }
+
+  &__reasons {
+    flex-basis: 100%;
+    margin: 0;
+    padding-left: 17px;
+    color: var(--c-muted);
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  &--media .confidence__dot { background: var(--c-warn); }
+  &--baja .confidence__dot { background: var(--c-danger, #b3261e); }
+}
+
+/* Alimento cuya clasificación el clasificador no tenía clara. */
+.food-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--c-warn-soft);
+  color: var(--c-warn);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
 
 /* Volver al historial cuando el análisis se abre desde una tarjeta del historial. */
 .back-link {

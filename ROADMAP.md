@@ -75,4 +75,7 @@ no hay sensor de inclinación).
 - [x] Historial → `/result/:id` con el detalle de cualquier análisis guardado
 - [x] Tabla de 30 nutrientes por 100 g en la ficha de cada alimento
 - [x] El consejo de Gemini se regenera al corregir el plato; el nombre de pila aparece ~1 de cada 3 veces
+- [x] Nivel de confianza (alta/media/baja) con sus motivos, recalculado al corregir
+- [x] Aviso «?» en los alimentos que el clasificador no tenía claros
+- [x] Topes de cordura del pipeline (altura media y peso total) con el aviso `volume_clamped`
 

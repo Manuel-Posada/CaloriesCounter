@@ -5,9 +5,21 @@ import { Subscription } from 'rxjs';
 import { FoodLogService } from '../../core/food-log/food-log.service';
 import { ResultStore } from '../../core/food-log/result.store';
 import { I18nService } from '../../core/i18n/i18n.service';
-import { CatalogFood, DetectedFood, PipelineWarning } from '../../core/models';
+import { CatalogFood, Confidence, DetectedFood, PipelineWarning } from '../../core/models';
 import { MessageKey } from '../../core/i18n/messages';
 import { TILT_WARN_DEG } from '../../core/tilt.service';
+
+/** Traducción de los motivos que bajan la confianza del análisis. */
+const CONFIDENCE_REASONS: Record<string, MessageKey> = {
+  escala_supuesta: 'confidence.reason.escalaSupuesta',
+  escala_sin_referencia: 'confidence.reason.escalaSinReferencia',
+  camara_inclinada: 'confidence.reason.camaraInclinada',
+  camara_algo_inclinada: 'confidence.reason.camaraAlgoInclinada',
+  clasificacion_baja: 'confidence.reason.clasificacionBaja',
+  clasificacion_muy_baja: 'confidence.reason.clasificacionMuyBaja',
+  densidad_asumida: 'confidence.reason.densidadAsumida',
+  volumen_recortado: 'confidence.reason.volumenRecortado',
+};
 
 /** Diámetros de plato ofrecidos para reescalar sin reprocesar la foto. */
 const PLATE_SIZES_CM = [22, 26, 30] as const;
@@ -188,6 +200,20 @@ interface RenderedSegment {
               </p>
             }
 
+            @if (r.confianza; as c) {
+              <div class="confidence" [class.confidence--media]="c.nivel === 'media'" [class.confidence--baja]="c.nivel === 'baja'">
+                <span class="confidence__dot" aria-hidden="true"></span>
+                <b>{{ i18n.t('result.confidenceLevel', { level: i18n.t(confidenceLabel(c)) }) }}</b>
+                @if (c.motivos.length) {
+                  <ul class="confidence__reasons">
+                    @for (reason of c.motivos; track reason) {
+                      <li>{{ i18n.t(reasonLabel(reason)) }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+
             @if (r.escala_origen === 'plate') {
               <div class="plate-size" role="group" [attr.aria-label]="i18n.t('result.plateSize')">
                 <span class="plate-size__label">{{ i18n.t('result.plateSize') }}</span>
@@ -237,6 +263,14 @@ interface RenderedSegment {
                     <span class="food-idx" aria-hidden="true">{{ $index + 1 }}</span>
                     <span class="food-name">{{ foodName(f) }}</span>
                     <span class="food-kcal">{{ f.nutricion.calorias_kcal | number: '1.0-0' }} kcal</span>
+                    @if (needsReview(f)) {
+                      <span
+                        class="food-check"
+                        [attr.title]="i18n.t('result.reviewFood')"
+                        [attr.aria-label]="i18n.t('result.reviewFood')"
+                        >?</span
+                      >
+                    }
                     <span class="chev" aria-hidden="true">›</span>
                   </button>
                 </li>
@@ -586,9 +620,29 @@ export class Result implements OnDestroy {
         return this.i18n.t('warning.lowVolume');
       case 'density_assumed':
         return this.i18n.t('warning.densityAssumed');
+      case 'volume_clamped':
+        return this.i18n.t('warning.volumeClamped');
       default:
         return w.code;
     }
+  }
+
+  /** Etiqueta del nivel de confianza y de cada motivo (claves i18n). */
+  protected confidenceLabel(confianza: Confidence): MessageKey {
+    return confianza.nivel === 'alta'
+      ? 'confidence.alta'
+      : confianza.nivel === 'media'
+        ? 'confidence.media'
+        : 'confidence.baja';
+  }
+
+  protected reasonLabel(code: string): MessageKey {
+    return CONFIDENCE_REASONS[code] ?? 'confidence.reason.unknown';
+  }
+
+  /** Alimento con clasificación dudosa que el usuario aún no ha revisado. */
+  protected needsReview(food: DetectedFood): boolean {
+    return !food.clase_editada && !food.peso_manual && (food.confianza ?? 0) < 0.15;
   }
 
   protected onPhotoLoad(event: Event): void {

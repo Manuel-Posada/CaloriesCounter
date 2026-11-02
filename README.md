@@ -210,12 +210,28 @@ su suma, así que ninguna edición escribe números a mano:
 El catálogo vive en `backend/core/data/nutrition_catalog.csv`, generado desde el CSV del pipeline
 con las columnas que hacen falta para recalcular (kcal y macros por 100 g + densidad). Se regenera
 con:
+
 ```powershell
 python ml/scripts/build_nutrition_catalog.py
 ```
 
-### Historial y detalle nutricional
+### Confianza y topes de cordura
 
+`core/confidence.py` calcula un nivel (**alta / media / baja**) y sus motivos a partir de la escala
+(plato, supuesta o sin referencia), la inclinación de la cámara, la confianza del clasificador
+—solo de los alimentos que el usuario no ha corregido—, las densidades asumidas y los volúmenes
+recortados. Se recalcula en cada corrección: si el usuario arregla los nombres dudosos, la
+confianza sube.
+
+En la pantalla aparece como chip con sus motivos, y cada alimento que el clasificador dudó lleva un
+**«?»** para invitar a revisarlo.
+
+El pipeline recorta a lo físicamente posible antes de devolver nada: **altura media > 6 cm** en un
+alimento o **más de 2 kg** en total (valores de `config.py`) se escalan y se avisa con
+`volume_clamped`. Es una red de seguridad, no una corrección: la foto sigue siendo mala, pero la
+app no devuelve kilos de comida.
+
+### Historial y detalle nutricional
 Cada tarjeta del historial enlaza a `/result/:id`, que carga el análisis guardado con
 `GET /api/food-logs/<id>/` (incluye los alimentos y su tabla). Los análisis antiguos, guardados antes
 de existir `items`, se abren igual pero sin detalle editable ni tabla por alimento.

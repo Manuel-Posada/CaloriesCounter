@@ -200,11 +200,18 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
         ser.is_valid(raise_exception=True)
         ser.save(usuario=request.user)
 
+        # Avisos y confianza se guardan con el análisis para que el detalle del historial los
+        # muestre igual que el resultado recién calculado.
+        registro = ser.instance
+        registro.advertencias = inference.get("advertencias", [])
+        food_items.attach_confidence(registro)
+        registro.save(update_fields=["advertencias", "confianza"])
+
         return Response(
             {
                 **ser.data,
                 "alimentos": food_items.alimentos_from_items(items),
-                "advertencias": inference.get("advertencias", []),
+                "advertencias": registro.advertencias,
             },
             status=status.HTTP_201_CREATED,
         )
@@ -240,7 +247,7 @@ class FoodLogDetailView(generics.RetrieveUpdateAPIView):
 
         update_fields = [
             "items", "volumen_estimado", "calorias_totales", "macronutrientes",
-            "clases_detectadas", "contornos", "plate_diameter_cm",
+            "clases_detectadas", "contornos", "plate_diameter_cm", "confianza",
         ]
         # El consejo habla del plato, así que al corregirlo se vuelve a pedir (si Gemini falla,
         # se conserva el anterior en lugar de dejar la ficha sin texto).

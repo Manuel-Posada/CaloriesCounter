@@ -127,6 +127,20 @@ export const ES = {
   'result.per100Note': 'Valores por 100 g del alimento, según la tabla nutricional.',
   'result.oldScan':
     'Este análisis es anterior al detalle por alimento: solo se conservan los totales y las zonas marcadas.',
+  'result.confidenceLevel': 'Confianza {level}',
+  'result.reviewFood': 'El clasificador no estaba seguro de este alimento: toca para revisarlo.',
+  'confidence.alta': 'alta',
+  'confidence.media': 'media',
+  'confidence.baja': 'baja',
+  'confidence.reason.escalaSupuesta': 'La escala se estimó sin ver el plato completo.',
+  'confidence.reason.escalaSinReferencia': 'No hubo una referencia de tamaño verificada.',
+  'confidence.reason.camaraInclinada': 'La foto no era cenital.',
+  'confidence.reason.camaraAlgoInclinada': 'La cámara estaba algo inclinada.',
+  'confidence.reason.clasificacionBaja': 'Algún alimento se clasificó con poca seguridad.',
+  'confidence.reason.clasificacionMuyBaja': 'Los nombres de los alimentos son dudosos.',
+  'confidence.reason.densidadAsumida': 'Se asumió la densidad de algún alimento.',
+  'confidence.reason.volumenRecortado': 'El volumen se recortó a un máximo físicamente posible.',
+  'confidence.reason.unknown': 'Hay factores que reducen la precisión.',
   'nutrient.groupGeneral': 'General',
   'nutrient.groupFats': 'Grasas',
   'nutrient.groupMinerals': 'Minerales',
@@ -255,6 +269,8 @@ export const ES = {
   'warning.lowVolume':
     'Volumen poco fiable: el plano de apoyo no se ajustó bien. Repite la foto con la mesa visible.',
   'warning.densityAssumed': 'Densidad asumida (1 g/cm³): la tabla no la incluye para este alimento.',
+  'warning.volumeClamped':
+    'La cantidad estimada superaba lo que cabe en un plato, así que la recortamos. Revisa la foto o corrige las porciones.',
 } as const;
 
 export type MessageKey = keyof typeof ES;
@@ -376,6 +392,20 @@ export const EN: Record<MessageKey, string> = {
   'result.per100Note': 'Values per 100 g of the food, from the nutrition table.',
   'result.oldScan':
     'This analysis predates per-food detail: only the totals and the marked areas were kept.',
+  'result.confidenceLevel': 'Confidence: {level}',
+  'result.reviewFood': 'The classifier was unsure about this food: tap to review it.',
+  'confidence.alta': 'high',
+  'confidence.media': 'medium',
+  'confidence.baja': 'low',
+  'confidence.reason.escalaSupuesta': 'The scale was estimated without seeing the whole plate.',
+  'confidence.reason.escalaSinReferencia': 'There was no verified size reference.',
+  'confidence.reason.camaraInclinada': 'The photo was not top-down.',
+  'confidence.reason.camaraAlgoInclinada': 'The camera was slightly tilted.',
+  'confidence.reason.clasificacionBaja': 'Some food was classified with low confidence.',
+  'confidence.reason.clasificacionMuyBaja': 'The food names are uncertain.',
+  'confidence.reason.densidadAsumida': 'A density had to be assumed for some food.',
+  'confidence.reason.volumenRecortado': 'The volume was capped at a physically possible maximum.',
+  'confidence.reason.unknown': 'Some factors reduce the accuracy.',
   'nutrient.groupGeneral': 'General',
   'nutrient.groupFats': 'Fats',
   'nutrient.groupMinerals': 'Minerals',
@@ -499,4 +529,6 @@ export const EN: Record<MessageKey, string> = {
   'warning.lowVolume':
     'Unreliable volume: the support plane did not fit well. Retake with the table visible.',
   'warning.densityAssumed': 'Assumed density (1 g/cm³): the table does not include it for this food.',
+  'warning.volumeClamped':
+    'The estimated amount exceeded what fits on a plate, so we capped it. Check the photo or correct the portions.',
 };

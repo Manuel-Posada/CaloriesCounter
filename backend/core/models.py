@@ -77,6 +77,11 @@ class FoodLog(models.Model):
     # Diámetro del plato con el que se fijó la escala y de dónde salió (plate/prior/raw).
     plate_diameter_cm = models.FloatField(default=26.0)
     escala_origen = models.CharField(max_length=10, default="raw")
+    # Avisos del pipeline guardados con el análisis (antes solo vivían en la respuesta del POST):
+    # así el detalle del historial muestra los mismos avisos que el resultado recién hecho.
+    advertencias = models.JSONField(default=list, blank=True)
+    # Nivel de confianza calculado a partir de la escala, la inclinación y el clasificador.
+    confianza = models.JSONField(default=dict, blank=True)
     consejo_nutricional = models.TextField(blank=True)
     # Inclinación estimada de la cámara respecto a la vertical, en grados, calculada por el
     # pipeline a partir del plano de apoyo. NULL = no se pudo determinar (nunca 0 por defecto).
