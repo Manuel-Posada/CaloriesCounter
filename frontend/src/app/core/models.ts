@@ -18,7 +18,7 @@ export interface DetectedFood {
   nombre: string;
   /** Nombre traducido del CSV nutricional; puede faltar en un Modal antiguo. */
   nombre_es?: string;
-  confianza: number;
+  confianza: number | null;
   volumen_cm3: number;
   peso_g: number;
   densidad_g_cm3: number;

@@ -76,6 +76,16 @@ def get(idx: int) -> dict | None:
     return _catalog().get(int(idx))
 
 
+@lru_cache(maxsize=1)
+def _by_name() -> dict[str, dict]:
+    return {_norm(row["nombre"]): row for row in _catalog().values()}
+
+
+def by_name(name: str) -> dict | None:
+    """Entrada del catálogo por nombre de clase en inglés (como se guarda en los contornos)."""
+    return _by_name().get(_norm(name))
+
+
 def details(idx: int) -> dict:
     """Detalle extendido por 100 g (minerales, vitaminas, grasas), vacío si no hay datos."""
     entry = _catalog().get(int(idx))

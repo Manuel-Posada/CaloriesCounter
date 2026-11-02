@@ -390,7 +390,13 @@ interface RenderedSegment {
                 </div>
                 <div>
                   <dt>{{ i18n.t('result.confidence') }}</dt>
-                  <dd>{{ f.confianza * 100 | number: '1.0-0' }}%</dd>
+                  <dd>
+                    @if (f.confianza != null) {
+                      {{ f.confianza * 100 | number: '1.0-0' }}%
+                    } @else {
+                      —
+                    }
+                  </dd>
                 </div>
               </dl>
 
@@ -642,7 +648,12 @@ export class Result implements OnDestroy {
 
   /** Alimento con clasificación dudosa que el usuario aún no ha revisado. */
   protected needsReview(food: DetectedFood): boolean {
-    return !food.clase_editada && !food.peso_manual && (food.confianza ?? 0) < 0.15;
+    return (
+      !food.clase_editada &&
+      !food.peso_manual &&
+      food.confianza != null &&
+      food.confianza < 0.15
+    );
   }
 
   protected onPhotoLoad(event: Event): void {

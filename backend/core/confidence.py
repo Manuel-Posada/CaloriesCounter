@@ -34,12 +34,12 @@ def evaluate(log) -> dict:
             score -= 10
             motivos.append("camara_algo_inclinada")
 
-    # Solo cuentan los alimentos que el usuario no ha revisado: si cambió la clase, el nombre
-    # ya no lo pone el clasificador y no tiene sentido penalizarlo.
+    # Solo cuentan los alimentos que el usuario no ha revisado y cuya confianza conocemos:
+    # los reconstruidos desde un análisis antiguo no la traen y no deben penalizar.
     dudosos = [
-        float(item.get("confianza") or 0)
+        float(item["confianza"])
         for item in log.items or []
-        if not item.get("clase_editada")
+        if not item.get("clase_editada") and item.get("confianza") is not None
     ]
     if dudosos:
         media = sum(dudosos) / len(dudosos)
