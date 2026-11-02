@@ -15,7 +15,7 @@ GEMINI_SYSTEM_PROMPT = (
     "macronutrientes basados en datos del USDA. Tu objetivo es dar un consejo ultra-conciso "
     "(máximo 3 oraciones) sobre este plato. No recalcules las calorías, asume que los datos son "
     "exactos. Enfócate en el impacto metabólico (ej. picos de glucosa, saciedad, balance). "
-    "Tono directo y amigable."
+    "Tono directo y amigable. Responde siempre en español y no repitas el JSON."
 )
 
 
@@ -80,12 +80,25 @@ def get_nutrition_advice(inference: dict) -> str:
     }
     try:
         genai.configure(api_key=settings.GEMINI_API_KEY)
-        model = genai.GenerativeModel(settings.GEMINI_MODEL, system_instruction=GEMINI_SYSTEM_PROMPT)
-        resp = model.generate_content(
-            json.dumps(payload, ensure_ascii=False),
-            generation_config={"temperature": 0.4, "max_output_tokens": 200},
-        )
-        return resp.text.strip()
+        payload_json = json.dumps(payload, ensure_ascii=False)
+        # El modelo configurado puede estar saturado (vimos timeouts con `gemini-flash-latest`):
+        # se intenta primero ese y, si falla, la variante lite, que es rápida y suficiente.
+        models = [settings.GEMINI_MODEL, "gemini-flash-lite-latest"]
+        for name in dict.fromkeys(m for m in models if m):
+            try:
+                model = genai.GenerativeModel(name, system_instruction=GEMINI_SYSTEM_PROMPT)
+                resp = model.generate_content(
+                    payload_json,
+                    generation_config={"temperature": 0.4, "max_output_tokens": 200},
+                    # Sin esto el SDK puede quedarse esperando y bloquear el POST completo.
+                    request_options={"timeout": 10},
+                )
+                text = (resp.text or "").strip()
+                if text:
+                    return text
+            except Exception:  # noqa: BLE001
+                log.warning("Gemini no respondió con %s; se prueba el siguiente", name)
+        return ""
     except Exception:  # SDK lanza varios tipos (bloqueo de seguridad, cuota, red...)
         log.exception("Gemini no disponible")
         return ""
