@@ -4,6 +4,8 @@ django-cors-headers>=4.7
 psycopg[binary]>=3.2
 python-decouple>=3.8
 gunicorn>=23.0
+dj-database-url>=2.3
+whitenoise>=6.8
 
 django-storages[s3]>=1.14
 boto3>=1.35

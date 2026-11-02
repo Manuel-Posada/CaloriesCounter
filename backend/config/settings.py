@@ -3,6 +3,8 @@ from pathlib import Path
 
 from decouple import Csv, config
 
+import dj_database_url
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("DJANGO_SECRET_KEY")
@@ -26,6 +28,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -55,16 +58,23 @@ TEMPLATES = [
 # Se usa el prefijo POSTGRES_* en lugar de DB_* porque python-decouple da
 # prioridad a las variables de entorno del sistema sobre el .env, y nombres
 # genéricos como DB_PASSWORD suelen estar definidos por otros proyectos.
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("POSTGRES_DB", default="caloriescounter"),
-        "USER": config("POSTGRES_USER", default="postgres"),
-        "PASSWORD": config("POSTGRES_PASSWORD", default=""),
-        "HOST": config("POSTGRES_HOST", default="localhost"),
-        "PORT": config("POSTGRES_PORT", default="5432"),
+# En producción (Neon) basta con definir DATABASE_URL.
+DATABASE_URL = config("DATABASE_URL", default="")
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": config("POSTGRES_DB", default="caloriescounter"),
+            "USER": config("POSTGRES_USER", default="postgres"),
+            "PASSWORD": config("POSTGRES_PASSWORD", default=""),
+            "HOST": config("POSTGRES_HOST", default="localhost"),
+            "PORT": config("POSTGRES_PORT", default="5432"),
+        }
+    }
 
 AUTH_USER_MODEL = "core.User"
 # Solo Google OAuth: ningún backend por contraseña salvo el admin (superusuarios).
@@ -76,9 +86,15 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="", cast=Csv())
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
+
+# Detrás del proxy de Modal/Vercel: sin esto Django cree que la petición es HTTP y
+# rechaza el admin por CSRF cuando el origen es https.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -111,7 +127,7 @@ FOOD_LOG_RETENTION_DAYS = config("FOOD_LOG_RETENTION_DAYS", default=30, cast=int
 
 STORAGES = {
     "default": {"BACKEND": "storages.backends.s3.S3Storage"},
-    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
 AWS_ACCESS_KEY_ID = R2_ACCESS_KEY_ID
@@ -131,4 +147,4 @@ MODAL_ENDPOINT_URL = config('MODAL_ENDPOINT_URL', default='')
 MODAL_SHARED_SECRET = config('MODAL_SHARED_SECRET', default='')
 MODAL_TIMEOUT = config('MODAL_TIMEOUT', default=90, cast=int)
 GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
-GEMINI_MODEL = config('GEMINI_MODEL', default='gemini-1.5-flash')
+GEMINI_MODEL = config('GEMINI_MODEL', default='gemini-flash-lite-latest')
