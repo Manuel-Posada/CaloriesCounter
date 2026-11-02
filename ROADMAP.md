@@ -12,16 +12,17 @@ no hay sensor de inclinación).
 - [x] Frontend: tarjeta de aviso en el resultado cuando el ángulo es alto
 - [x] Retención de 30 días para los `FoodLog` (comando `purge_food_logs`)
 
-## Mejoras de interfaz
+## Idiomas (español / inglés) ✅
 
-- [x] Menú lateral de configuración (drawer) con Perfil, Configuración, Administración
-      (solo `is_staff`) y cerrar sesión.
-- [x] `GET /api/me/` y `PATCH /api/me/` (nombre y apellidos editables).
-- [x] Selector de pipeline A/B en Administración, persistido y enviado en cada análisis.
-- [x] **Temas**: claro, oscuro y "sistema", con 5 acentos.
-- [x] **Cámara**: FOV horizontal (se envía como `fov_deg`) y sensibilidad del nivel.
-- [x] Marcar en el historial las fotos tomadas torcidas (> 15°).
-- [x] En móvil se ocultan las barras de desplazamiento; en escritorio se mantienen.
+- [x] Servicio de i18n propio con signals y diccionarios tipados (sin dependencias)
+- [x] Cambio en caliente y preferencia por dispositivo (`cc.locale`); por defecto, `navigator.language`
+- [x] Todas las pantallas migradas (login, captura, resultado, historial, perfil, ajustes, admin, menú)
+- [x] Fechas y números con el formato de cada idioma; `<html lang>` sincronizado
+- [x] `Accept-Language` en la API y prompt de Gemini en el idioma del usuario
+- [x] Avisos del pipeline como códigos (`tilt`, `low_volume`, `density_assumed`, `class_missing`)
+- [x] **323 nombres de comida traducidos** (`nombre_es` en el CSV nutricional), revisados por el usuario
+- [ ] Guardar el idioma en el perfil (`User.locale` + `PATCH /me/`) para que siga entre dispositivos
+- [ ] Más idiomas (la estructura ya lo permite: diccionario + prompt)
 
 ## Resultado con zonas y detalle ✅
 
@@ -30,16 +31,22 @@ no hay sensor de inclinación).
 - [x] Foto del resultado: proporción real + `<svg>` con el contorno de cada zona
 - [x] Etiqueta por zona con número, nombre y kcal, con separación si se solapan
 - [x] Lista de alimentos que abre una hoja de detalle: porción y valores por 100 g
-- [x] **Contornos guardados** en `FoodLog.contornos` y pintados en la miniatura del historial
-      mientras exista la imagen (72 h); `cleanup_r2_images` los vacía al borrarla.
-- [x] **EXIF**: el navegador lee `FocalLengthIn35mmFilm` antes de recomprimir y lo envía como
-      `f35_mm`; el pipeline lo usa si la subida no trae EXIF.
+- [x] Contornos guardados en `FoodLog.contornos` y pintados en la miniatura del historial (72 h)
+- [x] EXIF: el navegador lee `FocalLengthIn35mmFilm` antes de recomprimir y lo envía como `f35_mm`
+
+## Mejoras de interfaz
+
+- [x] Menú lateral de configuración con Perfil, Configuración, Administración y cerrar sesión
+- [x] `GET/PATCH /api/me/` (nombre y apellidos editables)
+- [x] Selector de pipeline A/B en Administración
+- [x] Temas claro/oscuro/sistema con 5 acentos
+- [x] Cámara: FOV horizontal y sensibilidad del nivel
+- [x] Historial: marcar fotos torcidas (> 15°) y pintar sus contornos
+- [x] En móvil se ocultan las barras de desplazamiento; en escritorio se mantienen
 
 ## Ideas / posible feature
 
-- [ ] **Recordatorios de comidas** (avisos): requieren permiso de notificaciones y un service
-      worker. No es un ajuste más: necesita infraestructura propia.
-- [ ] Ver la foto con sus contornos a tamaño completo desde el historial (hoy solo en la
-      miniatura de 84 px).
-- [ ] Detectar el FOV real de la cámara a partir de `FocalLength` + tamaño de sensor cuando no
-      hay `FocalLengthIn35mmFilm`.
+- [ ] **Recordatorios de comidas** (necesitan permiso de notificaciones y un service worker)
+- [ ] Ver la foto con sus contornos a tamaño completo desde el historial (hoy solo en la miniatura)
+- [ ] Calibrar la escala de profundidad con la distancia de captura para poder usar el modelo *Large*
+- [ ] Guardar el `nombre_es` también en los contornos del historial (hoy se guardan en inglés)
