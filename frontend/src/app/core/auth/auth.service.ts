@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, NgZone, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, catchError, finalize, map, of, shareReplay, tap, throwError } from 'rxjs';
+import { Observable, catchError, finalize, map, of, retry, shareReplay, tap, throwError, timer } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PipelineService } from '../food-log/pipeline.service';
 import { I18nService } from '../i18n/i18n.service';
@@ -9,6 +9,8 @@ import { TokenPair, UserProfile } from '../models';
 
 const ACCESS_KEY = 'cc.access';
 const REFRESH_KEY = 'cc.refresh';
+/** Copia del perfil para pintar el nombre y el avatar al instante (y si /me/ falla). */
+const PROFILE_KEY = 'cc.profile';
 const GIS_SRC = 'https://accounts.google.com/gsi/client';
 
 /** Por qué se cerró la sesión; la pantalla de login lo explica. */
@@ -36,7 +38,11 @@ export class AuthService {
   readonly isAuthenticated = computed(() => !!this.access() && !!this.refreshToken());
 
   /** Perfil de la cuenta (GET /me/). `null` mientras no se haya cargado. */
-  readonly profile = signal<UserProfile | null>(null);
+  readonly profile = signal<UserProfile | null>(readCachedProfile());
+  /** `true` cuando el perfil viene del servidor y no solo de la caché local. */
+  private readonly profileLoaded = signal(false);
+  private profileRetryTimer?: ReturnType<typeof setTimeout>;
+  private profileRetries = 0;
   readonly isAdmin = computed(() => this.profile()?.is_staff === true);
 
   /** Nombre a mostrar: el de Google y, si no hay, la parte local del email. */
@@ -119,7 +125,11 @@ export class AuthService {
     if (!this.isAuthenticated()) return false;
     const exp = tokenExpiry(this.access());
     if (exp !== null && exp - Date.now() > 60_000) return false;
-    this.refresh().subscribe({ error: () => undefined });
+    this.refresh().subscribe({
+      // Si el refresco no llega (red, backend despertando), el perfil se pide igual: con el
+      // access anterior si aún vale, o con el refresh del interceptor si devuelve 401.
+      error: () => this.loadProfile(),
+    });
     return true;
   }
 
@@ -130,7 +140,10 @@ export class AuthService {
     localStorage.removeItem(REFRESH_KEY);
     this.access.set(null);
     this.refreshToken.set(null);
-    this.profile.set(null);
+    if (this.profileRetryTimer !== undefined) clearTimeout(this.profileRetryTimer);
+    this.profileRetryTimer = undefined;
+    this.profileRetries = 0;
+    this.storeProfile(null);
     // La preferencia de pipeline es del dispositivo, pero no debe heredarla el siguiente usuario.
     this.pipelines.reset();
     // Cierre manual o por inactividad: no se vuelve a entrar solo. Solo una caducidad por
@@ -141,16 +154,26 @@ export class AuthService {
 
   /**
    * Perfil de la cuenta, cargado una sola vez. Las llamadas concurrentes comparten petición.
-   * Devuelve `null` si falla: el menú funciona igual, solo pierde el avatar y el acceso admin.
+   * Reintenta si el fallo es de red o del servidor (backend despertando) y devuelve `null`
+   * como último recurso: el menú funciona igual con la copia en caché.
    */
   ensureProfile(force = false): Observable<UserProfile | null> {
     const cached = this.profile();
-    if (cached && !force) return of(cached);
+    // La caché pinta al instante, pero no evita pedir el perfil al servidor una vez.
+    if (!force && cached && this.profileLoaded()) return of(cached);
     if (!this.isAuthenticated()) return of(null);
 
     if (!this.profileRequest$) {
       this.profileRequest$ = this.http.get<UserProfile>(`${environment.apiUrl}/me/`).pipe(
-        tap((p) => this.profile.set(p)),
+        retry({
+          count: 2,
+          delay: (error: unknown, attempt: number) => {
+            const status = (error as HttpErrorResponse)?.status;
+            // 401/403 los gestiona el interceptor (refresh o cierre); reintentar no aporta.
+            return status === 0 || status >= 500 ? timer(attempt * 1500) : throwError(() => error);
+          },
+        }),
+        tap((p) => this.storeProfile(p)),
         catchError(() => of(null)),
         finalize(() => (this.profileRequest$ = undefined)),
         shareReplay({ bufferSize: 1, refCount: false }),
@@ -161,14 +184,27 @@ export class AuthService {
 
   /** Dispara la carga sin esperar al resultado (para el arranque y tras el login). */
   loadProfile(force = false): void {
-    this.ensureProfile(force).subscribe();
+    this.ensureProfile(force).subscribe((profile) => {
+      if (profile) {
+        this.profileRetries = 0;
+        return;
+      }
+      // Backend dormido o microcorte: reintentos espaciados; la app sigue usable mientras.
+      if (!this.isAuthenticated() || this.profileLoaded() || this.profileRetryTimer !== undefined) return;
+      if (this.profileRetries >= 3) return;
+      this.profileRetries++;
+      this.profileRetryTimer = setTimeout(() => {
+        this.profileRetryTimer = undefined;
+        this.loadProfile();
+      }, 15_000);
+    });
   }
 
   /** Guarda nombre y apellidos. El email y la foto vienen de Google y no se editan aquí. */
   updateProfile(payload: { first_name: string; last_name: string }): Observable<UserProfile> {
     return this.http
       .patch<UserProfile>(`${environment.apiUrl}/me/`, payload)
-      .pipe(tap((profile) => this.profile.set(profile)));
+      .pipe(tap((profile) => this.storeProfile(profile)));
   }
 
   /** Guarda las preferencias de interfaz para que sigan al usuario entre dispositivos. */
@@ -179,7 +215,7 @@ export class AuthService {
   }): Observable<UserProfile> {
     return this.http
       .patch<UserProfile>(`${environment.apiUrl}/me/`, prefs)
-      .pipe(tap((profile) => this.profile.set(profile)));
+      .pipe(tap((profile) => this.storeProfile(profile)));
   }
 
   /** Indica si hay un OAuth Client ID real configurado (no el placeholder). */
@@ -223,6 +259,19 @@ export class AuthService {
     this.loadProfile();
   }
 
+  /** Guarda el perfil en memoria y en `localStorage` (para pintarlo al instante al abrir). */
+  private storeProfile(profile: UserProfile | null): void {
+    this.profile.set(profile);
+    this.profileLoaded.set(profile !== null);
+    if (profile) this.profileRetries = 0;
+    try {
+      if (profile) localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+      else localStorage.removeItem(PROFILE_KEY);
+    } catch {
+      // Almacenamiento lleno o bloqueado: la app funciona igual, solo pierde la caché.
+    }
+  }
+
   private loadGis(): Promise<void> {
     if (typeof google !== 'undefined' && google.accounts?.id) return Promise.resolve();
     return new Promise((resolve, reject) => {
@@ -244,6 +293,18 @@ function tokenExpiry(token: string | null): number | null {
     const payload = token.split('.')[1];
     const json = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
     return typeof json.exp === 'number' ? json.exp * 1000 : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Perfil guardado de la última sesión, para no mostrar «Mi cuenta» mientras llega /me/. */
+function readCachedProfile(): UserProfile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw) as UserProfile;
+    return typeof data?.email === 'string' && data.email ? data : null;
   } catch {
     return null;
   }

@@ -84,5 +84,6 @@ no hay sensor de inclinación).
 - [x] Cierre de sesión por inactividad (30 min, con aviso un minuto antes y «Seguir conectado»)
 - [x] Reentrada rápida: refresh al arrancar si el access caducó, y la red caída ya no cierra sesión
 - [x] Aviso del motivo en el login («Cerramos tu sesión por inactividad» / «Tu sesión caducó»)
+- [x] Perfil en caché y con reintentos: nunca se queda en «Mi cuenta» con la sesión abierta
 - [ ] Recordar el dispositivo más allá de los 14 días del refresh (requiere rotación + lista negra)
 

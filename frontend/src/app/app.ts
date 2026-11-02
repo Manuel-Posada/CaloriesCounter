@@ -102,6 +102,14 @@ export class App {
     this.drawer()?.openMenu();
   }
 
+  /** Volver a la pestaña o recuperar la red: si el perfil no llegó, se reintenta. */
+  @HostListener('document:visibilitychange')
+  @HostListener('window:online')
+  protected onMaybeBack(): void {
+    if (document.hidden) return;
+    if (this.auth.isAuthenticated() && !this.auth.profile()) this.auth.loadProfile();
+  }
+
   @HostListener('window:scroll')
   protected onWindowScroll(): void {
     this.isScrolled.set(window.scrollY > 8);

@@ -203,6 +203,9 @@ pantalla de resultados: sin referencia, el volumen sigue siendo poco fiable.
   petición.
 - **Un fallo de red ya no saca la sesión**: solo un `401/403` del endpoint de refresh la cierra
   (motivo «Tu sesión caducó»). Un corte de red se propaga y se reintenta en la siguiente petición.
+- **El perfil no se queda en «Mi cuenta»**: se guarda una copia en `localStorage` (`cc.profile`)
+  para pintar nombre y avatar al instante, y `GET /me/` se pide igualmente al servidor. Si falla,
+  se reintenta (2 veces rápido + hasta 3 cada 15 s) y al volver a la pestaña o recuperar la red.
 - **Auto-acceso de Google** (`auto_select`) en la pantalla de login: tras una caducidad por tiempo
   se entra sin tocar nada; tras un cierre manual o por inactividad **no**, para que el cierre siga
   significando algo.
