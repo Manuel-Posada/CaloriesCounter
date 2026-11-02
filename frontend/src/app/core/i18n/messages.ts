@@ -21,6 +21,10 @@ export const ES = {
 
   // Login
   'login.tagline': 'Fotografía tu plato y descubre calorías y macros al instante.',
+  'login.phrase1': 'Descubre lo que comes al instante',
+  'login.phrase2': 'Tu nutrición en una sola foto',
+  'login.phrase3': 'Conoce tus macros fácilmente',
+  'login.phrase4': 'Inteligencia artificial para tu dieta',
   'login.loading': 'Iniciando sesión…',
   'login.noClient': 'Login con Google sin configurar: falta el OAuth Client ID en environment.ts.',
   'login.gisError': 'No se pudo cargar el inicio de sesión de Google. Revisa tu conexión.',
@@ -28,6 +32,12 @@ export const ES = {
 
   // Captura
   'capture.title': '¿Qué vas a comer?',
+  'capture.title1': '¿Qué vas a comer hoy?',
+  'capture.title2': 'Listo para tu próxima comida',
+  'capture.title3': 'Escanea tu plato',
+  'capture.title4': 'Veamos qué hay en el menú',
+  'capture.levelRequired': 'Nivela el teléfono (≤ {deg}°) antes de disparar.',
+  'capture.levelLost': 'Ángulo perdido: vuelve a alinear y dispara.',
   'capture.subtitle':
     'Coloca el plato en la mesa y abre la cámara: te marcará en verde el momento exacto en el que está perfectamente cenital.',
   'capture.openCamera': 'Abrir cámara guiada',
@@ -200,12 +210,22 @@ export const EN: Record<MessageKey, string> = {
   'drawer.logout': 'Sign out',
 
   'login.tagline': 'Snap your plate and get calories and macros instantly.',
+  'login.phrase1': 'Discover what you eat, instantly',
+  'login.phrase2': 'Your nutrition in a single photo',
+  'login.phrase3': 'Know your macros with ease',
+  'login.phrase4': 'Artificial intelligence for your diet',
   'login.loading': 'Signing in…',
   'login.noClient': 'Google sign-in is not configured: missing OAuth Client ID in environment.ts.',
   'login.gisError': 'Could not load Google sign-in. Check your connection.',
   'login.invalid': 'We could not verify your Google account. Please try again.',
 
   'capture.title': 'What are you eating?',
+  'capture.title1': 'What are you eating today?',
+  'capture.title2': 'Ready for your next meal',
+  'capture.title3': 'Scan your plate',
+  'capture.title4': "Let's see what's on the menu",
+  'capture.levelRequired': 'Level the phone (≤ {deg}°) before shooting.',
+  'capture.levelLost': 'Angle lost: realign and shoot again.',
   'capture.subtitle':
     'Place the plate on the table and open the camera: it turns green at the exact moment the shot is perfectly top-down.',
   'capture.openCamera': 'Open guided camera',

@@ -1,52 +1,168 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: color-mix(in srgb, var(--c-bg) 75%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &--scrolled {
+    background: color-mix(in srgb, var(--c-surface) 82%, transparent);
+    border-bottom-color: var(--c-border);
+    box-shadow: 0 2px 12px rgb(15 23 42 / 5%);
+  }
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--topbar-h, 60px);
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+  }
+
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--c-text);
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  &__logo {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  &__profile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    border: 1.5px solid var(--c-border);
+    border-radius: 50%;
+    background: var(--c-surface);
+    transition:
+      transform 0.15s ease,
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover {
+      border-color: var(--c-primary);
+    }
+
+    &:active {
+      transform: scale(0.94);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--c-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  &__avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 0.8rem;
+  }
+}
+
 main.with-nav {
-  padding-bottom: calc(var(--nav-h) + var(--safe-bottom));
+  padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + var(--space-4));
 }
 
 .tabbar {
   position: fixed;
   inset: auto 0 0 0;
-  display: flex;
+  z-index: 10;
   height: calc(var(--nav-h) + var(--safe-bottom));
   padding-bottom: var(--safe-bottom);
-  background: var(--c-surface);
+  background: color-mix(in srgb, var(--c-surface) 88%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--c-border);
-  z-index: 10;
 
-  a,
-  button {
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+    height: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+  }
+
+  a {
+    position: relative;
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    background: none;
-    border: 0;
+    gap: 4px;
+    height: 100%;
     color: var(--c-muted);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     text-decoration: none;
+    transition:
+      color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
 
-    span {
-      font-size: 1.3rem;
+    &::after {
+      content: '';
+      width: 18px;
+      height: 3px;
+      margin-top: 2px;
+      border-radius: 999px;
+      background: var(--c-primary);
+      opacity: 0;
+      transform: scaleX(0);
+      transition:
+        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.2s ease;
+    }
+
+    &:active {
+      transform: scale(0.92);
     }
 
     &.active {
       color: var(--c-primary);
+      font-weight: 600;
+
+      .tabbar__icon {
+        transform: scale(1.15);
+      }
+
+      &::after {
+        opacity: 1;
+        transform: scaleX(1);
+      }
     }
   }
 
-  /* El tercer botón es el menú de cuenta: avatar redondo en vez de emoji. */
-  .account {
-    .avatar {
-      width: 26px;
-      height: 26px;
-      font-size: 0.7rem;
-    }
+  &__icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
-    .label {
-      font-size: 0.75rem;
-    }
+  &__label {
+    letter-spacing: 0.01em;
   }
 }
+
 

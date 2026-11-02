@@ -21,7 +21,7 @@ import { Component, computed, input, signal } from '@angular/core';
       border-radius: 50%;
       background: var(--c-primary-soft);
       color: var(--c-primary-dark);
-      font-weight: 700;
+      font-weight: 600;
       line-height: 1;
       user-select: none;
     }

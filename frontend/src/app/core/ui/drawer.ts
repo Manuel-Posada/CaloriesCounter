@@ -13,9 +13,15 @@ import { Avatar } from './avatar';
   imports: [Avatar, RouterLink, RouterLinkActive],
   template: `
     @if (open()) {
-      <div class="scrim" (click)="close()"></div>
+      <div class="scrim" [class.scrim--open]="open()" (click)="close()"></div>
 
-      <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-name">
+      <aside
+        class="drawer"
+        [class.drawer--open]="open()"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="drawer-name"
+      >
         <header class="head">
           <a class="account" routerLink="/profile" (click)="close()">
             <app-avatar

@@ -21,12 +21,19 @@ const STEPS: { key: Step; labelKey: MessageKey }[] = [
   { key: 'infer', labelKey: 'capture.stepInfer' },
 ];
 
-/** Tiempo que hay que mantener el nivel antes de disparar solo. */
-const HOLD_MS = 500;
-/** Duración de cada paso de la cuenta atrás automática. */
-const COUNTDOWN_STEP_MS = 300;
+const HOME_TITLE_KEYS: readonly MessageKey[] = [
+  'capture.title1',
+  'capture.title2',
+  'capture.title3',
+  'capture.title4',
+];
+
+/** Duración de cada paso de la cuenta regresiva (1 segundo × 3 pasos = 3 segundos). */
+const COUNTDOWN_STEP_MS = 1000;
 /** Frecuencia con la que se evalúa la inclinación. */
 const WATCH_MS = 100;
+/** Tiempo que permanece visible un aviso superpuesto en cámara antes de ocultarse. */
+const NOTICE_TIMEOUT_MS = 3500;
 
 @Component({
   selector: 'app-capture',
@@ -35,7 +42,7 @@ const WATCH_MS = 100;
     <section class="page capture" [class.capture--camera]="mode() === 'camera'">
       @if (mode() === 'idle') {
         <header>
-          <h1>{{ i18n.t('capture.title') }}</h1>
+          <h1>{{ dynamicTitle() }}</h1>
           <p class="muted">{{ i18n.t('capture.subtitle') }}</p>
         </header>
 
@@ -73,17 +80,58 @@ const WATCH_MS = 100;
 
           <button type="button" class="close" [attr.aria-label]="i18n.t('capture.closeCamera')" (click)="closeCamera()">✕</button>
 
-          <div class="frame" aria-hidden="true">
-            <span class="ring" [class.ring--ready]="isLevel()"></span>
+          <div
+            class="frame"
+            [class.frame--ready]="isLevel()"
+            [class.frame--counting]="isCounting()"
+            aria-hidden="true"
+          >
+            <svg class="guide" viewBox="0 0 240 240" fill="none">
+              <path
+                class="bracket bracket--tl"
+                d="M 24 72 L 24 42 A 18 18 0 0 1 42 24 L 72 24"
+              />
+              <path
+                class="bracket bracket--tr"
+                d="M 168 24 L 198 24 A 18 18 0 0 1 216 42 L 216 72"
+              />
+              <path
+                class="bracket bracket--br"
+                d="M 216 168 L 216 198 A 18 18 0 0 1 198 216 L 168 216"
+              />
+              <path
+                class="bracket bracket--bl"
+                d="M 72 216 L 42 216 A 18 18 0 0 1 24 198 L 24 168"
+              />
+              <circle class="target-ring" cx="120" cy="120" r="86" />
+            </svg>
           </div>
 
-          @if (countdown() > 0) {
-            <div class="countdown" aria-live="assertive">{{ countdown() }}</div>
+          @if (isCounting() && countdown() > 0) {
+            <div class="countdown" aria-live="assertive">
+              <span class="countdown__num">{{ countdown() }}</span>
+            </div>
           }
 
-          @if (tilt.silent()) {
+          @if (cameraNotice(); as notice) {
+            <p class="notice notice--alert" role="status" aria-live="polite">
+              {{ i18n.t(notice.key, notice.deg !== undefined ? { deg: notice.deg } : undefined) }}
+            </p>
+          } @else if (tilt.silent()) {
             <p class="notice">{{ i18n.t('capture.noSensor') }}</p>
           }
+
+          <button
+            type="button"
+            class="shutter"
+            [class.shutter--ready]="canShoot()"
+            [class.shutter--counting]="isCounting()"
+            [disabled]="isCounting()"
+            [attr.aria-label]="canShoot() ? i18n.t('capture.shoot') : i18n.t('capture.shootDisabled')"
+            (click)="triggerCapture()"
+          >
+            <span class="shutter__dot"></span>
+          </button>
         </div>
 
         <p class="tip">{{ i18n.t('capture.holdTip') }}</p>
@@ -96,17 +144,6 @@ const WATCH_MS = 100;
           [level]="isLevel()"
           [exitDeg]="prefs.levelExit()"
         />
-
-        <button
-          type="button"
-          class="shutter"
-          [class.shutter--ready]="canShoot()"
-          [disabled]="!canShoot()"
-          [attr.aria-label]="canShoot() ? i18n.t('capture.shoot') : i18n.t('capture.shootDisabled')"
-          (click)="shoot()"
-        >
-          <span class="shutter__dot"></span>
-        </button>
       } @else {
         <div class="preview">
           @if (previewUrl()) {
@@ -162,10 +199,12 @@ export class Capture implements OnDestroy {
   private stream?: MediaStream;
   private watchTimer?: ReturnType<typeof setInterval>;
   private countdownTimer?: ReturnType<typeof setInterval>;
-  private stableSince = 0;
+  private noticeTimeout?: ReturnType<typeof setTimeout>;
   private capturing = false;
   private audio?: AudioContext;
 
+  private readonly titleIndex = Math.floor(Math.random() * HOME_TITLE_KEYS.length);
+  protected readonly dynamicTitle = computed(() => this.i18n.t(HOME_TITLE_KEYS[this.titleIndex]));
   protected readonly steps = STEPS;
   protected readonly mode = signal<Mode>('idle');
   protected readonly step = signal<Step>('presign');
@@ -174,10 +213,12 @@ export class Capture implements OnDestroy {
   protected readonly cameraFailed = signal(false);
   protected readonly previewUrl = signal<string | null>(null);
   protected readonly isLevel = signal(false);
+  protected readonly isCounting = signal(false);
   protected readonly countdown = signal(0);
+  protected readonly cameraNotice = signal<{ key: MessageKey; deg?: number } | null>(null);
   protected readonly activeIndex = computed(() => STEPS.findIndex((s) => s.key === this.step()));
   protected readonly canShoot = computed(
-    () => this.countdown() === 0 && (this.isLevel() || this.tilt.silent()),
+    () => !this.isCounting() && (this.isLevel() || this.tilt.silent()),
   );
 
   constructor() {
@@ -215,23 +256,44 @@ export class Capture implements OnDestroy {
     }
 
     this.isLevel.set(false);
+    this.isCounting.set(false);
     this.countdown.set(0);
+    this.clearNotice();
     this.capturing = false;
-    this.stableSince = 0;
     this.mode.set('camera');
     this.watchTimer = setInterval(() => this.evaluateTilt(), WATCH_MS);
   }
 
   closeCamera(): void {
     this.cancelCountdown();
-    if (this.watchTimer) clearInterval(this.watchTimer);
-    this.watchTimer = undefined;
+    this.clearNotice();
+    if (this.watchTimer !== undefined) {
+      clearInterval(this.watchTimer);
+      this.watchTimer = undefined;
+    }
     this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = undefined;
     this.tilt.disable();
     this.isLevel.set(false);
-    this.stableSince = 0;
     if (this.mode() === 'camera') this.mode.set('idle');
+  }
+
+  /**
+   * Acción manual del obturador:
+   * - Si el dispositivo no está nivelado (> umbral cenital, 8° por defecto), muestra aviso y no inicia cuenta.
+   * - Si está nivelado (o el dispositivo no tiene sensor), inicia la cuenta regresiva de 3 segundos.
+   */
+  triggerCapture(): void {
+    if (this.mode() !== 'camera' || this.isCounting() || this.capturing) return;
+
+    if (!this.isLevel() && !this.tilt.silent()) {
+      this.chime(360);
+      this.showNotice('capture.levelRequired', this.prefs.levelEnter());
+      return;
+    }
+
+    this.clearNotice();
+    this.startCountdown();
   }
 
   async shoot(): Promise<void> {
@@ -283,35 +345,40 @@ export class Capture implements OnDestroy {
     void this.audio?.close();
   }
 
-  /** Vigila la inclinación: verde con histéresis y auto-disparo si se mantiene nivelado. */
+  /**
+   * Vigila la inclinación con histéresis:
+   * - Entra en verde al alcanzar `levelEnter()` (8° por defecto).
+   * - Sale de verde si supera `levelExit()` (histéresis).
+   * - No dispara automáticamente; pero si hay una cuenta regresiva activa y se pierde el nivel,
+   *   cancela de inmediato el temporizador y notifica al usuario.
+   */
   private evaluateTilt(): void {
     if (this.mode() !== 'camera') return;
 
     const angle = this.tilt.tilt();
     if (angle === null) {
       this.isLevel.set(false);
-      this.stableSince = 0;
-      if (this.countdown() > 0) this.cancelCountdown();
+      if (this.isCounting()) {
+        this.cancelCountdown(true);
+      }
       return;
     }
 
     const level = angle <= (this.isLevel() ? this.prefs.levelExit() : this.prefs.levelEnter());
-    if (level && !this.isLevel()) this.chime(720);
-    if (!level) {
-      this.stableSince = 0;
-      // Si se mueve durante la cuenta atrás se aborta: la foto saldría torcida.
-      if (this.countdown() > 0) this.cancelCountdown();
+    if (level && !this.isLevel()) {
+      this.chime(720);
+    }
+    if (!level && this.isCounting()) {
+      // Si se mueve y supera la histéresis durante los 3 s, se aborta de inmediato.
+      this.cancelCountdown(true);
     }
     this.isLevel.set(level);
-
-    if (!level || this.countdown() > 0) return;
-    if (this.stableSince === 0) this.stableSince = Date.now();
-    if (Date.now() - this.stableSince >= HOLD_MS) this.startCountdown();
   }
 
   private startCountdown(): void {
-    if (this.capturing || this.countdownTimer) return;
-    this.capturing = true;
+    if (this.capturing || this.isCounting() || this.countdownTimer !== undefined) return;
+
+    this.isCounting.set(true);
     this.countdown.set(3);
     this.chime(880);
 
@@ -319,6 +386,7 @@ export class Capture implements OnDestroy {
       const next = this.countdown() - 1;
       if (next > 0) {
         this.countdown.set(next);
+        this.chime(880);
         return;
       }
       this.cancelCountdown();
@@ -326,11 +394,36 @@ export class Capture implements OnDestroy {
     }, COUNTDOWN_STEP_MS);
   }
 
-  private cancelCountdown(): void {
-    if (this.countdownTimer) clearInterval(this.countdownTimer);
-    this.countdownTimer = undefined;
+  private cancelCountdown(interruptedByMotion = false): void {
+    if (this.countdownTimer !== undefined) {
+      clearInterval(this.countdownTimer);
+      this.countdownTimer = undefined;
+    }
+    this.isCounting.set(false);
     this.countdown.set(0);
     this.capturing = false;
+
+    if (interruptedByMotion) {
+      this.chime(320);
+      this.showNotice('capture.levelLost');
+    }
+  }
+
+  private showNotice(key: MessageKey, deg?: number): void {
+    this.clearNotice();
+    this.cameraNotice.set({ key, deg });
+    this.noticeTimeout = setTimeout(() => {
+      this.cameraNotice.set(null);
+      this.noticeTimeout = undefined;
+    }, NOTICE_TIMEOUT_MS);
+  }
+
+  private clearNotice(): void {
+    if (this.noticeTimeout !== undefined) {
+      clearTimeout(this.noticeTimeout);
+      this.noticeTimeout = undefined;
+    }
+    this.cameraNotice.set(null);
   }
 
   private failCamera(key: MessageKey): void {

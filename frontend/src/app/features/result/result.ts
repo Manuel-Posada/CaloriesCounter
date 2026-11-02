@@ -1,4 +1,4 @@
-﻿import { DecimalPipe, DatePipe } from '@angular/common';
+import { DecimalPipe, DatePipe } from '@angular/common';
 import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ResultStore } from '../../core/food-log/result.store';
@@ -39,9 +39,15 @@ interface RenderedSegment {
           @if (photo() && segments().length) {
             <svg class="overlay" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
               @for (s of segments(); track s.key) {
-                <polygon [attr.points]="s.points" />
+                <polygon [attr.points]="s.points" [style.--i]="$index" />
                 @if (s.ly !== s.cy) {
-                  <line [attr.x1]="s.cx" [attr.y1]="s.cy" [attr.x2]="s.lx" [attr.y2]="s.ly" />
+                  <line
+                    [attr.x1]="s.cx"
+                    [attr.y1]="s.cy"
+                    [attr.x2]="s.lx"
+                    [attr.y2]="s.ly"
+                    [style.--i]="$index"
+                  />
                 }
               }
             </svg>
@@ -52,6 +58,7 @@ interface RenderedSegment {
                 [class.tag--below]="s.below"
                 [style.left.%]="s.lx * 100"
                 [style.top.%]="s.ly * 100"
+                [style.--i]="$index"
               >
                 <span class="tag-idx" aria-hidden="true">{{ s.n }}</span>
                 <b>{{ s.label }}</b>
@@ -66,78 +73,86 @@ interface RenderedSegment {
           }
         </figure>
 
-        <!-- Aviso de foto no cenital: el volumen puede estar sobreestimado -->
-        @if (tiltWarning(); as t) {
-          <aside class="card tilt-warn" role="status">
-            <span class="icon" aria-hidden="true">📐</span>
-            <div>
-              <strong>{{ i18n.t('result.tiltTitle', { deg: (t | number: '1.0-0') ?? '' }) }}</strong>
-              <p>{{ i18n.t('result.tiltBody') }}</p>
+        <div class="results-panel">
+          <!-- Aviso de foto no cenital: el volumen puede estar sobreestimado -->
+          @if (tiltWarning(); as t) {
+            <aside class="card tilt-warn" role="status">
+              <span class="icon" aria-hidden="true">📐</span>
+              <div>
+                <strong>{{ i18n.t('result.tiltTitle', { deg: (t | number: '1.0-0') ?? '' }) }}</strong>
+                <p>{{ i18n.t('result.tiltBody') }}</p>
+              </div>
+            </aside>
+          }
+
+          <!-- Consejo de Gemini -->
+          @if (r.consejo_nutricional) {
+            <aside class="advice" [attr.aria-label]="i18n.t('result.advice')">
+              <span class="spark" aria-hidden="true">✨</span>
+              <p>{{ r.consejo_nutricional }}</p>
+            </aside>
+          }
+
+          <!-- Resumen calórico -->
+          <div class="card summary">
+            <div class="kcal">
+              <strong>{{ r.calorias_totales | number: '1.0-0' }}</strong>
+              <span>{{ i18n.t('result.kcalTotal') }}</span>
             </div>
-          </aside>
-        }
 
-        <!-- Consejo de Gemini -->
-        @if (r.consejo_nutricional) {
-          <aside class="advice" [attr.aria-label]="i18n.t('result.advice')">
-            <span class="spark" aria-hidden="true">✨</span>
-            <p>{{ r.consejo_nutricional }}</p>
-          </aside>
-        }
+            <div class="split" role="img" [attr.aria-label]="splitLabel()">
+              <span class="seg protein" [style.flex-grow]="split().p"></span>
+              <span class="seg carbs" [style.flex-grow]="split().c"></span>
+              <span class="seg fat" [style.flex-grow]="split().f"></span>
+            </div>
 
-        <!-- Resumen calórico -->
-        <div class="card summary">
-          <div class="kcal">
-            <strong>{{ r.calorias_totales | number: '1.0-0' }}</strong>
-            <span>{{ i18n.t('result.kcalTotal') }}</span>
+            <ul class="macros">
+              <li>
+                <i class="protein"></i>{{ i18n.t('result.protein') }}
+                <b>{{ r.macronutrientes.proteinas_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
+              </li>
+              <li>
+                <i class="carbs"></i>{{ i18n.t('result.carbs') }}
+                <b>{{ r.macronutrientes.carbohidratos_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
+              </li>
+              <li>
+                <i class="fat"></i>{{ i18n.t('result.fat') }}
+                <b>{{ r.macronutrientes.grasas_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
+              </li>
+            </ul>
           </div>
 
-          <div class="split" role="img" [attr.aria-label]="splitLabel()">
-            <span class="seg protein" [style.flex-grow]="split().p"></span>
-            <span class="seg carbs" [style.flex-grow]="split().c"></span>
-            <span class="seg fat" [style.flex-grow]="split().f"></span>
-          </div>
-
-          <ul class="macros">
-            <li>
-              <i class="protein"></i>{{ i18n.t('result.protein') }}
-              <b>{{ r.macronutrientes.proteinas_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
-            </li>
-            <li>
-              <i class="carbs"></i>{{ i18n.t('result.carbs') }}
-              <b>{{ r.macronutrientes.carbohidratos_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
-            </li>
-            <li>
-              <i class="fat"></i>{{ i18n.t('result.fat') }}
-              <b>{{ r.macronutrientes.grasas_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
-            </li>
+          <!-- Detalle por alimento -->
+          <h2>{{ i18n.t('result.foods', { count: r.alimentos.length }) }}</h2>
+          <ul class="foods">
+            @for (f of r.alimentos; track $index) {
+              <li class="food-item" [style.--i]="$index">
+                <button type="button" class="food" (click)="openSheet(f, $index)">
+                  <span class="food-idx" aria-hidden="true">{{ $index + 1 }}</span>
+                  <span class="food-name">{{ foodName(f) }}</span>
+                  <span class="food-kcal">{{ f.nutricion.calorias_kcal | number: '1.0-0' }} kcal</span>
+                  <span class="chev" aria-hidden="true">›</span>
+                </button>
+              </li>
+            }
           </ul>
+
+          @for (w of otherWarnings(); track $index) {
+            <p class="note">ℹ️ {{ warningText(w) }}</p>
+          }
+          <p class="note">{{ i18n.t('result.estimateNote') }}</p>
+
+          <a class="btn btn--primary btn--block" routerLink="/">{{ i18n.t('result.another') }}</a>
         </div>
 
-        <!-- Detalle por alimento -->
-        <h2>{{ i18n.t('result.foods', { count: r.alimentos.length }) }}</h2>
-        <ul class="foods">
-          @for (f of r.alimentos; track $index) {
-            <li>
-              <button type="button" class="food" (click)="openSheet(f, $index)">
-                <span class="food-idx" aria-hidden="true">{{ $index + 1 }}</span>
-                <span class="food-name">{{ foodName(f) }}</span>
-                <span class="food-kcal">{{ f.nutricion.calorias_kcal | number: '1.0-0' }} kcal</span>
-                <span class="chev" aria-hidden="true">›</span>
-              </button>
-            </li>
-          }
-        </ul>
-
-        @for (w of otherWarnings(); track $index) {
-          <p class="note">ℹ️ {{ warningText(w) }}</p>
-        }
-        <p class="note">{{ i18n.t('result.estimateNote') }}</p>
-
-        <a class="btn btn--primary btn--block" routerLink="/">{{ i18n.t('result.another') }}</a>
-
         <!-- Hoja de detalle nutricional -->
-        <dialog #sheet class="sheet" (click)="onSheetClick($event)" (close)="selected.set(null)">
+        <dialog
+          #sheet
+          class="sheet"
+          [class.sheet--open]="isSheetOpen()"
+          (click)="onSheetClick($event)"
+          (close)="selected.set(null)"
+        >
           @if (selected(); as f) {
             <article>
               <header class="sheet-head">
@@ -245,6 +260,7 @@ export class Result {
   protected readonly aspect = signal<string | null>(null);
   protected readonly selected = signal<DetectedFood | null>(null);
   protected readonly selectedIndex = signal(0);
+  protected readonly isSheetOpen = computed(() => this.selected() !== null);
 
   /** Foto local (instantánea) y, si se recarga la página, la URL prefirmada de R2. */
   protected readonly photo = computed(() => this.store.preview() ?? this.store.result()?.imagen_url ?? null);

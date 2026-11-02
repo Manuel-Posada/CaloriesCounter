@@ -1,8 +1,16 @@
-import { AfterViewInit, Component, ElementRef, ViewChild, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { MessageKey } from '../../core/i18n/messages';
+
+/** Frases de bienvenida: la clave se elige al azar una vez y el texto sigue al idioma. */
+const LOGIN_PHRASE_KEYS: readonly MessageKey[] = [
+  'login.phrase1',
+  'login.phrase2',
+  'login.phrase3',
+  'login.phrase4',
+];
 
 @Component({
   selector: 'app-login',
@@ -10,7 +18,7 @@ import { MessageKey } from '../../core/i18n/messages';
     <section class="login">
       <div class="logo" aria-hidden="true">🥗</div>
       <h1>CaloriesCounter</h1>
-      <p class="muted">{{ i18n.t('login.tagline') }}</p>
+      <p class="muted">{{ dynamicTagline() }}</p>
 
       <div #gbtn class="gbtn"></div>
 
@@ -31,6 +39,8 @@ export class Login implements AfterViewInit {
 
   @ViewChild('gbtn', { static: true }) gbtn!: ElementRef<HTMLElement>;
 
+  private readonly phraseIndex = Math.floor(Math.random() * LOGIN_PHRASE_KEYS.length);
+  protected readonly dynamicTagline = computed(() => this.i18n.t(LOGIN_PHRASE_KEYS[this.phraseIndex]));
   protected readonly loading = signal(false);
   protected readonly error = signal<MessageKey | null>(null);
 
@@ -54,4 +64,3 @@ export class Login implements AfterViewInit {
     });
   }
 }
-

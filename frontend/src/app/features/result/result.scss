@@ -48,6 +48,12 @@
     stroke-linejoin: round;
     vector-effect: non-scaling-stroke;
     filter: drop-shadow(0 0 1px rgb(15 23 42 / 70%));
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    will-change: transform, opacity;
+    animation: polygon-reveal 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(var(--i, 0) * 0.04s);
   }
 
   line {
@@ -55,6 +61,9 @@
     stroke-width: 1.5;
     stroke-dasharray: 4 3;
     vector-effect: non-scaling-stroke;
+    opacity: 0;
+    animation: backdrop-fade-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(var(--i, 0) * 0.04s + 0.06s);
   }
 }
 
@@ -76,6 +85,10 @@
   overflow: hidden;
   backdrop-filter: blur(4px);
   box-shadow: 0 2px 10px rgb(15 23 42 / 35%);
+  opacity: 0;
+  will-change: opacity;
+  animation: backdrop-fade-in 0.34s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 0.04s + 0.08s);
 
   b {
     min-width: 0;
@@ -107,10 +120,19 @@
   font-weight: 700;
 }
 
+.results-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  transform: translateY(100%);
+  will-change: transform, opacity;
+  animation: sheet-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 .advice {
   display: flex;
   gap: var(--space-3);
-  padding: var(--space-4);
+  padding: var(--space-5);
   border-radius: var(--radius);
   background: linear-gradient(135deg, var(--c-primary-dark), var(--c-primary));
   color: var(--c-primary-contrast);
@@ -226,6 +248,13 @@
   gap: var(--space-2);
 }
 
+.food-item {
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: slide-up-fade 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 0.06s);
+}
+
 .food {
   display: flex;
   align-items: center;
@@ -284,8 +313,8 @@
   position: fixed;
   inset: auto 0 0 0;
   width: 100%;
-  max-width: 560px;
-  max-height: 82vh;
+  max-width: 600px;
+  max-height: 84vh;
   margin: 0 auto;
   padding: 0;
   border: 0;
@@ -294,23 +323,32 @@
   color: var(--c-text);
   box-shadow: 0 -10px 40px rgb(15 23 42 / 25%);
   overflow: auto;
+  transform: translateY(100%);
+  will-change: transform;
 
-  &[open] {
-    animation: sheet-in 0.22s ease-out;
+  &[open],
+  &--open {
+    animation: sheet-in 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   &::backdrop {
     background: rgb(15 23 42 / 55%);
+    opacity: 0;
+    will-change: opacity;
+    animation: backdrop-fade-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   article {
-    padding: var(--space-4) var(--space-4) calc(var(--space-5) + var(--safe-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-5) calc(var(--space-6) + var(--safe-bottom));
   }
 
   h3 {
-    margin: var(--space-4) 0 var(--space-2);
+    margin: var(--space-2) 0 var(--space-2);
     font-size: 0.8rem;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--c-muted);
@@ -406,8 +444,44 @@
   padding-top: var(--space-6);
 }
 
+@keyframes slide-up-fade {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes polygon-reveal {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 @keyframes sheet-in {
   from {
     transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes backdrop-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

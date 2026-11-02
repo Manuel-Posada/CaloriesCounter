@@ -24,15 +24,22 @@
   --radius-sm: 10px;
   --radius: 16px;
   --radius-lg: 24px;
-  --shadow: 0 1px 2px rgb(15 23 42 / 6%), 0 4px 16px rgb(15 23 42 / 6%);
+  --shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 6px 24px rgb(15 23 42 / 5%);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui,
+    'Segoe UI', Roboto, sans-serif;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
 
   --space-1: 4px;
   --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
+  --space-3: 14px;
+  --space-4: 20px;
+  --space-5: 28px;
+  --space-6: 40px;
 
+  --topbar-h: 60px;
   --nav-h: 64px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
