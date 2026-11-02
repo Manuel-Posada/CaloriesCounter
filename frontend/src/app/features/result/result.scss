@@ -1,0 +1,413 @@
+.photo {
+  position: relative;
+  margin: 0;
+  /* La proporción real la fija el componente al cargar la imagen; 4/3 es el respaldo. */
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--c-border);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  figcaption {
+    position: absolute;
+    left: var(--space-3);
+    bottom: var(--space-3);
+    background: rgb(15 23 42 / 70%);
+    color: #fff;
+  }
+
+  /* Foto bien alineada: refuerzo positivo, discreto. */
+  .tilt-ok {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    background: var(--c-primary);
+    color: var(--c-primary-contrast);
+    backdrop-filter: blur(4px);
+  }
+}
+
+/* --- Zonas segmentadas sobre la foto --- */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+  polygon {
+    fill: rgb(22 163 74 / 18%);
+    stroke: #fff;
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 0 1px rgb(15 23 42 / 70%));
+  }
+
+  line {
+    stroke: rgb(15 23 42 / 60%);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 3;
+    vector-effect: non-scaling-stroke;
+  }
+}
+
+.tag {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 70%;
+  padding: 4px 10px 4px 4px;
+  transform: translate(-50%, calc(-100% - 10px));
+  border-radius: 999px;
+  background: rgb(15 23 42 / 82%);
+  color: #fff;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 10px rgb(15 23 42 / 35%);
+
+  b {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &--below {
+    transform: translate(-50%, 10px);
+  }
+}
+
+.tag-idx {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--c-primary);
+  color: var(--c-primary-contrast);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.tag-kcal {
+  flex: none;
+  color: #bbf7d0;
+  font-weight: 700;
+}
+
+.advice {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--c-primary-dark), var(--c-primary));
+  color: var(--c-primary-contrast);
+  box-shadow: var(--shadow);
+
+  .spark {
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+}
+
+.tilt-warn {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  border-left: 4px solid var(--c-accent);
+  background: var(--c-warn-soft);
+  color: var(--c-warn);
+
+  .icon {
+    font-size: 1.3rem;
+    line-height: 1.1;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: var(--space-1);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.kcal {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+
+  strong {
+    font-size: 2.6rem;
+    line-height: 1;
+  }
+
+  span {
+    color: var(--c-muted);
+  }
+}
+
+.split {
+  display: flex;
+  height: 10px;
+  border-radius: 99px;
+  overflow: hidden;
+  gap: 2px;
+
+  .seg {
+    flex-basis: 0;
+    min-width: 4px;
+  }
+}
+
+.protein { background: var(--c-protein); }
+.carbs { background: var(--c-carbs); }
+.fat { background: var(--c-fat); }
+
+.macros {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  b {
+    margin-left: auto;
+  }
+
+  i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+}
+
+/* --- Lista de alimentos (abre el detalle) --- */
+
+.foods {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.food {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  box-shadow: var(--shadow);
+  color: inherit;
+  text-align: left;
+
+  &:active {
+    transform: scale(0.995);
+  }
+}
+
+.food-idx {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--c-primary-soft);
+  color: var(--c-primary-dark);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.food-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.food-kcal {
+  color: var(--c-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.chev {
+  color: var(--c-muted);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* --- Hoja de detalle nutricional --- */
+
+.sheet {
+  position: fixed;
+  inset: auto 0 0 0;
+  width: 100%;
+  max-width: 560px;
+  max-height: 82vh;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--c-surface);
+  color: var(--c-text);
+  box-shadow: 0 -10px 40px rgb(15 23 42 / 25%);
+  overflow: auto;
+
+  &[open] {
+    animation: sheet-in 0.22s ease-out;
+  }
+
+  &::backdrop {
+    background: rgb(15 23 42 / 55%);
+  }
+
+  article {
+    padding: var(--space-4) var(--space-4) calc(var(--space-5) + var(--safe-bottom));
+  }
+
+  h3 {
+    margin: var(--space-4) 0 var(--space-2);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+}
+
+.sheet-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.eyebrow {
+  margin: 0 0 2px;
+  font-size: 0.75rem;
+  color: var(--c-muted);
+}
+
+.close {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+  border: 0;
+  border-radius: 50%;
+  background: var(--c-bg);
+  color: var(--c-muted);
+  font-size: 1rem;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  dt {
+    color: var(--c-muted);
+    font-size: 0.85rem;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &--muted dd {
+    font-weight: 500;
+  }
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--c-border);
+
+  div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  dt {
+    color: var(--c-muted);
+    font-size: 0.9rem;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.note {
+  font-size: 0.85rem;
+  color: var(--c-muted);
+}
+
+.empty {
+  align-items: center;
+  padding-top: var(--space-6);
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>CaloriesCounter</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#16a34a">
+  <script>
+    // Aplica el tema antes del primer pintado para evitar el destello blanco.
+    (function () {
+      try {
+        var mode = localStorage.getItem('cc.theme') || 'system';
+        var dark = mode === 'dark' ||
+          (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        var accent = localStorage.getItem('cc.accent');
+        if (accent && accent !== 'green') document.documentElement.dataset.accent = accent;
+      } catch (e) {
+        /* localStorage bloqueado: se queda el tema claro por defecto. */
+      }
+    })();
+  </script>
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>

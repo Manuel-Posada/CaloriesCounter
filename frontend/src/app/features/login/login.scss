@@ -1,0 +1,38 @@
+.login {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  text-align: center;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 24px;
+  background: var(--c-primary-soft);
+  font-size: 2.6rem;
+}
+
+.gbtn {
+  min-height: 44px;
+  margin-top: var(--space-3);
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--c-muted);
+}
+

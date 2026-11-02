@@ -1,0 +1,133 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  box-shadow: var(--shadow);
+}
+
+.gauge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.ring {
+  position: relative;
+  flex: 0 0 auto;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 2px solid var(--c-border);
+  background: radial-gradient(circle, var(--c-bg) 0%, var(--c-bg) 55%, transparent 56%);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.cross-x,
+.cross-y {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  background: var(--c-border);
+  opacity: 0.7;
+}
+
+.cross-x {
+  width: 60%;
+  height: 1px;
+}
+
+.cross-y {
+  height: 60%;
+  width: 1px;
+}
+
+.bubble {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  box-shadow: 0 0 0 4px rgb(245 158 11 / 18%);
+  transition: background 0.2s, box-shadow 0.2s;
+  will-change: transform;
+}
+
+.readout {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  min-width: max-content;
+
+  strong {
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  span {
+    font-size: 0.75rem;
+    color: var(--c-muted);
+  }
+}
+
+.hint {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--c-muted);
+  text-align: right;
+}
+
+/* Estados */
+.gauge--ok {
+  .ring {
+    border-color: var(--c-primary);
+    background: radial-gradient(circle, var(--c-primary-soft) 0%, var(--c-primary-soft) 55%, transparent 56%);
+  }
+
+  .bubble {
+    background: var(--c-primary);
+    box-shadow: 0 0 0 4px rgb(22 163 74 / 18%);
+  }
+
+  .readout strong {
+    color: var(--c-primary);
+  }
+}
+
+.gauge--ok + .hint {
+  color: var(--c-primary);
+}
+
+.gauge--near .bubble {
+  background: var(--c-accent);
+}
+
+.gauge--none .bubble {
+  background: var(--c-border);
+  box-shadow: none;
+}
+
+.gauge--far .bubble {
+  background: var(--c-danger);
+  box-shadow: 0 0 0 4px rgb(220 38 38 / 15%);
+}
+
+@media (max-width: 380px) {
+  .ring {
+    width: 76px;
+    height: 76px;
+  }
+
+  .hint {
+    font-size: 0.8rem;
+  }
+}
