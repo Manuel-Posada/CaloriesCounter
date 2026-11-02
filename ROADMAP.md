@@ -77,6 +77,8 @@ no hay sensor de inclinación).
 - [x] El consejo de Gemini se regenera al corregir el plato; el nombre de pila aparece ~1 de cada 3 veces
 - [x] Nivel de confianza (alta/media/baja) con sus motivos, recalculado al corregir
 - [x] Aviso «?» en los alimentos que el clasificador no tenía claros
+- [x] Aro direccional: cada lado se abre por el lado bajo (ejes de inclinación y balanceo)
+- [x] Guía clásica de nivel (cruz, círculo, burbuja y grados) opcional en Configuración → Cámara
 - [x] Topes de cordura del pipeline (altura media y peso total) con el aviso `volume_clamped`
 
 ## Sesión (2026-11)

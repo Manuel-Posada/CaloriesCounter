@@ -220,8 +220,10 @@
 /* ---------- Guía Morfológica: 4 Cuartos de Círculo ---------- */
 
 .frame {
-  --progress: 0;
-  --spread: 28px;
+  --up: 0px;
+  --down: 0px;
+  --left: 0px;
+  --right: 0px;
 
   position: absolute;
   inset: 0;
@@ -250,10 +252,7 @@
       border-top-width: 2.5px;
       border-left-width: 2.5px;
       border-top-left-radius: 100%;
-      transform: translate(
-        calc((1 - var(--progress, 0)) * -1 * var(--spread)),
-        calc((1 - var(--progress, 0)) * -1 * var(--spread))
-      );
+      transform: translate(calc(var(--left) * -1), calc(var(--up) * -1));
     }
 
     &--tr {
@@ -262,10 +261,7 @@
       border-top-width: 2.5px;
       border-right-width: 2.5px;
       border-top-right-radius: 100%;
-      transform: translate(
-        calc((1 - var(--progress, 0)) * var(--spread)),
-        calc((1 - var(--progress, 0)) * -1 * var(--spread))
-      );
+      transform: translate(var(--right), calc(var(--up) * -1));
     }
 
     &--br {
@@ -274,10 +270,7 @@
       border-bottom-width: 2.5px;
       border-right-width: 2.5px;
       border-bottom-right-radius: 100%;
-      transform: translate(
-        calc((1 - var(--progress, 0)) * var(--spread)),
-        calc((1 - var(--progress, 0)) * var(--spread))
-      );
+      transform: translate(var(--right), var(--down));
     }
 
     &--bl {
@@ -286,10 +279,7 @@
       border-bottom-width: 2.5px;
       border-left-width: 2.5px;
       border-bottom-left-radius: 100%;
-      transform: translate(
-        calc((1 - var(--progress, 0)) * -1 * var(--spread)),
-        calc((1 - var(--progress, 0)) * var(--spread))
-      );
+      transform: translate(calc(var(--left) * -1), var(--down));
     }
   }
 
@@ -301,11 +291,28 @@
   }
 }
 
+/* Aro abierto del inicio: los cuatro lados separados, como si faltara encuadrar. */
+.frame--open {
+  --up: 28px;
+  --down: 28px;
+  --left: 28px;
+  --right: 28px;
+}
+
+/* Guía clásica opcional: cruz, círculo de alineación y grados sobre la cámara. */
+.classic-gauge {
+  position: absolute;
+  top: calc(var(--space-4) + 52px);
+  left: 50%;
+  z-index: 4;
+  width: min(360px, calc(100vw - 2 * var(--space-4)));
+  transform: translateX(-50%);
+}
+
 .countdown {
   position: absolute;
   inset: 0;
-  z-index: 2;
-  display: grid;
+  z-index: 2;  display: grid;
   place-items: center;
   background: rgb(15 23 42 / 42%);
   backdrop-filter: blur(8px);

@@ -10,6 +10,7 @@ import { MessageKey } from '../../core/i18n/messages';
 import { compressImage } from '../../core/image.util';
 import { TiltService } from '../../core/tilt.service';
 import { PreferencesService } from '../../core/preferences.service';
+import { LevelGauge } from './level-gauge';
 
 type Step = 'presign' | 'upload' | 'infer';
 type Mode = 'idle' | 'camera' | 'working';
@@ -37,10 +38,14 @@ const WATCH_MS = 100;
 const NOTICE_TIMEOUT_MS = 3500;
 /** Tras este tiempo analizando se avisa de que el backend puede estar despertando. */
 const SLOW_HINT_MS = 8000;
+/** Separación máxima de los arcos cuando un eje está muy desviado. */
+const ARC_SPREAD_PX = 28;
+/** Grados de desviación en un eje que abren del todo su lado del aro. */
+const ARC_FULL_DEG = 30;
 
 @Component({
   selector: 'app-capture',
-  imports: [],
+  imports: [LevelGauge],
   template: `
     <section
       class="page capture"
@@ -51,7 +56,7 @@ const SLOW_HINT_MS = 8000;
         <div class="idle-stage">
           <h1 class="sr-only">{{ dynamicTitle() }}</h1>
 
-          <div class="frame" [style.--progress]="0" aria-hidden="true">
+          <div class="frame frame--open" aria-hidden="true">
             <span class="arc arc--tl"></span>
             <span class="arc arc--tr"></span>
             <span class="arc arc--br"></span>
@@ -120,7 +125,10 @@ const SLOW_HINT_MS = 8000;
           <div
             class="frame"
             [class.frame--ready]="isLevel()"
-            [style.--progress]="levelProgress()"
+            [style.--up]="gaps().up"
+            [style.--down]="gaps().down"
+            [style.--left]="gaps().left"
+            [style.--right]="gaps().right"
             aria-hidden="true"
           >
             <span class="arc arc--tl"></span>
@@ -128,6 +136,18 @@ const SLOW_HINT_MS = 8000;
             <span class="arc arc--br"></span>
             <span class="arc arc--bl"></span>
           </div>
+
+          @if (prefs.bubbleLevel()) {
+            <app-level-gauge
+              class="classic-gauge"
+              [tilt]="tilt.tilt()"
+              [beta]="tilt.beta()"
+              [gamma]="tilt.gamma()"
+              [bubble]="tilt.bubble()"
+              [level]="isLevel()"
+              [exitDeg]="prefs.levelExit()"
+            />
+          }
 
           @if (isCounting() && countdown() > 0) {
             <div class="countdown" aria-live="assertive">
@@ -262,24 +282,20 @@ export class Capture implements OnDestroy {
   );
 
   /**
-   * Progreso continuo de nivelación en el rango [0, 1]:
-   * - 0 cuando el ángulo es >= 45° (o en estado idle / sin lectura).
-   * - 1 cuando el teléfono está nivelado (ángulo <= `levelEnter()` o dentro de histéresis).
+   * Separación de cada lado del aro (0..28 px) según el eje que esté desviado: el arco se
+   * abre por el lado bajo, que es el que hay que levantar. `bubble` ya viene rotado con la
+   * pantalla, así que funciona igual en vertical y en horizontal.
    */
-  protected readonly levelProgress = computed(() => {
-    if (this.mode() !== 'camera') return 0;
-    if (this.isLevel()) return 1;
+  protected readonly gaps = computed(() => {
+    const closed = { up: '0px', down: '0px', left: '0px', right: '0px' };
+    if (this.mode() !== 'camera' || this.isLevel()) return closed;
 
-    const angle = this.tilt.tilt();
-    if (angle === null) return 0;
+    const { x, y } = this.tilt.bubble();
+    const open = (deg: number) =>
+      `${Math.round(ARC_SPREAD_PX * Math.min(1, Math.max(0, deg) / ARC_FULL_DEG))}px`;
 
-    const enter = this.prefs.levelEnter();
-    const maxAngle = 45;
-    if (angle <= enter) return 1;
-    if (angle >= maxAngle) return 0;
-
-    const progress = (maxAngle - angle) / (maxAngle - enter);
-    return Math.round(progress * 1000) / 1000;
+    // bubble.y < 0: el borde superior está alto (el bajo es el de abajo), y viceversa.
+    return { up: open(y), down: open(-y), left: open(x), right: open(-x) };
   });
 
   constructor() {

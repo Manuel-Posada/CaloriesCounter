@@ -20,6 +20,7 @@ const KEYS = {
   level: 'cc.level',
   fov: 'cc.fov',
   autoShoot: 'cc.autoshoot',
+  bubbleLevel: 'cc.bubblelevel',
 } as const;
 
 /**
@@ -36,6 +37,9 @@ export class PreferencesService {
 
   /** Disparo automático al mantenerse nivelado (por defecto, manual). */
   readonly autoShoot = signal<boolean>(readBool(KEYS.autoShoot, false));
+
+  /** Muestra la guía clásica (cruz, círculo y grados) además del aro direccional. */
+  readonly bubbleLevel = signal<boolean>(readBool(KEYS.bubbleLevel, false));
 
   /** Ángulo a partir del cual el aro se pone verde. */
   readonly levelEnter = computed(() => LEVEL_THRESHOLDS[this.level()].enter);
@@ -74,6 +78,11 @@ export class PreferencesService {
   setAutoShoot(enabled: boolean): void {
     this.autoShoot.set(enabled);
     save(KEYS.autoShoot, enabled ? '1' : '0');
+  }
+
+  setBubbleLevel(enabled: boolean): void {
+    this.bubbleLevel.set(enabled);
+    save(KEYS.bubbleLevel, enabled ? '1' : '0');
   }
 
   private applyTheme(): void {

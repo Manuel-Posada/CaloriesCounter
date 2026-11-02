@@ -104,6 +104,19 @@ import { Accent, LevelSensitivity, PreferencesService, ThemeMode } from '../../c
             (change)="onAutoShoot($event)"
           />
         </label>
+
+        <label class="switch-row">
+          <span class="switch-text">
+            <strong>{{ i18n.t('settings.classicLevel') }}</strong>
+            <small>{{ i18n.t('settings.classicLevelHint') }}</small>
+          </span>
+          <input
+            type="checkbox"
+            class="switch"
+            [checked]="prefs.bubbleLevel()"
+            (change)="onBubbleLevel($event)"
+          />
+        </label>
       </section>
 
       <!-- Avisos -->
@@ -166,5 +179,9 @@ export class Settings {
 
   protected onAutoShoot(event: Event): void {
     this.prefs.setAutoShoot((event.target as HTMLInputElement).checked);
+  }
+
+  protected onBubbleLevel(event: Event): void {
+    this.prefs.setBubbleLevel((event.target as HTMLInputElement).checked);
   }
 }

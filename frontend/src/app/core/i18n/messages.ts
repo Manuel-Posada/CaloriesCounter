@@ -240,6 +240,9 @@ export const ES = {
   'settings.autoShoot': 'Disparo automático',
   'settings.autoShootHint':
     'Dispara solo cuando el móvil se mantiene nivelado medio segundo. Si está desactivado, pulsas tú el obturador.',
+  'settings.classicLevel': 'Guía de nivel clásica',
+  'settings.classicLevelHint':
+    'Muestra la cruz con el círculo de alineación y los grados sobre la cámara, además del aro que se abre por el lado que hay que levantar.',
   'settings.language': 'Idioma',
   'settings.languageHint': 'Se aplica a toda la app y al consejo nutricional.',
   'settings.notices': 'Avisos',
@@ -509,6 +512,9 @@ export const EN: Record<MessageKey, string> = {
   'settings.autoShoot': 'Auto capture',
   'settings.autoShootHint':
     'Shoots by itself when the phone stays level for half a second. If off, you press the shutter.',
+  'settings.classicLevel': 'Classic level guide',
+  'settings.classicLevelHint':
+    'Shows the crosshair with the alignment circle and degrees over the camera, in addition to the ring that opens on the side to lift.',
   'settings.language': 'Language',
   'settings.languageHint': 'Applies to the whole app and to the nutrition advice.',
   'settings.notices': 'Reminders',

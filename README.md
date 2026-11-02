@@ -125,6 +125,12 @@ perpendicular a la mesa (≤ 8°, con histéresis hasta 12°) y, si se mantiene,
 Es lo que garantiza que el cálculo de volumen reciba una foto cenital. Si no hay sensor (escritorio) o
 no se concede el permiso, cae a la guía estática y a la cámara del sistema.
 
+El aro está partido en cuatro arcos y **cada lado se abre por el lado bajo**, que es el que hay que
+levantar: los arcos de arriba/abajo siguen el eje de inclinación y los de izquierda/derecha el de
+balanceo (usando `bubble`, que ya viene rotado con la pantalla). Así se ve de un vistazo qué eje
+corregir. La guía clásica (cruz, círculo, burbuja y grados) sigue disponible como opción en
+**Configuración → Cámara → Guía de nivel clásica**, y se pinta encima del visor con `app-level-gauge`.
+
 ### Aviso de foto no cenital
 
 La guía solo actúa en la captura en vivo; las fotos de la galería pueden venir torcidas. Para ese caso
