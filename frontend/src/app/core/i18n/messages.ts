@@ -72,6 +72,8 @@ export const ES = {
   'capture.inferDown': 'El análisis no está disponible ahora mismo. Inténtalo en un minuto.',
   'capture.timeout':
     'El análisis tardó demasiado y lo hemos detenido. Vuelve a intentarlo: la siguiente vez suele ser más rápida.',
+  'capture.reloadRequired':
+    'No pudimos abrir el resultado (la app se actualizó mientras la usabas). El análisis sí se guardó: recarga la página y lo verás en el historial.',
   'capture.genericError': 'Algo salió mal. Inténtalo de nuevo.',
   'capture.noCameraApi':
     'Este navegador no permite abrir la cámara desde la web. Usa la galería o la cámara del sistema.',
@@ -266,6 +268,8 @@ export const EN: Record<MessageKey, string> = {
   'capture.inferDown': 'Analysis is not available right now. Try again in a minute.',
   'capture.timeout':
     'The analysis took too long and was stopped. Please try again: the next one is usually faster.',
+  'capture.reloadRequired':
+    'We could not open the result (the app was updated while you were using it). The analysis was saved: reload the page and you will find it in the history.',
   'capture.genericError': 'Something went wrong. Please try again.',
   'capture.noCameraApi':
     'This browser does not allow opening the camera from the web. Use the gallery or the system camera.',

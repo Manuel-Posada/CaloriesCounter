@@ -13,5 +13,12 @@ export class ResultStore {
     this.result.set(result);
     this.preview.set(previewUrl);
   }
+
+  clear(): void {
+    const old = this.preview();
+    if (old) URL.revokeObjectURL(old);
+    this.result.set(null);
+    this.preview.set(null);
+  }
 }
 

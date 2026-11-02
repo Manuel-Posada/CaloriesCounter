@@ -507,7 +507,7 @@ export class Capture implements OnDestroy {
           this.clearSlowHint();
           this.store.set(e.result, this.previewUrl());
           this.handedOver = true; // el store es ahora dueño del object URL
-          this.router.navigate(['/result']);
+          this.navigateToResult();
           return;
         }
         this.step.set(e.step);
@@ -520,6 +520,25 @@ export class Capture implements OnDestroy {
         this.revokePreview();
       },
     });
+  }
+
+  /**
+   * Abre la pantalla de resultado. Si la navegación falla —el caso típico es un trozo de JS
+   * que ya no existe porque la app se actualizó con la página abierta— no dejamos la pantalla
+   * colgada en «analizando»: se avisa y el análisis sigue disponible en el historial.
+   */
+  private navigateToResult(): void {
+    const failed = (): void => {
+      this.handedOver = false;
+      this.store.clear();
+      this.previewUrl.set(null);
+      this.mode.set('idle');
+      this.error.set('capture.reloadRequired');
+      this.clearSlowHint();
+    };
+    this.router.navigate(['/result']).then((ok) => {
+      if (!ok) failed();
+    }, failed);
   }
 
   private messageFor(err: unknown): MessageKey {
