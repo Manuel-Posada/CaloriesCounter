@@ -42,40 +42,67 @@ const SLOW_HINT_MS = 8000;
   selector: 'app-capture',
   imports: [],
   template: `
-    <section class="page capture" [class.capture--camera]="mode() === 'camera'">
+    <section
+      class="page capture"
+      [class.capture--idle]="mode() === 'idle'"
+      [class.capture--camera]="mode() === 'camera'"
+    >
       @if (mode() === 'idle') {
-        <header>
-          <h1>{{ dynamicTitle() }}</h1>
-          <p class="muted">{{ i18n.t('capture.subtitle') }}</p>
-        </header>
+        <div class="idle-stage">
+          <h1 class="sr-only">{{ dynamicTitle() }}</h1>
 
-        <button type="button" class="btn btn--primary btn--xl btn--block" (click)="openCamera()">
-          <span aria-hidden="true">📷</span> {{ i18n.t('capture.openCamera') }}
-        </button>
+          <div class="frame" [style.--progress]="0" aria-hidden="true">
+            <span class="arc arc--tl"></span>
+            <span class="arc arc--tr"></span>
+            <span class="arc arc--br"></span>
+            <span class="arc arc--bl"></span>
+          </div>
 
-        <label class="btn btn--ghost btn--block">
-          <input class="sr-only" type="file" accept="image/*" (change)="onFile($event)" />
-          <span aria-hidden="true">🖼️</span> {{ i18n.t('capture.gallery') }}
-        </label>
+          <button type="button" class="idle-trigger" (click)="openCamera()">
+            <span class="idle-trigger__icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+                <circle cx="12" cy="13" r="3.5" />
+              </svg>
+            </span>
+            <span class="sr-only">{{ i18n.t('capture.openCamera') }}.</span>
+            <span class="idle-trigger__label">{{ dynamicTitle() }}</span>
+          </button>
 
-        @if (cameraFailed()) {
-          <label class="btn btn--ghost btn--block">
-            <input class="sr-only" type="file" accept="image/*" capture="environment" (change)="onFile($event)" />
-            <span aria-hidden="true">📸</span> {{ i18n.t('capture.systemCamera') }}
+          @if (error(); as key) {
+            <p class="idle-alert" role="alert">{{ i18n.t(key) }}</p>
+          }
+
+          @if (cameraFailed()) {
+            <label class="idle-fallback">
+              <input class="sr-only" type="file" accept="image/*" capture="environment" (change)="onFile($event)" />
+              <span aria-hidden="true">📸</span> {{ i18n.t('capture.systemCamera') }}
+            </label>
+          }
+
+          <label class="gallery-btn gallery-btn--idle" [attr.aria-label]="i18n.t('capture.gallery')">
+            <input class="sr-only" type="file" accept="image/*" (change)="onFile($event)" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="3" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <path d="m21 15-5-5L5 21" />
+            </svg>
           </label>
-        }
-
-        @if (error(); as key) {
-          <p class="alert" role="alert">{{ i18n.t(key) }}</p>
-        }
-
-        <div class="card tips">
-          <h2>{{ i18n.t('capture.tipsTitle') }}</h2>
-          <ul>
-            <li>{{ i18n.t('capture.tip1') }}</li>
-            <li>{{ i18n.t('capture.tip2') }}</li>
-            <li>{{ i18n.t('capture.tip3') }}</li>
-          </ul>
         </div>
       } @else if (mode() === 'camera') {
         <div class="viewfinder">
@@ -90,11 +117,16 @@ const SLOW_HINT_MS = 8000;
             ✕
           </button>
 
-          <div class="frame" [class.frame--ready]="isLevel()" aria-hidden="true">
-            <div class="corner corner--tl"></div>
-            <div class="corner corner--tr"></div>
-            <div class="corner corner--br"></div>
-            <div class="corner corner--bl"></div>
+          <div
+            class="frame"
+            [class.frame--ready]="isLevel()"
+            [style.--progress]="levelProgress()"
+            aria-hidden="true"
+          >
+            <span class="arc arc--tl"></span>
+            <span class="arc arc--tr"></span>
+            <span class="arc arc--br"></span>
+            <span class="arc arc--bl"></span>
           </div>
 
           @if (isCounting() && countdown() > 0) {
@@ -128,7 +160,15 @@ const SLOW_HINT_MS = 8000;
 
             <label class="gallery-btn" [attr.aria-label]="i18n.t('capture.gallery')">
               <input class="sr-only" type="file" accept="image/*" (change)="onFile($event)" />
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
                 <rect x="3" y="3" width="18" height="18" rx="3" />
                 <circle cx="8.5" cy="8.5" r="1.5" />
                 <path d="m21 15-5-5L5 21" />
@@ -220,6 +260,27 @@ export class Capture implements OnDestroy {
   protected readonly canShoot = computed(
     () => !this.isCounting() && (this.isLevel() || this.tilt.silent()),
   );
+
+  /**
+   * Progreso continuo de nivelación en el rango [0, 1]:
+   * - 0 cuando el ángulo es >= 45° (o en estado idle / sin lectura).
+   * - 1 cuando el teléfono está nivelado (ángulo <= `levelEnter()` o dentro de histéresis).
+   */
+  protected readonly levelProgress = computed(() => {
+    if (this.mode() !== 'camera') return 0;
+    if (this.isLevel()) return 1;
+
+    const angle = this.tilt.tilt();
+    if (angle === null) return 0;
+
+    const enter = this.prefs.levelEnter();
+    const maxAngle = 45;
+    if (angle <= enter) return 1;
+    if (angle >= maxAngle) return 0;
+
+    const progress = (maxAngle - angle) / (maxAngle - enter);
+    return Math.round(progress * 1000) / 1000;
+  });
 
   constructor() {
     // El <video> sólo existe cuando `mode` pasa a 'camera': enganchamos el stream al aparecer.
