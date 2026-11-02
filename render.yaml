@@ -15,7 +15,7 @@ services:
     # collectstatic necesita importar settings, que exige DJANGO_SECRET_KEY.
     buildCommand: pip install -r requirements.txt && DJANGO_SECRET_KEY=build-only python manage.py collectstatic --noinput
     # El timeout de gunicorn tiene que superar la latencia de la inferencia (hasta ~2 min en frío).
-    startCommand: python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 180
+    startCommand: python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 300
     healthCheckPath: /health
     autoDeploy: true
 

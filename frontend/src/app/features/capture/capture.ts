@@ -522,8 +522,9 @@ export class Capture implements OnDestroy {
     });
   }
 
-  private messageFor(err: HttpErrorResponse): MessageKey {
-    switch (err.status) {
+  private messageFor(err: unknown): MessageKey {
+    if ((err as Error)?.name === 'TimeoutError') return 'capture.timeout';
+    switch ((err as HttpErrorResponse).status) {
       case 0:
         return 'capture.noConnection';
       case 422:

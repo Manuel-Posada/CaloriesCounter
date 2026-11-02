@@ -1,3 +1,5 @@
+import logging
+import time
 import uuid
 
 from django.conf import settings
@@ -20,6 +22,8 @@ from .serializers import (
     PresignRequestSerializer,
     ProfileSerializer,
 )
+
+log = logging.getLogger(__name__)
 
 
 class HealthView(APIView):
@@ -124,12 +128,16 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
         inp.is_valid(raise_exception=True)
         data = inp.validated_data
 
+        t0 = time.perf_counter()
         try:
             image_bytes, content_type = services.download_image_from_r2(data["id_imagen_r2"])
+            t1 = time.perf_counter()
             inference = services.run_inference(
                 image_bytes, content_type, data["pipeline"], data.get("fov_deg"), data.get("f35_mm")
             )
+            t2 = time.perf_counter()
         except services.ServiceError as exc:
+            log.warning("food-log: fallo en %.1fs: %s", time.perf_counter() - t0, exc)
             return Response({"detail": str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
 
         if not inference.get("alimentos"):
@@ -142,6 +150,14 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
         # El consejo se genera en el idioma que pide el navegador (es por defecto).
         locale = (request.headers.get("Accept-Language") or "es")[:2].lower()
         consejo = services.get_nutrition_advice(inference, locale)
+        t3 = time.perf_counter()
+        log.info(
+            "food-log: r2=%.1fs modal=%.1fs gemini=%.1fs total=%.1fs",
+            t1 - t0,
+            t2 - t1,
+            t3 - t2,
+            t3 - t0,
+        )
 
         # Contornos de cada zona para poder pintarlas en el historial mientras exista la
         # imagen en R2 (72 h). Se vacían al borrar la foto en `cleanup_r2_images`.

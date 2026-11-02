@@ -1,6 +1,6 @@
 import { HttpClient, HttpEventType, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, concat, filter, map, of, startWith, switchMap } from 'rxjs';
+import { Observable, concat, filter, map, of, startWith, switchMap, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { FoodLog, FoodLogCreated, Page, PresignResponse } from '../models';
 import { PreferencesService } from '../preferences.service';
@@ -48,7 +48,12 @@ export class FoodLogService {
     return this.http.post<FoodLogCreated>(`${this.api}/food-logs/`, body);
   }
 
-  /** Orquesta los 3 pasos en secuencia y emite el estado para la UI. */
+  /**
+   * Orquesta los 3 pasos en secuencia y emite el estado para la UI.
+   *
+   * El `timeout` evita que la pantalla de "analizando" se quede colgada para siempre si una
+   * petición nunca responde (red móvil que se corta, proxy que no cierra…).
+   */
   analyze(blob: Blob, f35Mm: number | null = null): Observable<AnalyzeEvent> {
     return this.presign(blob.type || 'image/jpeg').pipe(
       switchMap((p) =>
@@ -62,6 +67,7 @@ export class FoodLogService {
         ),
       ),
       startWith<AnalyzeEvent>({ step: 'presign' }),
+      timeout(180_000),
     );
   }
 

@@ -70,6 +70,8 @@ export const ES = {
   'capture.shotFailed': 'No pudimos capturar la foto. Inténtalo de nuevo.',
   'capture.noConnection': 'Sin conexión o la subida fue bloqueada. Revisa tu red e inténtalo de nuevo.',
   'capture.inferDown': 'El análisis no está disponible ahora mismo. Inténtalo en un minuto.',
+  'capture.timeout':
+    'El análisis tardó demasiado y lo hemos detenido. Vuelve a intentarlo: la siguiente vez suele ser más rápida.',
   'capture.genericError': 'Algo salió mal. Inténtalo de nuevo.',
   'capture.noCameraApi':
     'Este navegador no permite abrir la cámara desde la web. Usa la galería o la cámara del sistema.',
@@ -262,6 +264,8 @@ export const EN: Record<MessageKey, string> = {
   'capture.shotFailed': 'We could not capture the photo. Please try again.',
   'capture.noConnection': 'No connection or the upload was blocked. Check your network and try again.',
   'capture.inferDown': 'Analysis is not available right now. Try again in a minute.',
+  'capture.timeout':
+    'The analysis took too long and was stopped. Please try again: the next one is usually faster.',
   'capture.genericError': 'Something went wrong. Please try again.',
   'capture.noCameraApi':
     'This browser does not allow opening the camera from the web. Use the gallery or the system camera.',
