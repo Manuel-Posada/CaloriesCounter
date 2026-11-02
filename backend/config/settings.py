@@ -90,6 +90,12 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="", cast=Csv())
+# Previews y alias de Vercel del propio proyecto (p. ej. caloriescounter-hazel.vercel.app).
+CORS_ALLOWED_ORIGIN_REGEXES = config(
+    "CORS_ALLOWED_ORIGIN_REGEXES",
+    default=r"^https://caloriescounter-[a-z0-9-]+\.vercel\.app$",
+    cast=Csv(),
+)
 CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
 
 # Detrás del proxy de Modal/Vercel: sin esto Django cree que la petición es HTTP y
