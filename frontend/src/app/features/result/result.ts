@@ -17,6 +17,7 @@ const CONFIDENCE_REASONS: Record<string, MessageKey> = {
   camara_algo_inclinada: 'confidence.reason.camaraAlgoInclinada',
   clasificacion_baja: 'confidence.reason.clasificacionBaja',
   clasificacion_muy_baja: 'confidence.reason.clasificacionMuyBaja',
+  clasificacion_desconocida: 'confidence.reason.clasificacionDesconocida',
   densidad_asumida: 'confidence.reason.densidadAsumida',
   volumen_recortado: 'confidence.reason.volumenRecortado',
 };

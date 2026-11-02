@@ -138,6 +138,8 @@ export const ES = {
   'confidence.reason.camaraAlgoInclinada': 'La cámara estaba algo inclinada.',
   'confidence.reason.clasificacionBaja': 'Algún alimento se clasificó con poca seguridad.',
   'confidence.reason.clasificacionMuyBaja': 'Los nombres de los alimentos son dudosos.',
+  'confidence.reason.clasificacionDesconocida':
+    'No se guardó la certeza del clasificador en este análisis antiguo.',
   'confidence.reason.densidadAsumida': 'Se asumió la densidad de algún alimento.',
   'confidence.reason.volumenRecortado': 'El volumen se recortó a un máximo físicamente posible.',
   'confidence.reason.unknown': 'Hay factores que reducen la precisión.',
@@ -403,6 +405,8 @@ export const EN: Record<MessageKey, string> = {
   'confidence.reason.camaraAlgoInclinada': 'The camera was slightly tilted.',
   'confidence.reason.clasificacionBaja': 'Some food was classified with low confidence.',
   'confidence.reason.clasificacionMuyBaja': 'The food names are uncertain.',
+  'confidence.reason.clasificacionDesconocida':
+    'The classifier confidence was not stored for this older analysis.',
   'confidence.reason.densidadAsumida': 'A density had to be assumed for some food.',
   'confidence.reason.volumenRecortado': 'The volume was capped at a physically possible maximum.',
   'confidence.reason.unknown': 'Some factors reduce the accuracy.',

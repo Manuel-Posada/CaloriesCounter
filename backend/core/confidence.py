@@ -50,6 +50,11 @@ def evaluate(log) -> dict:
             score -= 15
             motivos.append("clasificacion_baja")
 
+    # Análisis reconstruidos desde un registro antiguo: la certeza del clasificador no se guardó.
+    if any(item.get("confianza") is None for item in log.items or []):
+        score -= 30
+        motivos.append("clasificacion_desconocida")
+
     if any(item.get("densidad_asumida") for item in log.items or []):
         score -= 10
         motivos.append("densidad_asumida")
