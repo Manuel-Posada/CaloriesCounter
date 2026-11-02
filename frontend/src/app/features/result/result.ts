@@ -1,8 +1,9 @@
-import { DecimalPipe, DatePipe } from '@angular/common';
+﻿import { DecimalPipe, DatePipe } from '@angular/common';
 import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ResultStore } from '../../core/food-log/result.store';
-import { DetectedFood } from '../../core/models';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { DetectedFood, PipelineWarning } from '../../core/models';
 import { TILT_WARN_DEG } from '../../core/tilt.service';
 
 /** Zona segmentada lista para pintar sobre la foto. */
@@ -31,7 +32,7 @@ interface RenderedSegment {
       <section class="page">
         <figure class="photo" [style.aspect-ratio]="aspect()">
           @if (photo(); as src) {
-            <img [src]="src" alt="Foto de tu plato analizado" (load)="onPhotoLoad($event)" />
+            <img [src]="src" [attr.alt]="i18n.t('result.photoAlt')" (load)="onPhotoLoad($event)" />
           }
 
           <!-- Zonas segmentadas: contorno + etiqueta con nombre y calorías -->
@@ -59,9 +60,9 @@ interface RenderedSegment {
             }
           }
 
-          <figcaption class="chip">{{ r.fecha_hora | date: "d MMM, HH:mm" }}</figcaption>
+          <figcaption class="chip">{{ r.fecha_hora | date: 'd MMM, HH:mm' : undefined : i18n.dateLocale() }}</figcaption>
           @if (tiltOk(); as t) {
-            <span class="chip tilt-ok">Cenital · {{ t | number: '1.0-0' }}°</span>
+            <span class="chip tilt-ok">{{ i18n.t('result.centered', { deg: (t | number: '1.0-0') ?? '' }) }}</span>
           }
         </figure>
 
@@ -70,18 +71,15 @@ interface RenderedSegment {
           <aside class="card tilt-warn" role="status">
             <span class="icon" aria-hidden="true">📐</span>
             <div>
-              <strong>Foto poco cenital ({{ t | number: '1.0-0' }}°)</strong>
-              <p>
-                El volumen y las calorías pueden estar sobreestimados. Repite la foto con la
-                cámara guiada para afinarlos.
-              </p>
+              <strong>{{ i18n.t('result.tiltTitle', { deg: (t | number: '1.0-0') ?? '' }) }}</strong>
+              <p>{{ i18n.t('result.tiltBody') }}</p>
             </div>
           </aside>
         }
 
         <!-- Consejo de Gemini -->
         @if (r.consejo_nutricional) {
-          <aside class="advice" aria-label="Consejo nutricional">
+          <aside class="advice" [attr.aria-label]="i18n.t('result.advice')">
             <span class="spark" aria-hidden="true">✨</span>
             <p>{{ r.consejo_nutricional }}</p>
           </aside>
@@ -91,7 +89,7 @@ interface RenderedSegment {
         <div class="card summary">
           <div class="kcal">
             <strong>{{ r.calorias_totales | number: '1.0-0' }}</strong>
-            <span>kcal totales</span>
+            <span>{{ i18n.t('result.kcalTotal') }}</span>
           </div>
 
           <div class="split" role="img" [attr.aria-label]="splitLabel()">
@@ -101,14 +99,23 @@ interface RenderedSegment {
           </div>
 
           <ul class="macros">
-            <li><i class="protein"></i>Proteínas <b>{{ r.macronutrientes.proteinas_g | number: '1.0-1' }} g</b></li>
-            <li><i class="carbs"></i>Carbohidratos <b>{{ r.macronutrientes.carbohidratos_g | number: '1.0-1' }} g</b></li>
-            <li><i class="fat"></i>Grasas <b>{{ r.macronutrientes.grasas_g | number: '1.0-1' }} g</b></li>
+            <li>
+              <i class="protein"></i>{{ i18n.t('result.protein') }}
+              <b>{{ r.macronutrientes.proteinas_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
+            </li>
+            <li>
+              <i class="carbs"></i>{{ i18n.t('result.carbs') }}
+              <b>{{ r.macronutrientes.carbohidratos_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
+            </li>
+            <li>
+              <i class="fat"></i>{{ i18n.t('result.fat') }}
+              <b>{{ r.macronutrientes.grasas_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
+            </li>
           </ul>
         </div>
 
         <!-- Detalle por alimento -->
-        <h2>Alimentos detectados ({{ r.alimentos.length }})</h2>
+        <h2>{{ i18n.t('result.foods', { count: r.alimentos.length }) }}</h2>
         <ul class="foods">
           @for (f of r.alimentos; track $index) {
             <li>
@@ -123,11 +130,11 @@ interface RenderedSegment {
         </ul>
 
         @for (w of otherWarnings(); track $index) {
-          <p class="note">ℹ️ {{ w }}</p>
+          <p class="note">ℹ️ {{ warningText(w) }}</p>
         }
-        <p class="note">Las cantidades son estimaciones a partir de la foto; úsalas como referencia.</p>
+        <p class="note">{{ i18n.t('result.estimateNote') }}</p>
 
-        <a class="btn btn--primary btn--block" routerLink="/">Analizar otro plato</a>
+        <a class="btn btn--primary btn--block" routerLink="/">{{ i18n.t('result.another') }}</a>
 
         <!-- Hoja de detalle nutricional -->
         <dialog #sheet class="sheet" (click)="onSheetClick($event)" (close)="selected.set(null)">
@@ -135,46 +142,84 @@ interface RenderedSegment {
             <article>
               <header class="sheet-head">
                 <div>
-                  <p class="eyebrow">Alimento {{ selectedIndex() + 1 }}</p>
+                  <p class="eyebrow">{{ i18n.t('result.food', { n: selectedIndex() + 1 }) }}</p>
                   <h2>{{ pretty(f.nombre) }}</h2>
                 </div>
-                <button type="button" class="close" aria-label="Cerrar el detalle" (click)="closeSheet()">
+                <button
+                  type="button"
+                  class="close"
+                  [attr.aria-label]="i18n.t('result.closeSheet')"
+                  (click)="closeSheet()"
+                >
                   ✕
                 </button>
               </header>
 
               <section>
-                <h3>En tu porción ({{ f.peso_g | number: '1.0-0' }} g)</h3>
+                <h3>{{ i18n.t('result.sheetPortion', { grams: (f.peso_g | number: '1.0-0') ?? '' }) }}</h3>
                 <dl class="facts">
-                  <div><dt>Calorías</dt><dd>{{ f.nutricion.calorias_kcal | number: '1.0-0' }} kcal</dd></div>
-                  <div><dt>Proteínas</dt><dd>{{ f.nutricion.proteinas_g | number: '1.0-1' }} g</dd></div>
-                  <div><dt>Carbohidratos</dt><dd>{{ f.nutricion.carbohidratos_g | number: '1.0-1' }} g</dd></div>
-                  <div><dt>Grasas</dt><dd>{{ f.nutricion.grasas_g | number: '1.0-1' }} g</dd></div>
+                  <div>
+                    <dt>{{ i18n.t('result.calories') }}</dt>
+                    <dd>{{ f.nutricion.calorias_kcal | number: '1.0-0' }} kcal</dd>
+                  </div>
+                  <div>
+                    <dt>{{ i18n.t('result.protein') }}</dt>
+                    <dd>{{ f.nutricion.proteinas_g | number: '1.0-1' }} g</dd>
+                  </div>
+                  <div>
+                    <dt>{{ i18n.t('result.carbs') }}</dt>
+                    <dd>{{ f.nutricion.carbohidratos_g | number: '1.0-1' }} g</dd>
+                  </div>
+                  <div>
+                    <dt>{{ i18n.t('result.fat') }}</dt>
+                    <dd>{{ f.nutricion.grasas_g | number: '1.0-1' }} g</dd>
+                  </div>
                 </dl>
               </section>
 
               <section>
-                <h3>Por 100 g (tabla nutricional)</h3>
+                <h3>{{ i18n.t('result.sheetPer100') }}</h3>
                 @if (f.nutricion.por_100g; as p) {
                   <dl class="facts facts--muted">
-                    <div><dt>Calorías</dt><dd>{{ p.calorias_kcal | number: '1.0-0' }} kcal</dd></div>
-                    <div><dt>Proteínas</dt><dd>{{ p.proteinas_g | number: '1.0-1' }} g</dd></div>
-                    <div><dt>Carbohidratos</dt><dd>{{ p.carbohidratos_g | number: '1.0-1' }} g</dd></div>
-                    <div><dt>Grasas</dt><dd>{{ p.grasas_g | number: '1.0-1' }} g</dd></div>
+                    <div>
+                      <dt>{{ i18n.t('result.calories') }}</dt>
+                      <dd>{{ p.calorias_kcal | number: '1.0-0' }} kcal</dd>
+                    </div>
+                    <div>
+                      <dt>{{ i18n.t('result.protein') }}</dt>
+                      <dd>{{ p.proteinas_g | number: '1.0-1' }} g</dd>
+                    </div>
+                    <div>
+                      <dt>{{ i18n.t('result.carbs') }}</dt>
+                      <dd>{{ p.carbohidratos_g | number: '1.0-1' }} g</dd>
+                    </div>
+                    <div>
+                      <dt>{{ i18n.t('result.fat') }}</dt>
+                      <dd>{{ p.grasas_g | number: '1.0-1' }} g</dd>
+                    </div>
                   </dl>
                 } @else {
-                  <p class="note">El servidor no envió los valores de la tabla para este alimento.</p>
+                  <p class="note">{{ i18n.t('result.sheetNoPer100') }}</p>
                 }
               </section>
 
               <dl class="meta">
-                <div><dt>Volumen estimado</dt><dd>{{ f.volumen_cm3 | number: '1.0-0' }} cm³</dd></div>
-                <div><dt>Densidad</dt><dd>{{ f.densidad_g_cm3 | number: '1.0-2' }} g/cm³</dd></div>
-                <div><dt>Confianza</dt><dd>{{ f.confianza * 100 | number: '1.0-0' }}%</dd></div>
+                <div>
+                  <dt>{{ i18n.t('result.volume') }}</dt>
+                  <dd>{{ f.volumen_cm3 | number: '1.0-0' }} cm³</dd>
+                </div>
+                <div>
+                  <dt>{{ i18n.t('result.density') }}</dt>
+                  <dd>{{ f.densidad_g_cm3 | number: '1.0-2' }} g/cm³</dd>
+                </div>
+                <div>
+                  <dt>{{ i18n.t('result.confidence') }}</dt>
+                  <dd>{{ f.confianza * 100 | number: '1.0-0' }}%</dd>
+                </div>
               </dl>
 
               @if (f.densidad_asumida) {
-                <p class="note">Densidad asumida (1 g/cm³): la tabla no la incluye para este alimento.</p>
+                <p class="note">{{ i18n.t('result.densityAssumed') }}</p>
               }
             </article>
           }
@@ -182,8 +227,8 @@ interface RenderedSegment {
       </section>
     } @else {
       <section class="page empty">
-        <p class="muted">No hay ningún resultado para mostrar.</p>
-        <a class="btn btn--primary" routerLink="/">Tomar una foto</a>
+        <p class="muted">{{ i18n.t('result.emptyTitle') }}</p>
+        <a class="btn btn--primary" routerLink="/">{{ i18n.t('result.emptyCta') }}</a>
       </section>
     }
   `,
@@ -191,6 +236,7 @@ interface RenderedSegment {
 })
 export class Result {
   private readonly store = inject(ResultStore);
+  protected readonly i18n = inject(I18nService);
   protected readonly result = this.store.result;
 
   private readonly sheet = viewChild<ElementRef<HTMLDialogElement>>('sheet');
@@ -254,7 +300,11 @@ export class Result {
   protected readonly splitLabel = computed(() => {
     const { p, c, f } = this.split();
     const t = p + c + f || 1;
-    return `Energía: ${Math.round((p / t) * 100)}% proteínas, ${Math.round((c / t) * 100)}% carbohidratos, ${Math.round((f / t) * 100)}% grasas`;
+    return this.i18n.t('result.splitLabel', {
+      p: Math.round((p / t) * 100),
+      c: Math.round((c / t) * 100),
+      f: Math.round((f / t) * 100),
+    });
   });
 
   /** Inclinación por encima del umbral: el resultado merece una advertencia. */
@@ -274,8 +324,27 @@ export class Result {
    * con más contexto, y repetirla en la lista solo añade ruido.
    */
   protected readonly otherWarnings = computed(() =>
-    (this.store.result()?.advertencias ?? []).filter((w) => !w.includes('poco cenital')),
+    (this.store.result()?.advertencias ?? []).filter((w) =>
+      typeof w === 'string' ? !w.includes('poco cenital') : w.code !== 'tilt',
+    ),
   );
+
+  /** Traduce un aviso por su código; los strings sueltos son de un Modal antiguo. */
+  protected warningText(w: string | PipelineWarning): string {
+    if (typeof w === 'string') return w;
+    switch (w.code) {
+      case 'tilt':
+        return this.i18n.t('warning.tilt', { deg: w.params?.['deg'] ?? '' });
+      case 'class_missing':
+        return this.i18n.t('warning.classMissing');
+      case 'low_volume':
+        return this.i18n.t('warning.lowVolume');
+      case 'density_assumed':
+        return this.i18n.t('warning.densityAssumed');
+      default:
+        return w.code;
+    }
+  }
 
   protected onPhotoLoad(event: Event): void {
     const img = event.target as HTMLImageElement;
@@ -312,3 +381,4 @@ function clamp(value: number, min: number, max: number): number {
 function mean(points: number[][], axis: 0 | 1): number {
   return points.reduce((acc, p) => acc + p[axis], 0) / points.length;
 }
+

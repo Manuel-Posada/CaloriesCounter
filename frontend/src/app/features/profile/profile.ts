@@ -1,6 +1,8 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { MessageKey } from '../../core/i18n/messages';
 import { Avatar } from '../../core/ui/avatar';
 
 @Component({
@@ -8,7 +10,7 @@ import { Avatar } from '../../core/ui/avatar';
   imports: [Avatar, ReactiveFormsModule],
   template: `
     <section class="page">
-      <h1>Perfil</h1>
+      <h1>{{ i18n.t('profile.title') }}</h1>
 
       <div class="card identity">
         <app-avatar
@@ -16,37 +18,37 @@ import { Avatar } from '../../core/ui/avatar';
           [url]="profile()?.picture_url ?? ''"
           [initials]="auth.initials()"
         />
-        <strong class="name">{{ auth.displayName() || 'Tu cuenta' }}</strong>
+        <strong class="name">{{ auth.displayName() || i18n.t('profile.myAccount') }}</strong>
         @if (profile()?.email; as email) {
           <span class="muted">{{ email }}</span>
         }
-        <span class="chip">Cuenta de Google</span>
+        <span class="chip">{{ i18n.t('profile.googleAccount') }}</span>
       </div>
 
       <form class="card form" [formGroup]="form" (ngSubmit)="save()">
-        <h2>Datos personales</h2>
+        <h2>{{ i18n.t('profile.personal') }}</h2>
 
         <label>
-          <span>Nombre</span>
+          <span>{{ i18n.t('profile.firstName') }}</span>
           <input formControlName="first_name" autocomplete="given-name" maxlength="150" />
         </label>
 
         <label>
-          <span>Apellidos</span>
+          <span>{{ i18n.t('profile.lastName') }}</span>
           <input formControlName="last_name" autocomplete="family-name" maxlength="150" />
         </label>
 
-        <p class="hint">El email y la foto vienen de tu cuenta de Google y no se editan aquí.</p>
+        <p class="hint">{{ i18n.t('profile.googleNote') }}</p>
 
-        @if (error()) {
-          <p class="alert" role="alert">{{ error() }}</p>
+        @if (error(); as key) {
+          <p class="alert" role="alert">{{ i18n.t(key) }}</p>
         }
         @if (saved()) {
-          <p class="ok" role="status">Cambios guardados.</p>
+          <p class="ok" role="status">{{ i18n.t('profile.saved') }}</p>
         }
 
         <button class="btn btn--primary btn--block" type="submit" [disabled]="saving() || form.pristine">
-          {{ saving() ? 'Guardando…' : 'Guardar cambios' }}
+          {{ saving() ? i18n.t('profile.saving') : i18n.t('profile.save') }}
         </button>
       </form>
     </section>
@@ -55,6 +57,7 @@ import { Avatar } from '../../core/ui/avatar';
 })
 export class Profile {
   protected readonly auth = inject(AuthService);
+  protected readonly i18n = inject(I18nService);
   protected readonly profile = this.auth.profile;
 
   private readonly fb = inject(NonNullableFormBuilder);
@@ -65,7 +68,7 @@ export class Profile {
 
   protected readonly saving = signal(false);
   protected readonly saved = signal(false);
-  protected readonly error = signal<string | null>(null);
+  protected readonly error = signal<MessageKey | null>(null);
 
   private filled = false;
 
@@ -96,7 +99,7 @@ export class Profile {
       },
       error: () => {
         this.saving.set(false);
-        this.error.set('No pudimos guardar los cambios. Inténtalo de nuevo.');
+        this.error.set('profile.saveError');
       },
     });
   }

@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 import { readFocal35mm } from '../../core/exif.util';
 import { FoodLogService } from '../../core/food-log/food-log.service';
 import { ResultStore } from '../../core/food-log/result.store';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { MessageKey } from '../../core/i18n/messages';
 import { compressImage } from '../../core/image.util';
 import { TiltService } from '../../core/tilt.service';
 import { PreferencesService } from '../../core/preferences.service';
@@ -13,10 +15,10 @@ import { LevelGauge } from './level-gauge';
 type Step = 'presign' | 'upload' | 'infer';
 type Mode = 'idle' | 'camera' | 'working';
 
-const STEPS: { key: Step; label: string }[] = [
-  { key: 'presign', label: 'Preparando' },
-  { key: 'upload', label: 'Subiendo foto' },
-  { key: 'infer', label: 'Analizando tu plato' },
+const STEPS: { key: Step; labelKey: MessageKey }[] = [
+  { key: 'presign', labelKey: 'capture.stepPresign' },
+  { key: 'upload', labelKey: 'capture.stepUpload' },
+  { key: 'infer', labelKey: 'capture.stepInfer' },
 ];
 
 /** Tiempo que hay que mantener el nivel antes de disparar solo. */
@@ -33,46 +35,43 @@ const WATCH_MS = 100;
     <section class="page capture" [class.capture--camera]="mode() === 'camera'">
       @if (mode() === 'idle') {
         <header>
-          <h1>¿Qué vas a comer?</h1>
-          <p class="muted">
-            Coloca el plato en la mesa y abre la cámara: te marcará en verde el momento exacto en el que
-            está perfectamente cenital.
-          </p>
+          <h1>{{ i18n.t('capture.title') }}</h1>
+          <p class="muted">{{ i18n.t('capture.subtitle') }}</p>
         </header>
 
         <button type="button" class="btn btn--primary btn--xl btn--block" (click)="openCamera()">
-          <span aria-hidden="true">📷</span> Abrir cámara guiada
+          <span aria-hidden="true">📷</span> {{ i18n.t('capture.openCamera') }}
         </button>
 
         <label class="btn btn--ghost btn--block">
           <input class="sr-only" type="file" accept="image/*" (change)="onFile($event)" />
-          <span aria-hidden="true">🖼️</span> Elegir de la galería
+          <span aria-hidden="true">🖼️</span> {{ i18n.t('capture.gallery') }}
         </label>
 
         @if (cameraFailed()) {
           <label class="btn btn--ghost btn--block">
             <input class="sr-only" type="file" accept="image/*" capture="environment" (change)="onFile($event)" />
-            <span aria-hidden="true">📸</span> Usar la cámara del sistema
+            <span aria-hidden="true">📸</span> {{ i18n.t('capture.systemCamera') }}
           </label>
         }
 
-        @if (error()) {
-          <p class="alert" role="alert">{{ error() }}</p>
+        @if (error(); as key) {
+          <p class="alert" role="alert">{{ i18n.t(key) }}</p>
         }
 
         <div class="card tips">
-          <h2>Así el cálculo es exacto</h2>
+          <h2>{{ i18n.t('capture.tipsTitle') }}</h2>
           <ul>
-            <li>Móvil <strong>paralelo a la mesa</strong>, a unos 30–40 cm del plato.</li>
-            <li>Que se vea la mesa alrededor del plato.</li>
-            <li>Luz abundante, sin sombras duras.</li>
+            <li>{{ i18n.t('capture.tip1') }}</li>
+            <li>{{ i18n.t('capture.tip2') }}</li>
+            <li>{{ i18n.t('capture.tip3') }}</li>
           </ul>
         </div>
       } @else if (mode() === 'camera') {
         <div class="viewfinder">
           <video #video playsinline muted autoplay></video>
 
-          <button type="button" class="close" aria-label="Cerrar la cámara" (click)="closeCamera()">✕</button>
+          <button type="button" class="close" [attr.aria-label]="i18n.t('capture.closeCamera')" (click)="closeCamera()">✕</button>
 
           <div class="frame" aria-hidden="true">
             <span class="ring" [class.ring--ready]="isLevel()"></span>
@@ -83,15 +82,11 @@ const WATCH_MS = 100;
           }
 
           @if (tilt.silent()) {
-            <p class="notice">
-              Este dispositivo no tiene sensor de inclinación. Mantén el móvil paralelo a la mesa y usa la guía.
-            </p>
+            <p class="notice">{{ i18n.t('capture.noSensor') }}</p>
           }
         </div>
 
-        <p class="tip">
-          Sostén el móvil plano sobre el plato, a unos 30–40 cm, con la mesa visible alrededor.
-        </p>
+        <p class="tip">{{ i18n.t('capture.holdTip') }}</p>
 
         <app-level-gauge
           [tilt]="tilt.tilt()"
@@ -107,7 +102,7 @@ const WATCH_MS = 100;
           class="shutter"
           [class.shutter--ready]="canShoot()"
           [disabled]="!canShoot()"
-          [attr.aria-label]="canShoot() ? 'Tomar foto' : 'Nivela el móvil para disparar'"
+          [attr.aria-label]="canShoot() ? i18n.t('capture.shoot') : i18n.t('capture.shootDisabled')"
           (click)="shoot()"
         >
           <span class="shutter__dot"></span>
@@ -115,7 +110,7 @@ const WATCH_MS = 100;
       } @else {
         <div class="preview">
           @if (previewUrl()) {
-            <img [src]="previewUrl()!" alt="Foto seleccionada" />
+            <img [src]="previewUrl()!" [attr.alt]="i18n.t('capture.previewAlt')" />
           }
           <div class="scan" aria-hidden="true"></div>
         </div>
@@ -126,7 +121,7 @@ const WATCH_MS = 100;
               <span class="dot">
                 @if (i < activeIndex()) { ✓ } @else if (i === activeIndex()) { <span class="spinner"></span> }
               </span>
-              <span class="label">{{ s.label }}</span>
+              <span class="label">{{ i18n.t(s.labelKey) }}</span>
               @if (s.key === 'upload' && i === activeIndex()) {
                 <span class="pct">{{ progress() }}%</span>
               }
@@ -146,7 +141,7 @@ const WATCH_MS = 100;
           <div class="skeleton" style="height: 14px; margin-top: 12px"></div>
           <div class="skeleton" style="height: 14px; margin-top: 8px; width: 85%"></div>
         </div>
-        <p class="muted center">Esto toma unos segundos…</p>
+        <p class="muted center">{{ i18n.t('capture.working') }}</p>
       }
     </section>
   `,
@@ -158,6 +153,7 @@ export class Capture implements OnDestroy {
   private readonly router = inject(Router);
   protected readonly prefs = inject(PreferencesService);
   protected readonly tilt = inject(TiltService);
+  protected readonly i18n = inject(I18nService);
 
   private readonly videoRef = viewChild<ElementRef<HTMLVideoElement>>('video');
 
@@ -174,7 +170,7 @@ export class Capture implements OnDestroy {
   protected readonly mode = signal<Mode>('idle');
   protected readonly step = signal<Step>('presign');
   protected readonly progress = signal(0);
-  protected readonly error = signal<string | null>(null);
+  protected readonly error = signal<MessageKey | null>(null);
   protected readonly cameraFailed = signal(false);
   protected readonly previewUrl = signal<string | null>(null);
   protected readonly isLevel = signal(false);
@@ -191,7 +187,7 @@ export class Capture implements OnDestroy {
       const stream = this.stream;
       if (!el || !stream) return;
       if (el.srcObject !== stream) el.srcObject = stream;
-      void el.play().catch(() => this.failCamera('No pudimos iniciar la vista previa de la cámara.'));
+      void el.play().catch(() => this.failCamera('capture.cameraPreviewError'));
     });
   }
 
@@ -200,7 +196,7 @@ export class Capture implements OnDestroy {
     this.cameraFailed.set(false);
 
     if (!navigator.mediaDevices?.getUserMedia) {
-      this.failCamera('Este navegador no permite abrir la cámara desde la web. Usa la galería o la cámara del sistema.');
+      this.failCamera('capture.noCameraApi');
       return;
     }
 
@@ -243,7 +239,7 @@ export class Capture implements OnDestroy {
 
     const video = this.videoRef()?.nativeElement;
     if (!video || video.videoWidth === 0) {
-      this.error.set('La cámara todavía no está lista. Espera un segundo e inténtalo otra vez.');
+      this.error.set('capture.notReady');
       return;
     }
 
@@ -256,7 +252,7 @@ export class Capture implements OnDestroy {
     const ctx = canvas.getContext('2d');
     if (!ctx) {
       this.capturing = false;
-      this.error.set('No pudimos capturar la foto. Inténtalo de nuevo.');
+      this.error.set('capture.shotFailed');
       return;
     }
     ctx.drawImage(video, 0, 0);
@@ -267,7 +263,7 @@ export class Capture implements OnDestroy {
     this.capturing = false;
 
     if (!shot) {
-      this.error.set('No pudimos capturar la foto. Inténtalo de nuevo.');
+      this.error.set('capture.shotFailed');
       return;
     }
     await this.analyze(shot);
@@ -337,24 +333,24 @@ export class Capture implements OnDestroy {
     this.capturing = false;
   }
 
-  private failCamera(message: string): void {
+  private failCamera(key: MessageKey): void {
     this.cameraFailed.set(true);
-    this.error.set(message);
+    this.error.set(key);
     this.closeCamera();
   }
 
-  private cameraMessage(err: unknown): string {
+  private cameraMessage(err: unknown): MessageKey {
     switch ((err as DOMException)?.name) {
       case 'NotAllowedError':
       case 'SecurityError':
-        return 'No diste permiso para usar la cámara. Actívalo en los ajustes del navegador o usa la galería.';
+        return 'capture.cameraNoPermission';
       case 'NotFoundError':
       case 'OverconstrainedError':
-        return 'No encontramos ninguna cámara disponible en este dispositivo.';
+        return 'capture.cameraNotFound';
       case 'NotReadableError':
-        return 'Otra aplicación está usando la cámara. Ciérrala e inténtalo de nuevo.';
+        return 'capture.cameraBusy';
       default:
-        return 'No pudimos abrir la cámara. Prueba con la galería.';
+        return 'capture.cameraGeneric';
     }
   }
 
@@ -370,7 +366,7 @@ export class Capture implements OnDestroy {
         source instanceof File ? readFocal35mm(source) : Promise.resolve(null),
       ]);
     } catch {
-      this.error.set('No pudimos leer esa imagen. Prueba con otra foto (JPG, PNG o WebP).');
+      this.error.set('capture.readError');
       this.mode.set('idle');
       return;
     }
@@ -400,16 +396,16 @@ export class Capture implements OnDestroy {
     });
   }
 
-  private messageFor(err: HttpErrorResponse): string {
+  private messageFor(err: HttpErrorResponse): MessageKey {
     switch (err.status) {
       case 0:
-        return 'Sin conexión o la subida fue bloqueada. Revisa tu red e inténtalo de nuevo.';
+        return 'capture.noConnection';
       case 422:
-        return 'No detectamos alimentos en la foto. Prueba con más luz o un ángulo más cercano.';
+        return 'capture.noFood';
       case 502:
-        return 'El análisis no está disponible ahora mismo. Inténtalo en un minuto.';
+        return 'capture.inferDown';
       default:
-        return 'Algo salió mal. Inténtalo de nuevo.';
+        return 'capture.genericError';
     }
   }
 

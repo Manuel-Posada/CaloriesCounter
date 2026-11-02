@@ -65,17 +65,14 @@ class FoodPipeline:
 
             for s in segments:
                 if s.class_idx not in self.nutrition:
-                    warnings.append(f"clase {s.class_idx} no existe en la tabla nutricional; omitida")
+                    warnings.append({"code": "class_missing", "params": {"idx": s.class_idx}})
                     continue
                 vol = estimate_volume_cm3(depth_m, s.mask, food_union, focal_px)
                 if vol.plane_normal is not None:
                     angles.append(camera_tilt_deg(vol.plane_normal))
                 n = self.nutrition.compute(s.class_idx, vol.volume_cm3)
                 if vol.saturated_frac > 0.5:
-                    warnings.append(
-                        f"clase {s.class_idx}: volumen poco fiable (plano de apoyo mal ajustado); "
-                        "usa una foto con la mesa/plato bien visible"
-                    )
+                    warnings.append({"code": "low_volume", "params": {"idx": s.class_idx}})
                 foods.append(
                     {
                         "idx": s.class_idx,
@@ -104,7 +101,7 @@ class FoodPipeline:
                     }
                 )
                 if n["densidad_asumida"]:
-                    warnings.append(f"clase {s.class_idx}: densidad ausente en CSV, se asumió 1.0 g/cm³")
+                    warnings.append({"code": "density_assumed", "params": {"idx": s.class_idx}})
 
         totals = {
             "volumen_cm3": sum(f["volumen_cm3"] for f in foods),
@@ -119,10 +116,7 @@ class FoodPipeline:
         # None cuando ningún segmento dio un plano del anillo (no se inventa un 0°).
         angulo = round(float(np.median(angles)), 1) if angles else None
         if angulo is not None and angulo > TILT_WARN_DEG:
-            warnings.append(
-                f"foto poco cenital ({angulo:.0f}° de inclinación): el volumen y las calorías "
-                "pueden estar sobreestimados; repite la foto con la cámara guiada"
-            )
+            warnings.append({"code": "tilt", "params": {"deg": angulo}})
 
         t_end = time.perf_counter()
         return {

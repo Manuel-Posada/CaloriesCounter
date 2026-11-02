@@ -139,7 +139,9 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
             )
 
         totales = inference["totales"]
-        consejo = services.get_nutrition_advice(inference)
+        # El consejo se genera en el idioma que pide el navegador (es por defecto).
+        locale = (request.headers.get("Accept-Language") or "es")[:2].lower()
+        consejo = services.get_nutrition_advice(inference, locale)
 
         # Contornos de cada zona para poder pintarlas en el historial mientras exista la
         # imagen en R2 (72 h). Se vacían al borrar la foto en `cleanup_r2_images`.

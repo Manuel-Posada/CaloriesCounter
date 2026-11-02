@@ -10,13 +10,27 @@ from .r2 import R2NotConfigured, get_r2_client
 
 log = logging.getLogger(__name__)
 
-GEMINI_SYSTEM_PROMPT = (
-    "Eres un experto nutricional. Recibes un JSON con alimentos, sus gramos calculados y sus "
-    "macronutrientes basados en datos del USDA. Tu objetivo es dar un consejo ultra-conciso "
-    "(máximo 3 oraciones) sobre este plato. No recalcules las calorías, asume que los datos son "
-    "exactos. Enfócate en el impacto metabólico (ej. picos de glucosa, saciedad, balance). "
-    "Tono directo y amigable. Responde siempre en español y no repitas el JSON."
-)
+GEMINI_PROMPTS = {
+    "es": (
+        "Eres un experto nutricional. Recibes un JSON con alimentos, sus gramos calculados y sus "
+        "macronutrientes basados en datos del USDA. Tu objetivo es dar un consejo ultra-conciso "
+        "(máximo 3 oraciones) sobre este plato. No recalcules las calorías, asume que los datos son "
+        "exactos. Enfócate en el impacto metabólico (ej. picos de glucosa, saciedad, balance). "
+        "Tono directo y amigable. Responde siempre en español y no repitas el JSON."
+    ),
+    "en": (
+        "You are a nutrition expert. You receive a JSON with foods, their estimated grams and their "
+        "USDA-based macros. Give an ultra-concise tip (max 3 sentences) about this plate. Do not "
+        "recalculate calories, assume the data is exact. Focus on the metabolic impact (e.g. glucose "
+        "spikes, satiety, balance). Direct, friendly tone. Always answer in English and do not repeat "
+        "the JSON."
+    ),
+}
+
+
+def prompt_for(locale: str) -> str:
+    """Prompt en el idioma pedido; cualquier idioma desconocido cae a español."""
+    return GEMINI_PROMPTS["en" if (locale or "").lower().startswith("en") else "es"]
 
 
 class ServiceError(Exception):
@@ -67,7 +81,7 @@ def run_inference(
 
 
 # ---------------------------------------------------------------- Gemini
-def get_nutrition_advice(inference: dict) -> str:
+def get_nutrition_advice(inference: dict, locale: str = "es") -> str:
     """Devuelve el consejo de Gemini; ante cualquier fallo devuelve '' (no bloquea el registro)."""
     if not inference.get("alimentos") or not settings.GEMINI_API_KEY:
         return ""
@@ -86,7 +100,7 @@ def get_nutrition_advice(inference: dict) -> str:
         models = [settings.GEMINI_MODEL, "gemini-flash-lite-latest"]
         for name in dict.fromkeys(m for m in models if m):
             try:
-                model = genai.GenerativeModel(name, system_instruction=GEMINI_SYSTEM_PROMPT)
+                model = genai.GenerativeModel(name, system_instruction=prompt_for(locale))
                 resp = model.generate_content(
                     payload_json,
                     generation_config={"temperature": 0.4, "max_output_tokens": 200},

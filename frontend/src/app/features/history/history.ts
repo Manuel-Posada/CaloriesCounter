@@ -2,6 +2,8 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FoodLogService } from '../../core/food-log/food-log.service';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { MessageKey } from '../../core/i18n/messages';
 import { FoodContour, FoodLog } from '../../core/models';
 import { TILT_WARN_DEG } from '../../core/tilt.service';
 
@@ -10,8 +12,8 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
   imports: [DatePipe, DecimalPipe, RouterLink],
   template: `
     <section class="page">
-      <h1>Historial</h1>
-      <p class="muted">Las fotos se conservan 3 días; los datos, 1 mes.</p>
+      <h1>{{ i18n.t('history.title') }}</h1>
+      <p class="muted">{{ i18n.t('history.retention') }}</p>
 
       @if (loading() && items().length === 0) {
         @for (n of [1, 2, 3]; track n) {
@@ -22,15 +24,17 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
         }
       }
 
-      @if (error()) {
-        <p class="alert" role="alert">{{ error() }}
-          <button type="button" class="link" (click)="load()">Reintentar</button></p>
+      @if (error(); as key) {
+        <p class="alert" role="alert">
+          {{ i18n.t(key) }}
+          <button type="button" class="link" (click)="load()">{{ i18n.t('history.retry') }}</button>
+        </p>
       }
 
       @if (!loading() && !error() && items().length === 0) {
         <div class="card empty">
-          <p>Aún no has registrado comidas.</p>
-          <a class="btn btn--primary" routerLink="/">Analizar mi primer plato</a>
+          <p>{{ i18n.t('history.empty') }}</p>
+          <a class="btn btn--primary" routerLink="/">{{ i18n.t('history.emptyCta') }}</a>
         </div>
       }
 
@@ -41,7 +45,7 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
               <!-- Reciente: imagen almacenada en R2 -->
               <article class="card row">
                 <figure class="thumb-wrap">
-                  <img class="thumb" [src]="log.imagen_url!" alt="Foto de la comida" loading="lazy"
+                  <img class="thumb" [src]="log.imagen_url!" [attr.alt]="i18n.t('history.photoAlt')" loading="lazy"
                        (load)="onThumbLoad(log.id, $event)" (error)="onImageError(log.id)" />
                   @if (size(log.id); as s) {
                     @if (log.contornos.length) {
@@ -58,11 +62,11 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
                 </figure>
                 <div class="grow">
                   <div class="top">
-                    <strong>{{ log.calorias_totales | number: '1.0-0' }} kcal</strong>
+                    <strong>{{ log.calorias_totales | number: '1.0-0' : i18n.dateLocale() }} kcal</strong>
                     <span class="right">
-                      <time class="muted">{{ log.fecha_hora | date: "d MMM, HH:mm" }}</time>
+                      <time class="muted">{{ log.fecha_hora | date: 'd MMM, HH:mm' : undefined : i18n.dateLocale() }}</time>
                       @if (tilted(log)) {
-                        <span class="chip chip--warn" title="La foto no era cenital">📐 {{ log.angulo_camara_deg | number: '1.0-0' }}°</span>
+                        <span class="chip chip--warn" [attr.title]="i18n.t('history.tilted')">📐 {{ log.angulo_camara_deg | number: '1.0-0' : i18n.dateLocale() }}°</span>
                       }
                     </span>
                   </div>
@@ -74,21 +78,21 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
               <!-- Antigua: solo texto y datos -->
               <article class="card text-only">
                 <div class="top">
-                  <time class="muted">{{ log.fecha_hora | date: "EEEE d MMM, HH:mm" }}</time>
+                  <time class="muted">{{ log.fecha_hora | date: 'EEEE d MMM, HH:mm' : undefined : i18n.dateLocale() }}</time>
                   <span class="right">
                     @if (tilted(log)) {
-                      <span class="chip chip--warn" title="La foto no era cenital">📐 {{ log.angulo_camara_deg | number: '1.0-0' }}°</span>
+                      <span class="chip chip--warn" [attr.title]="i18n.t('history.tilted')">📐 {{ log.angulo_camara_deg | number: '1.0-0' : i18n.dateLocale() }}°</span>
                     }
-                    <span class="chip">Sin foto</span>
+                    <span class="chip">{{ i18n.t('history.noPhoto') }}</span>
                   </span>
                 </div>
                 <div class="figures">
                   <div class="big"><strong>{{ log.calorias_totales | number: '1.0-0' }}</strong><span>kcal</span></div>
                   <dl>
-                    <div><dt>Prot.</dt><dd>{{ log.macronutrientes.proteinas_g | number: '1.0-0' }} g</dd></div>
-                    <div><dt>Carb.</dt><dd>{{ log.macronutrientes.carbohidratos_g | number: '1.0-0' }} g</dd></div>
-                    <div><dt>Grasa</dt><dd>{{ log.macronutrientes.grasas_g | number: '1.0-0' }} g</dd></div>
-                    <div><dt>Vol.</dt><dd>{{ log.volumen_estimado | number: '1.0-0' }} cm³</dd></div>
+                    <div><dt>{{ i18n.t('result.protein') }}</dt><dd>{{ log.macronutrientes.proteinas_g | number: '1.0-0' }} g</dd></div>
+                    <div><dt>{{ i18n.t('result.carbs') }}</dt><dd>{{ log.macronutrientes.carbohidratos_g | number: '1.0-0' }} g</dd></div>
+                    <div><dt>{{ i18n.t('result.fat') }}</dt><dd>{{ log.macronutrientes.grasas_g | number: '1.0-0' }} g</dd></div>
+                    <div><dt>{{ i18n.t('result.volume') }}</dt><dd>{{ log.volumen_estimado | number: '1.0-0' }} cm³</dd></div>
                   </dl>
                 </div>
                 @if (log.consejo_nutricional) { <p class="tip">{{ log.consejo_nutricional }}</p> }
@@ -100,7 +104,7 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
 
       @if (hasMore()) {
         <button type="button" class="btn btn--ghost btn--block" [disabled]="loading()" (click)="load()">
-          @if (loading()) { <span class="spinner"></span> } Cargar más
+          @if (loading()) { <span class="spinner"></span> } {{ i18n.t('history.loadMore') }}
         </button>
       }
     </section>
@@ -109,10 +113,11 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
 })
 export class History implements OnInit {
   private readonly logs = inject(FoodLogService);
+  protected readonly i18n = inject(I18nService);
 
   protected readonly items = signal<FoodLog[]>([]);
   protected readonly loading = signal(false);
-  protected readonly error = signal<string | null>(null);
+  protected readonly error = signal<MessageKey | null>(null);
   protected readonly hasMore = signal(false);
   /** IDs cuya imagen falló al cargar (p. ej. borrada entre el listado y la vista). */
   protected readonly failed = new Set<number | string>();
@@ -136,7 +141,7 @@ export class History implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.error.set('No pudimos cargar tu historial.');
+        this.error.set('history.loadingError');
       },
     });
   }
@@ -170,13 +175,21 @@ export class History implements OnInit {
 
   protected macros(log: FoodLog): string {
     const m = log.macronutrientes;
-    return `P ${Math.round(m.proteinas_g)} g · C ${Math.round(m.carbohidratos_g)} g · G ${Math.round(m.grasas_g)} g`;
+    return this.i18n.t('history.macros', {
+      p: Math.round(m.proteinas_g),
+      c: Math.round(m.carbohidratos_g),
+      f: Math.round(m.grasas_g),
+    });
   }
 
   protected onImageError(logId: string | number): void {
     this.failed.add(logId);
+    this.currentReference();
+  }
+
+  /** Nueva referencia del array para forzar la reactividad (`failed` es un Set). */
+  private currentReference(): void {
     const current = this.items() || [];
-    this.items.set([...current]); // nueva referencia para forzar la reactividad
+    this.items.set([...current]);
   }
 }
-

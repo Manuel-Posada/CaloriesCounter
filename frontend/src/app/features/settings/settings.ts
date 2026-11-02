@@ -1,19 +1,36 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { I18nService, Locale } from '../../core/i18n/i18n.service';
+import { MessageKey } from '../../core/i18n/messages';
 import { Accent, LevelSensitivity, PreferencesService, ThemeMode } from '../../core/preferences.service';
 
 @Component({
   selector: 'app-settings',
   template: `
     <section class="page">
-      <h1>Configuración</h1>
-      <p class="muted">Ajustes de la app guardados en este dispositivo.</p>
+      <h1>{{ i18n.t('settings.title') }}</h1>
+      <p class="muted">{{ i18n.t('settings.subtitle') }}</p>
 
       <!-- Apariencia -->
       <section class="card group">
-        <h2>Apariencia</h2>
+        <h2>{{ i18n.t('settings.appearance') }}</h2>
 
-        <p class="label">Tema</p>
-        <div class="segmented" role="group" aria-label="Tema">
+        <p class="label">{{ i18n.t('settings.language') }}</p>
+        <div class="segmented" role="group" [attr.aria-label]="i18n.t('settings.language')">
+          @for (l of languages; track l.id) {
+            <button
+              type="button"
+              [class.active]="i18n.locale() === l.id"
+              [attr.aria-pressed]="i18n.locale() === l.id"
+              (click)="i18n.setLocale(l.id)"
+            >
+              {{ l.label }}
+            </button>
+          }
+        </div>
+        <p class="hint">{{ i18n.t('settings.languageHint') }}</p>
+
+        <p class="label">{{ i18n.t('settings.theme') }}</p>
+        <div class="segmented" role="group" [attr.aria-label]="i18n.t('settings.theme')">
           @for (t of themes; track t.id) {
             <button
               type="button"
@@ -21,20 +38,20 @@ import { Accent, LevelSensitivity, PreferencesService, ThemeMode } from '../../c
               [attr.aria-pressed]="prefs.theme() === t.id"
               (click)="prefs.setTheme(t.id)"
             >
-              {{ t.label }}
+              {{ i18n.t(t.key) }}
             </button>
           }
         </div>
 
-        <p class="label">Color de acento</p>
-        <div class="swatches" role="group" aria-label="Color de acento">
+        <p class="label">{{ i18n.t('settings.accent') }}</p>
+        <div class="swatches" role="group" [attr.aria-label]="i18n.t('settings.accent')">
           @for (a of accents; track a.id) {
             <button
               type="button"
               class="swatch"
               [class.active]="prefs.accent() === a.id"
               [style]="{ '--swatch': a.color }"
-              [attr.aria-label]="a.label"
+              [attr.aria-label]="i18n.t(a.key)"
               [attr.aria-pressed]="prefs.accent() === a.id"
               (click)="prefs.setAccent(a.id)"
             >
@@ -46,23 +63,20 @@ import { Accent, LevelSensitivity, PreferencesService, ThemeMode } from '../../c
 
       <!-- Cámara -->
       <section class="card group">
-        <h2>Cámara</h2>
+        <h2>{{ i18n.t('settings.camera') }}</h2>
 
         <label class="field">
-          <span class="label">Campo de visión (horizontal)</span>
+          <span class="label">{{ i18n.t('settings.fov') }}</span>
           <select [value]="selectValue()" (change)="onFov($event)">
-            @for (opt of fovOptions; track opt.value) {
+            @for (opt of fovOptions(); track opt.value) {
               <option [value]="opt.value">{{ opt.label }}</option>
             }
           </select>
         </label>
-        <p class="hint">
-          Si conoces el FOV de tu cámara, el volumen sale más preciso. «Automático» usa el EXIF de
-          la foto y, si no hay, 65°.
-        </p>
+        <p class="hint">{{ i18n.t('settings.fovHint') }}</p>
 
-        <p class="label">Sensibilidad del nivel</p>
-        <div class="segmented" role="group" aria-label="Sensibilidad del nivel">
+        <p class="label">{{ i18n.t('settings.level') }}</p>
+        <div class="segmented" role="group" [attr.aria-label]="i18n.t('settings.level')">
           @for (l of levels; track l.id) {
             <button
               type="button"
@@ -70,24 +84,20 @@ import { Accent, LevelSensitivity, PreferencesService, ThemeMode } from '../../c
               [attr.aria-pressed]="prefs.level() === l.id"
               (click)="prefs.setLevel(l.id)"
             >
-              {{ l.label }}
+              {{ i18n.t(l.key) }}
             </button>
           }
         </div>
         <p class="hint">
-          El aro se pone verde a {{ prefs.levelEnter() }}° y se pierde a {{ prefs.levelExit() }}°.
-          Cuanto más estricta, más cenital tiene que estar la foto.
+          {{ i18n.t('settings.levelHint', { enter: prefs.levelEnter(), exit: prefs.levelExit() }) }}
         </p>
       </section>
 
       <!-- Avisos -->
       <section class="card group">
-        <h2>Avisos</h2>
-        <p class="muted">
-          Recordatorios para registrar tus comidas. Necesitan permiso de notificaciones y llegarán
-          en una próxima versión.
-        </p>
-        <span class="chip">Próximamente</span>
+        <h2>{{ i18n.t('settings.notices') }}</h2>
+        <p class="muted">{{ i18n.t('settings.noticesBody') }}</p>
+        <span class="chip">{{ i18n.t('settings.comingSoon') }}</span>
       </section>
     </section>
   `,
@@ -95,35 +105,41 @@ import { Accent, LevelSensitivity, PreferencesService, ThemeMode } from '../../c
 })
 export class Settings {
   protected readonly prefs = inject(PreferencesService);
+  protected readonly i18n = inject(I18nService);
 
-  protected readonly themes: { id: ThemeMode; label: string }[] = [
-    { id: 'system', label: 'Sistema' },
-    { id: 'light', label: 'Claro' },
-    { id: 'dark', label: 'Oscuro' },
+  protected readonly languages: { id: Locale; label: string }[] = [
+    { id: 'es', label: 'Español' },
+    { id: 'en', label: 'English' },
   ];
 
-  protected readonly accents: { id: Accent; label: string; color: string }[] = [
-    { id: 'green', label: 'Verde', color: '#16a34a' },
-    { id: 'blue', label: 'Azul', color: '#2563eb' },
-    { id: 'orange', label: 'Naranja', color: '#ea580c' },
-    { id: 'pink', label: 'Rosa', color: '#db2777' },
-    { id: 'violet', label: 'Violeta', color: '#7c3aed' },
+  protected readonly themes: { id: ThemeMode; key: MessageKey }[] = [
+    { id: 'system', key: 'settings.themeSystem' },
+    { id: 'light', key: 'settings.themeLight' },
+    { id: 'dark', key: 'settings.themeDark' },
   ];
 
-  protected readonly levels: { id: LevelSensitivity; label: string }[] = [
-    { id: 'strict', label: 'Estricta' },
-    { id: 'normal', label: 'Normal' },
-    { id: 'relaxed', label: 'Flexible' },
+  protected readonly accents: { id: Accent; key: MessageKey; color: string }[] = [
+    { id: 'green', key: 'settings.accentGreen', color: '#16a34a' },
+    { id: 'blue', key: 'settings.accentBlue', color: '#2563eb' },
+    { id: 'orange', key: 'settings.accentOrange', color: '#ea580c' },
+    { id: 'pink', key: 'settings.accentPink', color: '#db2777' },
+    { id: 'violet', key: 'settings.accentViolet', color: '#9463f7' },
   ];
 
-  protected readonly fovOptions = [
-    { value: 'auto', label: 'Automático' },
+  protected readonly levels: { id: LevelSensitivity; key: MessageKey }[] = [
+    { id: 'strict', key: 'settings.levelStrict' },
+    { id: 'normal', key: 'settings.levelNormal' },
+    { id: 'relaxed', key: 'settings.levelRelaxed' },
+  ];
+
+  protected readonly fovOptions = computed(() => [
+    { value: 'auto', label: this.i18n.t('settings.fovAuto') },
     { value: '60', label: '60°' },
     { value: '65', label: '65°' },
     { value: '70', label: '70°' },
     { value: '75', label: '75°' },
     { value: '80', label: '80°' },
-  ];
+  ]);
 
   protected selectValue(): string {
     const fov = this.prefs.fovDeg();

@@ -1,22 +1,21 @@
 import { Component, inject, signal } from '@angular/core';
 import { PipelineService } from '../../core/food-log/pipeline.service';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { MessageKey } from '../../core/i18n/messages';
 
 /** Ajustes reservados a administradores (`is_staff`). */
 @Component({
   selector: 'app-admin',
   template: `
     <section class="page">
-      <h1>Administración</h1>
-      <p class="muted">Ajustes de inferencia reservados a administradores.</p>
+      <h1>{{ i18n.t('settings.adminTitle') }}</h1>
+      <p class="muted">{{ i18n.t('settings.adminSubtitle') }}</p>
 
       <div class="card">
-        <h2>Pipeline</h2>
-        <p class="muted small">
-          Se envía con cada análisis. Solo afecta a este dispositivo: el resto de usuarios sigue
-          con el pipeline de producción.
-        </p>
+        <h2>{{ i18n.t('settings.pipeline') }}</h2>
+        <p class="muted small">{{ i18n.t('settings.pipelineHint') }}</p>
 
-        <div class="options" role="radiogroup" aria-label="Pipeline de inferencia">
+        <div class="options" role="radiogroup" [attr.aria-label]="i18n.t('settings.pipeline')">
           @for (opt of options; track opt.id) {
             <label class="option" [class.selected]="pipeline() === opt.id">
               <input
@@ -27,8 +26,8 @@ import { PipelineService } from '../../core/food-log/pipeline.service';
                 (change)="select(opt.id)"
               />
               <span class="text">
-                <strong>{{ opt.id }} · {{ opt.name }}</strong>
-                <small>{{ opt.detail }}</small>
+                <strong>{{ opt.id }} · {{ i18n.t(opt.nameKey) }}</strong>
+                <small>{{ i18n.t(opt.detailKey) }}</small>
               </span>
             </label>
           }
@@ -40,11 +39,11 @@ import { PipelineService } from '../../core/food-log/pipeline.service';
           [disabled]="isDefault()"
           (click)="reset()"
         >
-          Restablecer el de producción (B)
+          {{ i18n.t('settings.pipelineReset') }}
         </button>
 
         @if (saved()) {
-          <p class="note" role="status">Guardado en este dispositivo.</p>
+          <p class="note" role="status">{{ i18n.t('settings.pipelineSaved') }}</p>
         }
       </div>
     </section>
@@ -53,21 +52,14 @@ import { PipelineService } from '../../core/food-log/pipeline.service';
 })
 export class Admin {
   private readonly pipelines = inject(PipelineService);
+  protected readonly i18n = inject(I18nService);
   protected readonly pipeline = this.pipelines.pipeline;
   protected readonly isDefault = this.pipelines.isDefault;
   protected readonly saved = signal(false);
 
-  protected readonly options = [
-    {
-      id: 'A' as const,
-      name: 'YOLO26-seg',
-      detail: 'Segmenta y clasifica en una sola pasada. Más rápido, menos fino con platos complejos.',
-    },
-    {
-      id: 'B' as const,
-      name: 'Mask2Former + Inception-V4',
-      detail: 'Segmentación agnóstica y clasificador de 323 clases. Es el de producción.',
-    },
+  protected readonly options: { id: 'A' | 'B'; nameKey: MessageKey; detailKey: MessageKey }[] = [
+    { id: 'A', nameKey: 'settings.pipelineA', detailKey: 'settings.pipelineADetail' },
+    { id: 'B', nameKey: 'settings.pipelineB', detailKey: 'settings.pipelineBDetail' },
   ];
 
   protected select(id: 'A' | 'B'): void {

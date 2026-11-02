@@ -63,10 +63,17 @@ export interface FoodLog {
   imagen_eliminada_en: string | null;
 }
 
+/** Aviso del pipeline: código + parámetros, para traducirlo en el cliente. */
+export interface PipelineWarning {
+  code: string;
+  params?: Record<string, string | number>;
+}
+
 /** Respuesta del POST /food-logs/: el registro + el detalle por alimento (no se persiste). */
 export interface FoodLogCreated extends FoodLog {
   alimentos: DetectedFood[];
-  advertencias: string[];
+  /** Los strings sueltos vienen de un Modal antiguo que aún no emitía códigos. */
+  advertencias: (string | PipelineWarning)[];
 }
 
 export interface Page<T> {

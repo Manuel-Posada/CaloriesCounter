@@ -1,6 +1,7 @@
 import { Component, ElementRef, effect, inject, signal, viewChild } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
+import { I18nService } from '../i18n/i18n.service';
 import { Avatar } from './avatar';
 
 /**
@@ -23,33 +24,33 @@ import { Avatar } from './avatar';
               [initials]="auth.initials()"
             />
             <span class="who">
-              <strong id="drawer-name">{{ auth.displayName() || 'Mi cuenta' }}</strong>
+              <strong id="drawer-name">{{ auth.displayName() || i18n.t('profile.myAccount') }}</strong>
               @if (auth.profile()?.email; as email) {
                 <span class="email">{{ email }}</span>
               }
             </span>
           </a>
-          <button #closeBtn type="button" class="close" aria-label="Cerrar el menú" (click)="close()">
+          <button #closeBtn type="button" class="close" [attr.aria-label]="i18n.t('drawer.close')" (click)="close()">
             ✕
           </button>
         </header>
 
-        <nav class="items" aria-label="Cuenta">
+        <nav class="items" [attr.aria-label]="i18n.t('app.account')">
           <a routerLink="/profile" routerLinkActive="active" (click)="close()">
-            <span class="ico" aria-hidden="true">👤</span>Perfil
+            <span class="ico" aria-hidden="true">👤</span>{{ i18n.t('drawer.profile') }}
           </a>
           <a routerLink="/settings" routerLinkActive="active" (click)="close()">
-            <span class="ico" aria-hidden="true">⚙️</span>Configuración
+            <span class="ico" aria-hidden="true">⚙️</span>{{ i18n.t('drawer.settings') }}
           </a>
           @if (auth.isAdmin()) {
             <a routerLink="/admin" routerLinkActive="active" (click)="close()">
-              <span class="ico" aria-hidden="true">🛡️</span>Administración
+              <span class="ico" aria-hidden="true">🛡️</span>{{ i18n.t('drawer.admin') }}
             </a>
           }
         </nav>
 
         <button type="button" class="logout" (click)="logout()">
-          <span class="ico" aria-hidden="true">🚪</span>Cerrar sesión
+          <span class="ico" aria-hidden="true">🚪</span>{{ i18n.t('drawer.logout') }}
         </button>
 
         <p class="brand">CaloriesCounter</p>
@@ -61,6 +62,7 @@ import { Avatar } from './avatar';
 })
 export class Drawer {
   protected readonly auth = inject(AuthService);
+  protected readonly i18n = inject(I18nService);
   protected readonly open = signal(false);
 
   private readonly closeBtn = viewChild<ElementRef<HTMLButtonElement>>('closeBtn');
