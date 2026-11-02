@@ -203,11 +203,13 @@ su suma, así que ninguna edición escribe números a mano:
   que un plato de 30 cm en vez de 26 multiplica por 1,54 **sin reprocesar la foto**. Los elementos
   con gramos puestos a mano no se tocan.
 - `GET /api/foods/?q=` busca en las 323 clases (sin tildes y con sinónimos: `papa` → `patata`).
+- Cada corrección **regenera el consejo** de Gemini con el plato actualizado (si Gemini falla se
+  conserva el anterior y la edición no se pierde). El consejo usa el nombre de pila del usuario
+  **aproximadamente 1 de cada 3 veces** (`services.pick_name`), para que no suene repetitivo.
 
 El catálogo vive en `backend/core/data/nutrition_catalog.csv`, generado desde el CSV del pipeline
 con las columnas que hacen falta para recalcular (kcal y macros por 100 g + densidad). Se regenera
 con:
-
 ```powershell
 python ml/scripts/build_nutrition_catalog.py
 ```

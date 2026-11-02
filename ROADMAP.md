@@ -51,3 +51,28 @@ no hay sensor de inclinación).
 - [ ] Ver la foto con sus contornos a tamaño completo desde el historial (hoy solo en la miniatura)
 - [ ] Calibrar la escala de profundidad con la distancia de captura para poder usar el modelo *Large*
 - [ ] Guardar el `nombre_es` también en los contornos del historial (hoy se guardan en inglés)
+- [ ] **Chat con el agente, con control estricto de tema.** Conversación sobre el plato analizado
+      (macros, porciones, sustituciones, hábitos), no un asistente general:
+      - *Alcance cerrado*: el system prompt define el tema y una respuesta de rechazo amable; una
+        llamada previa con salida estructurada (`{on_topic: bool, motivo}`) filtra la pregunta antes
+        de responder.
+      - *Bloqueos explícitos*: diagnóstico o tratamiento médico, medicamentos, trastornos de la
+        conducta alimentaria, y cualquier tema ajeno a nutrición. Nunca sustituye a un profesional.
+      - *Límites*: contexto = resumen del plato (nunca la foto ni datos personales), tope de
+        mensajes por sesión y por usuario/día, `max_output_tokens` corto y el mismo timeout que el
+        consejo.
+      - *Privacidad*: el nombre de pila solo si el usuario lo permite; el historial del chat caduca
+        a los N días.
+      - *UI*: pestaña dentro del resultado y aviso permanente de que es orientativo.
+      - *Coste*: medir tokens por conversación y cachear las respuestas frecuentes.
+
+## Correcciones y detalle (2026-11)
+
+- [x] Escala real con el borde del plato (Hough + geometría pinhole) y aviso si no se detecta
+- [x] `FoodLog.items`: detalle editable por alimento; los totales son su suma
+- [x] `PATCH /food-logs/<id>/`: corregir clase, gramos y diámetro del plato (volumen ∝ diámetro³)
+- [x] `GET /foods/?q=`: catálogo de 323 clases sin tildes y con sinónimos (`papa` → `patata`)
+- [x] Historial → `/result/:id` con el detalle de cualquier análisis guardado
+- [x] Tabla de 30 nutrientes por 100 g en la ficha de cada alimento
+- [x] El consejo de Gemini se regenera al corregir el plato; el nombre de pila aparece ~1 de cada 3 veces
+

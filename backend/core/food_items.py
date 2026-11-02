@@ -154,6 +154,20 @@ def recalc(log) -> None:
     ]
 
 
+def inference_like(log) -> dict:
+    """Forma que espera el generador de consejos (la misma que devuelve Modal), desde un registro."""
+    items = log.items or []
+    return {
+        "alimentos": alimentos_from_items(items),
+        "totales": {
+            "volumen_cm3": log.volumen_estimado,
+            "peso_g": round(sum(float(i.get("peso_g") or 0) for i in items), 2),
+            "calorias_kcal": log.calorias_totales,
+            **(log.macronutrientes or {}),
+        },
+    }
+
+
 def alimentos_from_items(items: list[dict]) -> list[dict]:
     """Vista tipo Modal (lo que consume la pantalla de resultado) a partir de `items`."""
     out = []

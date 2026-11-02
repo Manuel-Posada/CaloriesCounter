@@ -151,7 +151,9 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
         totales = inference["totales"]
         # El consejo se genera en el idioma que pide el navegador (es por defecto).
         locale = (request.headers.get("Accept-Language") or "es")[:2].lower()
-        consejo = services.get_nutrition_advice(inference, locale)
+        consejo = services.get_nutrition_advice(
+            inference, locale, user_name=services.pick_name(request.user.first_name)
+        )
         t3 = time.perf_counter()
         log.info(
             "food-log: r2=%.1fs modal=%.1fs gemini=%.1fs total=%.1fs",
@@ -236,10 +238,24 @@ class FoodLogDetailView(generics.RetrieveUpdateAPIView):
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
-        obj.save(update_fields=[
+        update_fields = [
             "items", "volumen_estimado", "calorias_totales", "macronutrientes",
             "clases_detectadas", "contornos", "plate_diameter_cm",
-        ])
+        ]
+        # El consejo habla del plato, así que al corregirlo se vuelve a pedir (si Gemini falla,
+        # se conserva el anterior en lugar de dejar la ficha sin texto).
+        locale = (request.headers.get("Accept-Language") or "es")[:2].lower()
+        consejo = services.get_nutrition_advice(
+            food_items.inference_like(obj),
+            locale,
+            user_name=services.pick_name(request.user.first_name),
+            timeout_s=6,
+        )
+        if consejo:
+            obj.consejo_nutricional = consejo
+            update_fields.append("consejo_nutricional")
+
+        obj.save(update_fields=update_fields)
         return Response(self.get_serializer(obj).data)
 
 class FoodCatalogView(APIView):

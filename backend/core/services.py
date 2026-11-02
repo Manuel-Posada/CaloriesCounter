@@ -1,5 +1,6 @@
 import json
 import logging
+import random
 
 import google.generativeai as genai
 import requests
@@ -9,6 +10,9 @@ from django.conf import settings
 from .r2 import R2NotConfigured, get_r2_client
 
 log = logging.getLogger(__name__)
+
+# El nombre del usuario aparece de vez en cuando, no en cada consejo: cansa y suena artificial.
+NAME_CHANCE = 0.35
 
 GEMINI_PROMPTS = {
     "es": (
@@ -28,9 +32,27 @@ GEMINI_PROMPTS = {
 }
 
 
-def prompt_for(locale: str) -> str:
-    """Prompt en el idioma pedido; cualquier idioma desconocido cae a español."""
-    return GEMINI_PROMPTS["en" if (locale or "").lower().startswith("en") else "es"]
+def prompt_for(locale: str, name: str | None = None) -> str:
+    """Prompt en el idioma pedido; cualquier idioma desconocido cae a español.
+
+    `name` solo se pasa cuando toca personalizar (ver `pick_name`): así el asistente no
+    repite el nombre en cada consejo.
+    """
+    is_en = (locale or "").lower().startswith("en")
+    base = GEMINI_PROMPTS["en" if is_en else "es"]
+    if not name:
+        return base
+    if is_en:
+        return f"{base} You may address the user as {name} once, naturally; skip it if it does not fit."
+    return f"{base} Puedes dirigirte al usuario como {name} una sola vez, de forma natural; si no encaja, no lo menciones."
+
+
+def pick_name(first_name: str) -> str | None:
+    """Nombre de pila para el saludo, solo a veces; None la mayoría de las veces."""
+    name = (first_name or "").strip().split(" ")[0][:40]
+    if not name or random.random() >= NAME_CHANCE:
+        return None
+    return name
 
 
 class ServiceError(Exception):
@@ -81,14 +103,21 @@ def run_inference(
 
 
 # ---------------------------------------------------------------- Gemini
-def get_nutrition_advice(inference: dict, locale: str = "es") -> str:
+def get_nutrition_advice(
+    inference: dict, locale: str = "es", user_name: str | None = None, timeout_s: int = 10
+) -> str:
     """Devuelve el consejo de Gemini; ante cualquier fallo devuelve '' (no bloquea el registro)."""
     if not inference.get("alimentos") or not settings.GEMINI_API_KEY:
         return ""
     # Solo lo relevante para el LLM.
     payload = {
         "alimentos": [
-            {"nombre": f["nombre"], "peso_g": f["peso_g"], **f["nutricion"]} for f in inference["alimentos"]
+            {
+                "nombre": f["nombre"],
+                "peso_g": f["peso_g"],
+                **{k: v for k, v in f["nutricion"].items() if k != "por_100g"},
+            }
+            for f in inference["alimentos"]
         ],
         "totales": {k: v for k, v in inference["totales"].items() if k != "clases_detectadas"},
     }
@@ -100,12 +129,12 @@ def get_nutrition_advice(inference: dict, locale: str = "es") -> str:
         models = [settings.GEMINI_MODEL, "gemini-flash-lite-latest"]
         for name in dict.fromkeys(m for m in models if m):
             try:
-                model = genai.GenerativeModel(name, system_instruction=prompt_for(locale))
+                model = genai.GenerativeModel(name, system_instruction=prompt_for(locale, user_name))
                 resp = model.generate_content(
                     payload_json,
                     generation_config={"temperature": 0.4, "max_output_tokens": 200},
                     # Sin esto el SDK puede quedarse esperando y bloquear el POST completo.
-                    request_options={"timeout": 10},
+                    request_options={"timeout": timeout_s},
                 )
                 text = (resp.text or "").strip()
                 if text:
