@@ -91,6 +91,19 @@ import { Accent, LevelSensitivity, PreferencesService, ThemeMode } from '../../c
         <p class="hint">
           {{ i18n.t('settings.levelHint', { enter: prefs.levelEnter(), exit: prefs.levelExit() }) }}
         </p>
+
+        <label class="switch-row">
+          <span class="switch-text">
+            <strong>{{ i18n.t('settings.autoShoot') }}</strong>
+            <small>{{ i18n.t('settings.autoShootHint') }}</small>
+          </span>
+          <input
+            type="checkbox"
+            class="switch"
+            [checked]="prefs.autoShoot()"
+            (change)="onAutoShoot($event)"
+          />
+        </label>
       </section>
 
       <!-- Avisos -->
@@ -149,5 +162,9 @@ export class Settings {
   protected onFov(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
     this.prefs.setFov(value === 'auto' ? null : Number(value));
+  }
+
+  protected onAutoShoot(event: Event): void {
+    this.prefs.setAutoShoot((event.target as HTMLInputElement).checked);
   }
 }

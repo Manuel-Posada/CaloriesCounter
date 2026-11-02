@@ -30,6 +30,8 @@ const HOME_TITLE_KEYS: readonly MessageKey[] = [
 
 /** Duración de cada paso de la cuenta regresiva (1 segundo × 3 pasos = 3 segundos). */
 const COUNTDOWN_STEP_MS = 1000;
+/** Tiempo que hay que mantener el nivel antes de disparar solo (si el auto-disparo está activo). */
+const HOLD_MS = 500;
 /** Frecuencia con la que se evalúa la inclinación. */
 const WATCH_MS = 100;
 /** Tiempo que permanece visible un aviso superpuesto en cámara antes de ocultarse. */
@@ -200,6 +202,7 @@ export class Capture implements OnDestroy {
   private watchTimer?: ReturnType<typeof setInterval>;
   private countdownTimer?: ReturnType<typeof setInterval>;
   private noticeTimeout?: ReturnType<typeof setTimeout>;
+  private stableSince = 0;
   private capturing = false;
   private audio?: AudioContext;
 
@@ -258,6 +261,7 @@ export class Capture implements OnDestroy {
     this.isLevel.set(false);
     this.isCounting.set(false);
     this.countdown.set(0);
+    this.stableSince = 0;
     this.clearNotice();
     this.capturing = false;
     this.mode.set('camera');
@@ -275,6 +279,7 @@ export class Capture implements OnDestroy {
     this.stream = undefined;
     this.tilt.disable();
     this.isLevel.set(false);
+    this.stableSince = 0;
     if (this.mode() === 'camera') this.mode.set('idle');
   }
 
@@ -368,16 +373,26 @@ export class Capture implements OnDestroy {
     if (level && !this.isLevel()) {
       this.chime(720);
     }
-    if (!level && this.isCounting()) {
-      // Si se mueve y supera la histéresis durante los 3 s, se aborta de inmediato.
-      this.cancelCountdown(true);
+    if (!level) {
+      this.stableSince = 0;
+      if (this.isCounting()) {
+        // Si se mueve y supera la histéresis durante los 3 s, se aborta de inmediato.
+        this.cancelCountdown(true);
+      }
     }
     this.isLevel.set(level);
+
+    // Disparo automático (opcional): nivelado y estable durante HOLD_MS.
+    if (this.prefs.autoShoot() && level && !this.isCounting() && !this.capturing) {
+      if (this.stableSince === 0) this.stableSince = Date.now();
+      if (Date.now() - this.stableSince >= HOLD_MS) this.startCountdown();
+    }
   }
 
   private startCountdown(): void {
     if (this.capturing || this.isCounting() || this.countdownTimer !== undefined) return;
 
+    this.stableSince = 0;
     this.isCounting.set(true);
     this.countdown.set(3);
     this.chime(880);
@@ -401,6 +416,7 @@ export class Capture implements OnDestroy {
     }
     this.isCounting.set(false);
     this.countdown.set(0);
+    this.stableSince = 0;
     this.capturing = false;
 
     if (interruptedByMotion) {

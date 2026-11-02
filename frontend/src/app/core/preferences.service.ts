@@ -19,6 +19,7 @@ const KEYS = {
   accent: 'cc.accent',
   level: 'cc.level',
   fov: 'cc.fov',
+  autoShoot: 'cc.autoshoot',
 } as const;
 
 /**
@@ -32,6 +33,9 @@ export class PreferencesService {
   readonly level = signal<LevelSensitivity>(oneOf(KEYS.level, ['strict', 'normal', 'relaxed'], 'normal'));
   /** FOV horizontal de la cámara en grados; `null` = que decida el pipeline (EXIF o 65°). */
   readonly fovDeg = signal<number | null>(readFov());
+
+  /** Disparo automático al mantenerse nivelado (por defecto, manual). */
+  readonly autoShoot = signal<boolean>(readBool(KEYS.autoShoot, false));
 
   /** Ángulo a partir del cual el aro se pone verde. */
   readonly levelEnter = computed(() => LEVEL_THRESHOLDS[this.level()].enter);
@@ -67,6 +71,11 @@ export class PreferencesService {
     else save(KEYS.fov, String(fov));
   }
 
+  setAutoShoot(enabled: boolean): void {
+    this.autoShoot.set(enabled);
+    save(KEYS.autoShoot, enabled ? '1' : '0');
+  }
+
   private applyTheme(): void {
     const mode = this.theme();
     const dark = mode === 'dark' || (mode === 'system' && this.darkMedia.matches);
@@ -94,6 +103,15 @@ function readFov(): number | null {
     return FOV_OPTIONS.includes(stored) && stored !== 0 ? stored : null;
   } catch {
     return null;
+  }
+}
+
+function readBool(key: string, fallback: boolean): boolean {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored === null ? fallback : stored === '1' || stored === 'true';
+  } catch {
+    return fallback;
   }
 }
 

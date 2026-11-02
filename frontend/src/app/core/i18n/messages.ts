@@ -156,6 +156,9 @@ export const ES = {
   'settings.levelRelaxed': 'Flexible',
   'settings.levelHint':
     'El aro se pone verde a {enter}° y se pierde a {exit}°. Cuanto más estricta, más cenital tiene que estar la foto.',
+  'settings.autoShoot': 'Disparo automático',
+  'settings.autoShootHint':
+    'Dispara solo cuando el móvil se mantiene nivelado medio segundo. Si está desactivado, pulsas tú el obturador.',
   'settings.language': 'Idioma',
   'settings.languageHint': 'Se aplica a toda la app y al consejo nutricional.',
   'settings.notices': 'Avisos',
@@ -339,6 +342,9 @@ export const EN: Record<MessageKey, string> = {
   'settings.levelRelaxed': 'Relaxed',
   'settings.levelHint':
     'The ring turns green at {enter}° and drops at {exit}°. The stricter, the more top-down the photo must be.',
+  'settings.autoShoot': 'Auto capture',
+  'settings.autoShootHint':
+    'Shoots by itself when the phone stays level for half a second. If off, you press the shutter.',
   'settings.language': 'Language',
   'settings.languageHint': 'Applies to the whole app and to the nutrition advice.',
   'settings.notices': 'Reminders',

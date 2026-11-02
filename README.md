@@ -225,6 +225,7 @@ Todo se guarda en `localStorage` y se aplica antes del primer pintado con un scr
 | Idioma | `cc.locale` | según el navegador; `es` o `en` |
 | Campo de visión | `cc.fov` | `null` (EXIF o 65°) o `60`…`80` grados |
 | Sensibilidad del nivel | `cc.level` | `strict` (5°/8°), `normal` (8°/12°), `relaxed` (12°/16°) |
+| Disparo automático | `cc.autoshoot` | `0` (manual, por defecto) o `1` (dispara al nivelar) |
 
 **Idioma, tema y acento se sincronizan con el perfil** (`User.locale/theme/accent`): al cargar
 `GET /api/me/` sus valores se aplican en el dispositivo y cada cambio local se sube con un `PATCH`
