@@ -21,7 +21,8 @@ no hay sensor de inclinación).
 - [x] `Accept-Language` en la API y prompt de Gemini en el idioma del usuario
 - [x] Avisos del pipeline como códigos (`tilt`, `low_volume`, `density_assumed`, `class_missing`)
 - [x] **323 nombres de comida traducidos** (`nombre_es` en el CSV nutricional), revisados por el usuario
-- [ ] Guardar el idioma en el perfil (`User.locale` + `PATCH /me/`) para que siga entre dispositivos
+- [x] Idioma, tema y acento guardados en el perfil (`User.locale/theme/accent` + `PATCH /me/`),
+      sincronizados con `localStorage` como caché para el primer pintado
 - [ ] Más idiomas (la estructura ya lo permite: diccionario + prompt)
 
 ## Resultado con zonas y detalle ✅

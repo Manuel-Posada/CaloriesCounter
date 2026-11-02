@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth/auth.service';
 import { I18nService } from './core/i18n/i18n.service';
+import { PreferencesSync } from './core/preferences-sync.service';
 import { PreferencesService } from './core/preferences.service';
 import { Avatar } from './core/ui/avatar';
 import { Drawer } from './core/ui/drawer';
@@ -44,6 +45,8 @@ export class App {
   constructor() {
     // Instanciar las preferencias al arrancar aplica el tema guardado (y escucha al sistema).
     inject(PreferencesService);
+    // Sincroniza idioma/tema/acento con el perfil del usuario.
+    inject(PreferencesSync);
     // Tras recargar, los tokens vienen de localStorage y nadie ha pedido aún el perfil.
     // Aquí AuthService ya está construido: pedirlo desde su constructor sería circular.
     if (this.auth.isAuthenticated()) this.auth.loadProfile();

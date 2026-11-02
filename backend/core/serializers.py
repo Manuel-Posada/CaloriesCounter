@@ -16,8 +16,17 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["email", "first_name", "last_name", "picture_url", "is_staff"]
-        # Solo el nombre se puede editar; el email y el avatar los manda Google.
+        fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "picture_url",
+            "is_staff",
+            "locale",
+            "theme",
+            "accent",
+        ]
+        # El nombre y las preferencias se pueden editar; el email y el avatar los manda Google.
         read_only_fields = ["email", "picture_url", "is_staff"]
 
 

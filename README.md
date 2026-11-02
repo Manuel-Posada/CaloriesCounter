@@ -222,8 +222,14 @@ Todo se guarda en `localStorage` y se aplica antes del primer pintado con un scr
 |---|---|---|
 | Tema | `cc.theme` | `system` (por defecto), `light`, `dark` |
 | Acento | `cc.accent` | `green` (por defecto), `blue`, `orange`, `pink`, `violet` |
+| Idioma | `cc.locale` | según el navegador; `es` o `en` |
 | Campo de visión | `cc.fov` | `null` (EXIF o 65°) o `60`…`80` grados |
 | Sensibilidad del nivel | `cc.level` | `strict` (5°/8°), `normal` (8°/12°), `relaxed` (12°/16°) |
+
+**Idioma, tema y acento se sincronizan con el perfil** (`User.locale/theme/accent`): al cargar
+`GET /api/me/` sus valores se aplican en el dispositivo y cada cambio local se sube con un `PATCH`
+retardado 600 ms. El `localStorage` queda como caché para el primer pintado. El FOV y la
+sensibilidad del nivel son solo de cada dispositivo.
 
 El tema se aplica con `data-theme` en `<html>` y el acento con `data-accent`; los tokens viven en
 `styles/_tokens.scss`. El ajuste de tema sigue a `prefers-color-scheme` cuando está en `system`.

@@ -32,6 +32,27 @@ class User(AbstractUser):
     )
     picture_url = models.URLField(blank=True)
 
+    # Preferencias de interfaz, para que sigan al usuario entre dispositivos.
+    locale = models.CharField(
+        max_length=5, choices=[("es", "Español"), ("en", "English")], default="es"
+    )
+    theme = models.CharField(
+        max_length=10,
+        choices=[("system", "Sistema"), ("light", "Claro"), ("dark", "Oscuro")],
+        default="system",
+    )
+    accent = models.CharField(
+        max_length=10,
+        choices=[
+            ("green", "Verde"),
+            ("blue", "Azul"),
+            ("orange", "Naranja"),
+            ("pink", "Rosa"),
+            ("violet", "Violeta"),
+        ],
+        default="green",
+    )
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 

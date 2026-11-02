@@ -138,6 +138,17 @@ export class AuthService {
       .pipe(tap((profile) => this.profile.set(profile)));
   }
 
+  /** Guarda las preferencias de interfaz para que sigan al usuario entre dispositivos. */
+  savePreferences(prefs: {
+    locale?: UserProfile['locale'];
+    theme?: UserProfile['theme'];
+    accent?: UserProfile['accent'];
+  }): Observable<UserProfile> {
+    return this.http
+      .patch<UserProfile>(`${environment.apiUrl}/me/`, prefs)
+      .pipe(tap((profile) => this.profile.set(profile)));
+  }
+
   /** Indica si hay un OAuth Client ID real configurado (no el placeholder). */
   isGoogleConfigured(): boolean {
     const id = environment.googleClientId?.trim() ?? '';

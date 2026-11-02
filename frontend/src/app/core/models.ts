@@ -107,5 +107,9 @@ export interface UserProfile {
   picture_url: string;
   /** Habilita la sección de administración. */
   is_staff: boolean;
+  /** Preferencias de interfaz guardadas en el perfil. */
+  locale: 'es' | 'en';
+  theme: 'system' | 'light' | 'dark';
+  accent: 'green' | 'blue' | 'orange' | 'pink' | 'violet';
 }
 
