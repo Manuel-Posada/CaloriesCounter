@@ -75,6 +75,8 @@ no hay sensor de inclinación).
 - [x] Historial → `/result/:id` con el detalle de cualquier análisis guardado
 - [x] Galería deslizable entre análisis (scroll-snap, miniaturas, URL sincronizada y precarga)
 - [x] Paginación compartida entre historial y galería; detalle del panel activo con reintento
+- [x] Borrado de análisis con confirmación (`DELETE /food-logs/<id>/`, también borra la foto de R2)
+- [x] Fecha, hora y año visibles en historial y resultado (zona horaria del dispositivo)
 - [x] Cámara a pantalla completa con orientación bloqueada en vertical (Chrome Android)
 - [x] Hoja y menú se cierran deslizando (abajo / derecha)
 - [x] Tabla de 30 nutrientes por 100 g en la ficha de cada alimento

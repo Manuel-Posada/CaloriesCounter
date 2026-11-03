@@ -18,6 +18,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", action="store_true", help="No guarda nada, solo informa.")
+        parser.add_argument(
+            "--force",
+            action="store_true",
+            help="Repara también análisis con totales fuera de rango (p. ej. fotos antiguas mal medidas).",
+        )
 
     def handle(self, *args, **opts):
         reparados = omitidos = 0
@@ -25,10 +30,13 @@ class Command(BaseCommand):
             if not log.contornos:
                 omitidos += 1
                 continue
-            if log.calorias_totales > MAX_KCAL or log.volumen_estimado > MAX_VOLUME_CM3:
+            outside_range = log.calorias_totales > MAX_KCAL or log.volumen_estimado > MAX_VOLUME_CM3
+            if outside_range and not opts["force"]:
                 self.stdout.write(f"  #{log.pk}: totales fuera de rango, se omite")
                 omitidos += 1
                 continue
+            if outside_range:
+                self.stdout.write(f"  #{log.pk}: totales fuera de rango, se repara por --force")
 
             items = []
             for contorno in log.contornos:

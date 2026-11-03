@@ -20,8 +20,10 @@ export class I18nService {
   readonly dateLocale = computed(() => (this.locale() === 'es' ? 'es' : 'en-US'));
 
   /** Formatos de fecha con el orden natural de cada idioma. */
-  readonly shortDate = computed(() => (this.locale() === 'es' ? 'd MMM, HH:mm' : 'MMM d, HH:mm'));
-  readonly longDate = computed(() => (this.locale() === 'es' ? 'EEEE d MMM, HH:mm' : 'EEEE, MMM d, HH:mm'));
+  readonly shortDate = computed(() => (this.locale() === 'es' ? 'd MMM y, HH:mm' : 'MMM d, y, HH:mm'));
+  readonly longDate = computed(() =>
+    this.locale() === 'es' ? 'EEEE d MMM y, HH:mm' : 'EEEE, MMM d, y, HH:mm',
+  );
 
   constructor() {
     // Mantiene <html lang> sincronizado: lectores de pantalla, guiones y corrector.

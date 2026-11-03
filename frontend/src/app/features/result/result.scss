@@ -468,6 +468,47 @@
 
 .note--error { color: var(--c-danger, #b3261e); }
 
+/* Borrado de un análisis: enlace discreto y confirmación en dos pasos. */
+.link {
+  align-self: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &--danger {
+    color: var(--c-danger, #b3261e);
+  }
+}
+
+.delete-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  text-align: center;
+
+  .note { margin: 0; }
+}
+
+.delete-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.btn--danger {
+  background: var(--c-danger, #b3261e);
+  color: #fff;
+  border-color: transparent;
+}
+
 /* Nivel de confianza del análisis: color y motivos, sin tecnicismos. */
 .confidence {
   display: flex;

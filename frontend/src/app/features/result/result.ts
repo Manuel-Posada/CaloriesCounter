@@ -11,7 +11,7 @@ import {
   viewChild,
   viewChildren,
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FoodLogService } from '../../core/food-log/food-log.service';
 import { ResultStore } from '../../core/food-log/result.store';
@@ -374,6 +374,27 @@ interface RenderedSegment {
                   <p class="note">{{ i18n.t('result.estimateNote') }}</p>
 
                   <a class="btn btn--primary btn--block" routerLink="/">{{ i18n.t('result.another') }}</a>
+
+                  @if (confirmDeleteId() === r.id) {
+                    <div class="delete-confirm">
+                      <p class="note">{{ i18n.t('result.deleteConfirm') }}</p>
+                      @if (editError() === 'result.deleteError') {
+                        <p class="note note--error" role="alert">{{ i18n.t('result.deleteError') }}</p>
+                      }
+                      <div class="delete-actions">
+                        <button type="button" class="btn btn--ghost" [disabled]="deleting()" (click)="cancelDelete()">
+                          {{ i18n.t('result.cancel') }}
+                        </button>
+                        <button type="button" class="btn btn--danger" [disabled]="deleting()" (click)="deleteLog(r)">
+                          {{ i18n.t('result.delete') }}
+                        </button>
+                      </div>
+                    </div>
+                  } @else {
+                    <button type="button" class="link link--danger" (click)="requestDelete(r.id)">
+                      {{ i18n.t('result.deleteLog') }}
+                    </button>
+                  }
                 </div>
               </div>
             </article>
@@ -591,6 +612,7 @@ export class Result implements OnDestroy {
   private readonly store = inject(ResultStore);
   private readonly logs = inject(FoodLogService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly location = inject(Location);
   protected readonly i18n = inject(I18nService);
   protected readonly result = this.store.result;
@@ -602,7 +624,7 @@ export class Result implements OnDestroy {
 
   protected readonly plateSizes = PLATE_SIZES_CM;
   protected readonly saving = signal(false);
-  protected readonly editError = signal<'result.editError' | 'result.editRange' | null>(null);
+  protected readonly editError = signal<'result.editError' | 'result.editRange' | 'result.deleteError' | null>(null);
   protected readonly searchResults = signal<CatalogFood[]>([]);
   protected readonly searching = signal(false);
   /** Cargando un análisis del historial (/result/:id) o no encontrado. */
@@ -615,6 +637,9 @@ export class Result implements OnDestroy {
   protected readonly isSheetRebounding = signal(false);
   /** Detalles cuyo `GET` falló (se ofrece reintentar en el panel). */
   protected readonly failedSlideIds = signal<Record<number, boolean>>({});
+  /** Confirmación en dos pasos para borrar un análisis. */
+  protected readonly confirmDeleteId = signal<number | null>(null);
+  protected readonly deleting = signal(false);
   protected readonly animatedKcal = signal(0);
   /** ID del registro activo en el carrusel horizontal con Scroll Snap. */
   protected readonly activeId = signal<number | null>(null);
@@ -1224,6 +1249,56 @@ export class Result implements OnDestroy {
     const current = this.result();
     if (!current || current.escala_origen !== 'plate' || current.plate_diameter_cm === cm) return;
     this.patch({ plate_diameter_cm: cm });
+  }
+
+  protected requestDelete(id: number): void {
+    this.editError.set(null);
+    this.confirmDeleteId.set(id);
+  }
+
+  protected cancelDelete(): void {
+    this.confirmDeleteId.set(null);
+  }
+
+  /** Borra el análisis (con confirmación en dos pasos) y pasa al siguiente plato del carrusel. */
+  protected deleteLog(slide: FoodLogCreated): void {
+    if (this.deleting()) return;
+    const indexBefore = this.gallerySlides().findIndex((item) => item.id === slide.id);
+    this.deleting.set(true);
+    this.logs.delete(slide.id).subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.confirmDeleteId.set(null);
+        this.detailsById.update((cur) => {
+          const next = { ...cur };
+          delete next[slide.id];
+          return next;
+        });
+
+        const remaining = this.logs.cachedHistory();
+        if (!remaining.length) {
+          this.store.clear();
+          void this.router.navigate([this.fromHistory() ? '/history' : '/']);
+          return;
+        }
+
+        // Se toma el vecino de la lista ya sin el borrado. Hay que actualizar el store antes de
+        // volver a leer `gallerySlides`, que reinyecta el resultado actual si sigue en memoria.
+        const nextItem = remaining[Math.min(Math.max(indexBefore, 0), remaining.length - 1)];
+        const nextDetail =
+          this.detailsById()[nextItem.id] ??
+          ({ ...nextItem, alimentos: [], advertencias: nextItem.advertencias ?? [] } as FoodLogCreated);
+        this.store.set(nextDetail, null);
+        this.activeId.set(nextItem.id);
+        if (this.fromHistory()) this.location.replaceState(`/result/${nextItem.id}`);
+        this.centerSlide(nextItem.id, 'auto');
+        if (!this.detailsById()[nextItem.id]) this.ensureSlideDetail(nextItem.id, true);
+      },
+      error: () => {
+        this.deleting.set(false);
+        this.editError.set('result.deleteError');
+      },
+    });
   }
 
   private patch(body: {

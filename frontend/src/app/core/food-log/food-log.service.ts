@@ -136,6 +136,16 @@ export class FoodLogService {
     );
   }
 
+  /** Borra un análisis y su imagen. */
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/food-logs/${id}/`).pipe(
+      tap(() => {
+        this.detailCache.delete(id);
+        this.cachedHistory.update((cur) => cur.filter((item) => item.id !== id));
+      }),
+    );
+  }
+
   /** Busca en el catálogo de 323 clases para cambiar un alimento mal clasificado. */
   searchFoods(query: string): Observable<{ resultados: CatalogFood[] }> {
     return this.http.get<{ resultados: CatalogFood[] }>(`${this.api}/foods/`, {

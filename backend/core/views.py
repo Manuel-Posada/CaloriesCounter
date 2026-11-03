@@ -2,6 +2,7 @@ import logging
 import time
 import uuid
 
+from botocore.exceptions import ClientError
 from django.conf import settings
 from google.auth.transport import requests as g_requests
 from google.oauth2 import id_token as google_id_token
@@ -217,14 +218,25 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
         )
 
 
-class FoodLogDetailView(generics.RetrieveUpdateAPIView):
-    """GET: detalle de un análisis (con alimentos). PATCH: correcciones del usuario."""
+class FoodLogDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """GET: detalle de un análisis (con alimentos). PATCH: correcciones. DELETE: borrarlo."""
 
     serializer_class = FoodLogDetailSerializer
-    http_method_names = ["get", "patch"]
+    http_method_names = ["get", "patch", "delete"]
 
     def get_queryset(self):
         return FoodLog.objects.filter(usuario=self.request.user)
+
+    def perform_destroy(self, instance):
+        # El registro se borra igual aunque R2 falle: la foto caduca sola a las 72 h.
+        key = instance.id_imagen_r2
+        instance.delete()
+        if not key:
+            return
+        try:
+            get_r2_client().delete_object(Bucket=settings.R2_BUCKET_NAME, Key=key)
+        except (R2NotConfigured, ClientError) as exc:
+            log.warning("food-log: no se pudo borrar %s de R2: %s", key, exc)
 
     def patch(self, request, *args, **kwargs):
         obj = self.get_object()

@@ -282,6 +282,10 @@ La lista del historial y la galería comparten caché y paginación: al acercars
 se pide la siguiente página sola, y el panel visible siempre dispara la carga de su detalle (si falla,
 muestra «Reintentar» en lugar de quedarse vacío).
 
+Cada análisis se puede **borrar** desde su panel (confirmación en dos pasos); `DELETE /api/food-logs/<id>/`
+elimina el registro y su fotografía de R2. Las fechas se guardan en UTC (`auto_now_add`) y se muestran
+en la zona horaria del dispositivo con fecha, hora y año.
+
 La ficha de cada alimento incluye un desplegable **«Ver todos los nutrientes (por 100 g)»** con 30
 valores agrupados en general, grasas, minerales y vitaminas. Los nombres viajan como códigos
 (`sodio_mg`, `vitamina_b12_ug`…) y se traducen en el cliente.
