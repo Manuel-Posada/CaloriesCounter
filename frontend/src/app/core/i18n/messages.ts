@@ -132,6 +132,8 @@ export const ES = {
   'result.per100Note': 'Valores por 100 g del alimento, según la tabla nutricional.',
   'result.oldScan':
     'Este análisis es anterior al detalle por alimento: solo se conservan los totales y las zonas marcadas.',
+  'result.slideError': 'No pudimos cargar este análisis.',
+  'result.retry': 'Reintentar',
   'result.confidenceLevel': 'Confianza {level}',
   'result.reviewFood': 'El clasificador no estaba seguro de este alimento: toca para revisarlo.',
   'confidence.alta': 'alta',
@@ -407,6 +409,8 @@ export const EN: Record<MessageKey, string> = {
   'result.per100Note': 'Values per 100 g of the food, from the nutrition table.',
   'result.oldScan':
     'This analysis predates per-food detail: only the totals and the marked areas were kept.',
+  'result.slideError': 'We could not load this analysis.',
+  'result.retry': 'Retry',
   'result.confidenceLevel': 'Confidence: {level}',
   'result.reviewFood': 'The classifier was unsure about this food: tap to review it.',
   'confidence.alta': 'high',

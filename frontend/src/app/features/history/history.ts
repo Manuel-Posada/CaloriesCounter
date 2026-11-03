@@ -111,7 +111,7 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
       </ul>
 
       @if (hasMore()) {
-        <button type="button" class="btn btn--ghost btn--block" [disabled]="loading()" (click)="load()">
+        <button type="button" class="btn btn--ghost btn--block" [disabled]="loading()" (click)="loadMore()">
           @if (loading()) { <span class="spinner"></span> } {{ i18n.t('history.loadMore') }}
         </button>
       }
@@ -123,34 +123,33 @@ export class History implements OnInit {
   private readonly logs = inject(FoodLogService);
   protected readonly i18n = inject(I18nService);
 
-  protected readonly items = signal<FoodLog[]>([]);
-  protected readonly loading = signal(false);
+  protected readonly items = this.logs.cachedHistory;
+  protected readonly loading = this.logs.historyLoading;
   protected readonly error = signal<MessageKey | null>(null);
-  protected readonly hasMore = signal(false);
+  protected readonly hasMore = this.logs.historyHasMore;
   /** IDs cuya imagen falló al cargar (p. ej. borrada entre el listado y la vista). */
   protected readonly failed = new Set<number | string>();
   /** Tamaño natural de cada miniatura, para alinear el contorno con la imagen recortada. */
   private readonly sizes = signal<Record<number, { w: number; h: number }>>({});
-  private page = 1;
 
   ngOnInit(): void {
-    this.load();
+    // La caché se comparte con la galería del resultado: si ya hay páginas, no se repiten.
+    if (this.items().length === 0) this.load();
   }
 
+  /** Recarga desde la primera página (primera visita o reintento). */
   load(): void {
-    this.loading.set(true);
     this.error.set(null);
-    this.logs.list(this.page).subscribe({
-      next: (res) => {
-        this.items.update((cur) => [...cur, ...res.results]);
-        this.hasMore.set(!!res.next);
-        this.page++;
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-        this.error.set('history.loadingError');
-      },
+    this.logs.refreshHistory().subscribe({
+      error: () => this.error.set('history.loadingError'),
+    });
+  }
+
+  /** Carga la siguiente página sin salir de la lista. */
+  protected loadMore(): void {
+    this.error.set(null);
+    this.logs.loadMoreHistory()?.subscribe({
+      error: () => this.error.set('history.loadingError'),
     });
   }
 

@@ -447,6 +447,9 @@ export class Capture implements OnDestroy {
     if (this.isOpeningCamera() || this.mode() !== 'idle') return;
 
     this.isOpeningCamera.set(true);
+    // Debe hacerse dentro del gesto del usuario: después de los `await` se pierde la activación
+    // transitoria y el navegador rechazaría la pantalla completa (necesaria para bloquear el giro).
+    this.enterImmersiveCamera();
     this.error.set(null);
     this.cameraFailed.set(false);
 
@@ -464,6 +467,7 @@ export class Capture implements OnDestroy {
       await this.tilt.enable();
       if (this.destroyed || this.mode() !== 'idle') {
         this.tilt.disable();
+        this.exitImmersiveCamera();
         return;
       }
 
@@ -475,6 +479,7 @@ export class Capture implements OnDestroy {
       if (this.destroyed || this.mode() !== 'idle') {
         stream.getTracks().forEach((track) => track.stop());
         this.tilt.disable();
+        this.exitImmersiveCamera();
         return;
       }
 
@@ -499,6 +504,7 @@ export class Capture implements OnDestroy {
   }
 
   closeCamera(resetMode = true): void {
+    this.exitImmersiveCamera();
     this.cancelCountdown();
     this.clearNotice();
     this.clearHoldTimer();
@@ -607,6 +613,46 @@ export class Capture implements OnDestroy {
     const angle = norm === 90 ? 90 : norm === 270 ? -90 : norm === 180 ? 180 : 0;
     const pageLandscape = typeof window !== 'undefined' && window.innerWidth > window.innerHeight;
     return pageLandscape ? 0 : angle;
+  }
+
+  /**
+   * Pantalla completa + bloqueo vertical al abrir la cámara. Chrome solo permite
+   * `screen.orientation.lock` en pantalla completa, así que se pide primero sobre la raíz
+   * (dentro del gesto del usuario). En iOS Safari no existe ninguno de los dos: se ignora.
+   */
+  private enterImmersiveCamera(): void {
+    const lock = (): void => {
+      try {
+        const request = (screen.orientation as ScreenOrientation & {
+          lock?: (orientation: string) => Promise<void>;
+        })?.lock?.('portrait');
+        // `lock()` puede rechazar (sin soporte o sin activación): no debe quedar sin capturar.
+        if (request && typeof request.catch === 'function') {
+          void request.catch(() => undefined);
+        }
+      } catch {
+        // Navegador sin bloqueo de orientación.
+      }
+    };
+    const root = document.documentElement as HTMLElement & {
+      requestFullscreen?: (options?: { navigationUI?: string }) => Promise<void>;
+    };
+    if (root.requestFullscreen && !document.fullscreenElement) {
+      root.requestFullscreen({ navigationUI: 'hide' }).then(lock, lock);
+    } else {
+      lock();
+    }
+  }
+
+  private exitImmersiveCamera(): void {
+    try {
+      (screen.orientation as ScreenOrientation & { unlock?: () => void })?.unlock?.();
+    } catch {
+      // Navegador sin bloqueo de orientación.
+    }
+    if (document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => undefined);
+    }
   }
 
   private startSlowHint(): void {

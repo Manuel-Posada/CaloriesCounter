@@ -352,13 +352,20 @@ interface RenderedSegment {
                         </li>
                       }
                     </ul>
-                  } @else if (isSlideDetailLoading(r)) {
+                  } @else if (slideFailed(r)) {
+                    <div class="card slide-error">
+                      <p class="note">{{ i18n.t('result.slideError') }}</p>
+                      <button type="button" class="btn btn--ghost" (click)="retrySlide(r.id)">
+                        {{ i18n.t('result.retry') }}
+                      </button>
+                    </div>
+                  } @else if (isSlideLoaded(r)) {
+                    <p class="note">{{ i18n.t('result.oldScan') }}</p>
+                  } @else {
                     <div class="card">
                       <div class="skeleton" style="height: 16px; width: 48%"></div>
                       <div class="skeleton" style="height: 14px; margin-top: 10px; width: 82%"></div>
                     </div>
-                  } @else if (r.contornos.length) {
-                    <p class="note">{{ i18n.t('result.oldScan') }}</p>
                   }
 
                   @for (w of otherWarningsFor(r); track $index) {
@@ -606,6 +613,8 @@ export class Result implements OnDestroy {
   protected readonly sheetDragY = signal(0);
   protected readonly isSheetDragging = signal(false);
   protected readonly isSheetRebounding = signal(false);
+  /** Detalles cuyo `GET` falló (se ofrece reintentar en el panel). */
+  protected readonly failedSlideIds = signal<Record<number, boolean>>({});
   protected readonly animatedKcal = signal(0);
   /** ID del registro activo en el carrusel horizontal con Scroll Snap. */
   protected readonly activeId = signal<number | null>(null);
@@ -621,6 +630,7 @@ export class Result implements OnDestroy {
   private kcalRafId?: number;
   private loadSub?: Subscription;
   private initialScrollSynced = false;
+  private scrollRaf?: number;
   private canDragSheet = false;
   private sheetStartX = 0;
   private sheetStartY = 0;
@@ -692,40 +702,46 @@ export class Result implements OnDestroy {
       onCleanup(() => this.cancelKcalRaf());
     });
 
-    // Sincroniza el carrusel CSS Scroll Snap mediante IntersectionObserver al deslizar entre platos.
+    // Sincroniza el carrusel al hacer scroll: se toma como activo el panel más cercano al centro.
+    // Es más fiable que IntersectionObserver con swipes rápidos o desplazamientos programáticos.
     effect((onCleanup) => {
       const track = this.galleryTrack()?.nativeElement;
       const slides = this.slideEls();
-      const isHistory = this.fromHistory();
       if (!track || slides.length === 0) return;
+      const isHistory = this.fromHistory();
 
-      const targetId = untracked(() => this.activeId());
-      if (isHistory && !this.initialScrollSynced && targetId !== null) {
+      if (isHistory && !this.initialScrollSynced && untracked(() => this.activeId()) !== null) {
+        const initialId = untracked(() => this.activeId());
         // Se centra en el siguiente frame: el ancho de los paneles aún no está medido al crear el efecto.
         requestAnimationFrame(() => {
-          this.centerSlide(targetId, 'auto');
+          if (initialId !== null) this.centerSlide(initialId, 'auto');
           this.initialScrollSynced = true;
         });
       }
 
-      if (!isHistory || slides.length <= 1 || typeof IntersectionObserver === 'undefined') return;
+      if (!isHistory || slides.length <= 1) return;
 
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-              const snappedId = Number(entry.target.getAttribute('data-log-id'));
-              if (snappedId && snappedId !== untracked(() => this.activeId())) {
-                this.onSlideSnapped(snappedId);
-              }
-            }
-          }
-        },
-        { root: track, threshold: 0.6 },
-      );
+      const onScroll = (): void => this.scheduleSlideSync(track);
+      track.addEventListener('scroll', onScroll, { passive: true });
+      onCleanup(() => {
+        track.removeEventListener('scroll', onScroll);
+        this.cancelSlideSync();
+      });
+    });
 
-      slides.forEach((ref) => observer.observe(ref.nativeElement));
-      onCleanup(() => observer.disconnect());
+    // El plato visible siempre debe tener su detalle: cubre swipe rápido, saltos por miniatura
+    // y el arranque; además trae la siguiente página del historial al acercarse al final.
+    effect(() => {
+      const id = this.activeId();
+      if (id === null || !this.fromHistory()) return;
+      const slides = this.gallerySlides();
+      const idx = slides.findIndex((slide) => slide.id === id);
+      if (idx < 0) return;
+      untracked(() => this.ensureSlideDetail(id, true));
+      untracked(() => this.prefetchNeighbors(id));
+      if (idx >= slides.length - 2 && this.logs.historyHasMore()) {
+        this.logs.loadMoreHistory()?.subscribe({ error: () => undefined });
+      }
     });
 
     // /result/:id abre un análisis guardado (desde el historial); /result llega del store en
@@ -770,8 +786,47 @@ export class Result implements OnDestroy {
     const track = this.galleryTrack()?.nativeElement;
     const slide = track?.querySelector<HTMLElement>(`[data-log-id="${id}"]`);
     if (!track || !slide) return;
-    const left = slide.offsetLeft - (track.clientWidth - slide.clientWidth) / 2;
-    track.scrollTo({ left: Math.max(0, left), behavior });
+    const trackRect = track.getBoundingClientRect();
+    const slideRect = slide.getBoundingClientRect();
+    const delta =
+      slideRect.left + slideRect.width / 2 - (trackRect.left + trackRect.width / 2);
+    track.scrollTo({ left: Math.max(0, track.scrollLeft + delta), behavior });
+  }
+
+  /** Agrupa los eventos de scroll en un frame para no recalcular en cada píxel. */
+  private scheduleSlideSync(track: HTMLElement): void {
+    if (this.scrollRaf !== undefined) return;
+    this.scrollRaf = requestAnimationFrame(() => {
+      this.scrollRaf = undefined;
+      this.syncActiveFromScroll(track);
+    });
+  }
+
+  private cancelSlideSync(): void {
+    if (this.scrollRaf !== undefined) {
+      cancelAnimationFrame(this.scrollRaf);
+      this.scrollRaf = undefined;
+    }
+  }
+
+  /** El panel activo es el más cercano al centro visible del carrusel. */
+  private syncActiveFromScroll(track: HTMLElement): void {
+    const trackRect = track.getBoundingClientRect();
+    const center = trackRect.left + trackRect.width / 2;
+    let bestId = this.activeId();
+    let bestDist = Infinity;
+    for (const ref of this.slideEls()) {
+      const node = ref.nativeElement;
+      const rect = node.getBoundingClientRect();
+      const dist = Math.abs(rect.left + rect.width / 2 - center);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestId = Number(node.getAttribute('data-log-id'));
+      }
+    }
+    if (bestId && Number.isFinite(bestId) && bestId !== this.activeId()) {
+      this.onSlideSnapped(bestId);
+    }
   }
 
   /** Se ejecuta cuando un panel hace snap en el carrusel o se elige desde las miniaturas. */
@@ -785,8 +840,10 @@ export class Result implements OnDestroy {
     const bar = this.thumbsBar()?.nativeElement;
     const thumb = bar?.querySelector<HTMLElement>(`[data-thumb-id="${id}"]`);
     if (bar && thumb) {
-      const left = thumb.offsetLeft - (bar.clientWidth - thumb.clientWidth) / 2;
-      bar.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+      const barRect = bar.getBoundingClientRect();
+      const thumbRect = thumb.getBoundingClientRect();
+      const delta = thumbRect.left + thumbRect.width / 2 - (barRect.left + barRect.width / 2);
+      bar.scrollTo({ left: Math.max(0, bar.scrollLeft + delta), behavior: 'smooth' });
     }
 
     const existing = this.detailsById()[id];
@@ -818,8 +875,18 @@ export class Result implements OnDestroy {
     }
   }
 
-  protected isSlideDetailLoading(slide: FoodLogCreated): boolean {
-    return !!this.loadingSlideIds()[slide.id] && slide.alimentos.length === 0;
+  /** El detalle del panel ya se descargó (aunque no tenga alimentos: análisis antiguos). */
+  protected isSlideLoaded(slide: FoodLogCreated): boolean {
+    return !!this.detailsById()[slide.id];
+  }
+
+  protected slideFailed(slide: FoodLogCreated): boolean {
+    return !!this.failedSlideIds()[slide.id];
+  }
+
+  protected retrySlide(id: number): void {
+    this.failedSlideIds.update((cur) => ({ ...cur, [id]: false }));
+    this.ensureSlideDetail(id, true);
   }
 
   /**
@@ -1191,6 +1258,7 @@ export class Result implements OnDestroy {
     if (this.searchTimer !== undefined) clearTimeout(this.searchTimer);
     this.clearSheetCloseTimer();
     this.cancelKcalRaf();
+    this.cancelSlideSync();
     this.loadSub?.unsubscribe();
   }
 
@@ -1253,19 +1321,26 @@ export class Result implements OnDestroy {
       return;
     }
 
+    // Ya hay una petición en vuelo para este panel: al llegar, si es el activo, se entra solo.
+    if (this.loadingSlideIds()[id]) {
+      onDone?.();
+      return;
+    }
+
     this.loadingSlideIds.update((cur) => ({ ...cur, [id]: true }));
     this.logs.get(id).subscribe({
       next: (detail) => {
         const record: FoodLogCreated = { ...detail, advertencias: detail.advertencias ?? [] };
         this.detailsById.update((cur) => ({ ...cur, [id]: record }));
         this.loadingSlideIds.update((cur) => ({ ...cur, [id]: false }));
-        if (makeActive && this.activeId() === id) {
+        if (this.activeId() === id) {
           this.store.set(record, null);
         }
         onDone?.();
       },
       error: () => {
         this.loadingSlideIds.update((cur) => ({ ...cur, [id]: false }));
+        this.failedSlideIds.update((cur) => ({ ...cur, [id]: true }));
         if (makeActive && this.gallerySlides().length === 0) {
           this.notFound.set(true);
         }

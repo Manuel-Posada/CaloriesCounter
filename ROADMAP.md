@@ -74,6 +74,8 @@ no hay sensor de inclinación).
 - [x] `GET /foods/?q=`: catálogo de 323 clases sin tildes y con sinónimos (`papa` → `patata`)
 - [x] Historial → `/result/:id` con el detalle de cualquier análisis guardado
 - [x] Galería deslizable entre análisis (scroll-snap, miniaturas, URL sincronizada y precarga)
+- [x] Paginación compartida entre historial y galería; detalle del panel activo con reintento
+- [x] Cámara a pantalla completa con orientación bloqueada en vertical (Chrome Android)
 - [x] Hoja y menú se cierran deslizando (abajo / derecha)
 - [x] Tabla de 30 nutrientes por 100 g en la ficha de cada alimento
 - [x] El consejo de Gemini se regenera al corregir el plato; el nombre de pila aparece ~1 de cada 3 veces

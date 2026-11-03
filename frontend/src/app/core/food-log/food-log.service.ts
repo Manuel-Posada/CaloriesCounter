@@ -1,6 +1,6 @@
 import { HttpClient, HttpEventType, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, concat, filter, map, of, startWith, switchMap, tap, timeout } from 'rxjs';
+import { Observable, concat, filter, finalize, map, of, startWith, switchMap, tap, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { CatalogFood, FoodLog, FoodLogCreated, FoodLogDetail, Page, PresignResponse } from '../models';
 import { PreferencesService } from '../preferences.service';
@@ -21,6 +21,10 @@ export class FoodLogService {
 
   /** Lista de registros en memoria para sincronizar la galería deslizable entre Historial y Resultado. */
   readonly cachedHistory = signal<FoodLog[]>([]);
+  /** Paginación compartida entre Historial y la galería del resultado. */
+  readonly historyHasMore = signal(false);
+  readonly historyLoading = signal(false);
+  private historyPage = 0;
   private readonly detailCache = new Map<number, FoodLogDetail>();
 
   /** Paso 1: URL prefirmada de subida. */
@@ -76,10 +80,13 @@ export class FoodLogService {
   }
 
   list(page = 1): Observable<Page<FoodLog>> {
+    this.historyLoading.set(true);
     return this.http
       .get<Page<FoodLog>>(`${this.api}/food-logs/`, { params: new HttpParams().set('page', page) })
       .pipe(
         tap((res) => {
+          this.historyPage = Math.max(this.historyPage, page);
+          this.historyHasMore.set(!!res.next);
           if (page === 1) {
             this.cachedHistory.set(res.results);
           } else {
@@ -89,7 +96,22 @@ export class FoodLogService {
             });
           }
         }),
+        finalize(() => this.historyLoading.set(false)),
       );
+  }
+
+  /** Vuelve a pedir la primera página (refresco o reintento). */
+  refreshHistory(): Observable<Page<FoodLog>> {
+    return this.list(1);
+  }
+
+  /**
+   * Carga la siguiente página del historial si queda alguna. Devuelve `null` si ya no hay
+   * más o si hay una petición en curso (Historial y galería comparten estado).
+   */
+  loadMoreHistory(): Observable<Page<FoodLog>> | null {
+    if (this.historyLoading() || !this.historyHasMore()) return null;
+    return this.list(this.historyPage + 1);
   }
 
   /** Detalle de un análisis guardado (con los alimentos y su tabla nutricional). */

@@ -135,6 +135,12 @@ El propio **obturador es el nivel**: su burbuja se desplaza hacia el lado alto y
 **Configuración → Cámara → Guía de nivel clásica** y añade la cruz y los grados dentro del botón
 («23°», «Levanta el borde inferior»), sin recuadro ni fondo.
 
+Al abrir la cámara se entra en **pantalla completa y se bloquea la orientación en vertical**
+(`requestFullscreen` + `screen.orientation.lock`), para que la interfaz no gire mientras se sujeta el
+móvil de lado; los iconos se contrarrotan solo si la página no ha girado. Chrome Android lo soporta;
+iOS Safari no ofrece ninguna de las dos APIs, así que allí la página sigue girando (limitación de la
+plataforma web).
+
 ### Aviso de foto no cenital
 
 La guía solo actúa en la captura en vivo; las fotos de la galería pueden venir torcidas. Para ese caso
@@ -271,6 +277,10 @@ se puede deslizar al anterior o al siguiente sin volver atrás; la URL se actual
 `replaceState`, las miniaturas y el contador superior siguen al plato activo y los detalles se
 precargan en segundo plano. La hoja de detalle y el menú lateral se cierran deslizando (hacia abajo
 y hacia la derecha respectivamente).
+
+La lista del historial y la galería comparten caché y paginación: al acercarse al final del carrusel
+se pide la siguiente página sola, y el panel visible siempre dispara la carga de su detalle (si falla,
+muestra «Reintentar» en lugar de quedarse vacío).
 
 La ficha de cada alimento incluye un desplegable **«Ver todos los nutrientes (por 100 g)»** con 30
 valores agrupados en general, grasas, minerales y vitaminas. Los nombres viajan como códigos
