@@ -1,5 +1,15 @@
 import { DecimalPipe, DatePipe } from '@angular/common';
-import { Component, ElementRef, OnDestroy, computed, effect, inject, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FoodLogService } from '../../core/food-log/food-log.service';
@@ -26,6 +36,8 @@ const CONFIDENCE_REASONS: Record<string, MessageKey> = {
 const PLATE_SIZES_CM = [22, 26, 30] as const;
 /** Duración de la animación de salida del bottom-sheet (sincronizada con `result.scss`). */
 const SHEET_CLOSE_MS = 240;
+/** Duración del conteo progresivo (count-up) de las calorías totales al revelar el resultado. */
+const KCAL_COUNT_MS = 550;
 
 /** Nutrientes extendidos, agrupados como en una etiqueta nutricional. */
 const NUTRIENT_GROUPS: {
@@ -194,7 +206,7 @@ interface RenderedSegment {
           <!-- Resumen calórico -->
           <div class="card summary">
             <div class="kcal">
-              <strong>{{ r.calorias_totales | number: '1.0-0' }}</strong>
+              <strong>{{ animatedKcal() | number: '1.0-0' }}</strong>
               <span>{{ i18n.t('result.kcalTotal') }}</span>
             </div>
 
@@ -503,8 +515,12 @@ export class Result implements OnDestroy {
   protected readonly notFound = signal(false);
   protected readonly fromHistory = signal(false);
   protected readonly isSheetClosing = signal(false);
+  protected readonly animatedKcal = signal(0);
   private searchTimer?: ReturnType<typeof setTimeout>;
   private sheetCloseTimer?: ReturnType<typeof setTimeout>;
+  private kcalRafId?: number;
+  /** Último total ya mostrado: en las correcciones se anima desde aquí, no desde cero. */
+  private lastKcalTarget?: number;
   private loadSub?: Subscription;
 
   constructor() {
@@ -513,6 +529,24 @@ export class Result implements OnDestroy {
       const active = this.isSheetOpen() && !this.isSheetClosing();
       document.body.classList.toggle('sheet-open', active);
       onCleanup(() => document.body.classList.remove('sheet-open'));
+    });
+
+    // Interpola el contador de calorías totales: de 0 al total la primera vez y, en las
+    // correcciones, desde el valor que ya se estaba mostrando.
+    effect((onCleanup) => {
+      const res = this.result();
+      if (!res) {
+        this.cancelKcalRaf();
+        this.lastKcalTarget = undefined;
+        this.animatedKcal.set(0);
+        return;
+      }
+      const target = Math.round(res.calorias_totales);
+      // Leer el valor animado sin crear dependencia: si no, el efecto se relanzaría cada frame.
+      const from = this.lastKcalTarget === undefined ? 0 : untracked(() => this.animatedKcal());
+      this.lastKcalTarget = target;
+      this.animateKcal(target, from);
+      onCleanup(() => this.cancelKcalRaf());
     });
 
     // /result/:id abre un análisis guardado (desde el historial); /result llega del store en
@@ -813,7 +847,43 @@ export class Result implements OnDestroy {
   ngOnDestroy(): void {
     if (this.searchTimer !== undefined) clearTimeout(this.searchTimer);
     this.clearSheetCloseTimer();
+    this.cancelKcalRaf();
     this.loadSub?.unsubscribe();
+  }
+
+  private animateKcal(target: number, from = 0): void {
+    this.cancelKcalRaf();
+    if (target <= 0 || from === target || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      this.animatedKcal.set(target);
+      return;
+    }
+
+    const duration = from === 0 ? KCAL_COUNT_MS : 350;
+    const start = performance.now();
+
+    const tick = (now: number): void => {
+      const elapsed = now - start;
+      const progress = Math.min(1, Math.max(0, elapsed / duration));
+      // Suavizado ease-out-quart: aceleración rápida al inicio y frenado suave al llegar al total.
+      const eased = 1 - Math.pow(1 - progress, 4);
+      this.animatedKcal.set(Math.round(from + (target - from) * eased));
+
+      if (progress < 1) {
+        this.kcalRafId = requestAnimationFrame(tick);
+      } else {
+        this.kcalRafId = undefined;
+        this.animatedKcal.set(target);
+      }
+    };
+
+    this.kcalRafId = requestAnimationFrame(tick);
+  }
+
+  private cancelKcalRaf(): void {
+    if (this.kcalRafId !== undefined) {
+      cancelAnimationFrame(this.kcalRafId);
+      this.kcalRafId = undefined;
+    }
   }
 
   private clearSheetCloseTimer(): void {
