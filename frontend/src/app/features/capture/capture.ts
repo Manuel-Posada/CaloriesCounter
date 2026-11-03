@@ -48,6 +48,7 @@ const ARC_FULL_DEG = 30;
       class="page capture"
       [class.capture--idle]="mode() === 'idle'"
       [class.capture--camera]="mode() === 'camera'"
+      [style.--icon-rot]="deviceOrientation() + 'deg'"
     >
       @if (mode() === 'idle') {
         <div class="idle-stage">
@@ -130,7 +131,7 @@ const ARC_FULL_DEG = 30;
             [attr.aria-label]="i18n.t('capture.closeCamera')"
             (click)="closeCamera()"
           >
-            ✕
+            <span class="close__icon" aria-hidden="true">✕</span>
           </button>
 
           <svg
@@ -295,6 +296,8 @@ export class Capture implements OnDestroy {
   protected readonly isLevel = signal(false);
   protected readonly isCounting = signal(false);
   protected readonly countdown = signal(0);
+  /** Ángulo de orientación física de la pantalla (0, 90, -90) para contrarrotar los iconos. */
+  protected readonly deviceOrientation = signal<number>(0);
   /** El análisis tarda más de lo normal (backend despertando de un arranque en frío). */
   protected readonly slowServer = signal(false);
   protected readonly cameraNotice = signal<{ key: MessageKey; deg?: number } | null>(null);
@@ -355,7 +358,18 @@ export class Capture implements OnDestroy {
     return x < 0 ? 'gauge.lowerRight' : 'gauge.lowerLeft';
   });
 
+  private readonly onOrientationChange = (): void => {
+    this.deviceOrientation.set(this.readDeviceOrientation());
+  };
+
   constructor() {
+    this.deviceOrientation.set(this.readDeviceOrientation());
+    window.addEventListener('orientationchange', this.onOrientationChange);
+    // `orientationchange` llega antes de que el viewport cambie de tamaño: `resize` confirma
+    // si la página terminó en horizontal (y por tanto ya está girada).
+    window.addEventListener('resize', this.onOrientationChange);
+    screen.orientation?.addEventListener?.('change', this.onOrientationChange);
+
     // El <video> sólo existe cuando `mode` pasa a 'camera': enganchamos el stream reactivamente.
     effect(() => {
       const el = this.videoRef()?.nativeElement;
@@ -566,12 +580,33 @@ export class Capture implements OnDestroy {
 
   ngOnDestroy(): void {
     this.destroyed = true;
+    window.removeEventListener('orientationchange', this.onOrientationChange);
+    window.removeEventListener('resize', this.onOrientationChange);
+    screen.orientation?.removeEventListener?.('change', this.onOrientationChange);
     this.sub?.unsubscribe();
     this.sub = undefined;
     this.clearSlowHint();
     this.closeCamera(false);
     this.revokePreview();
     void this.audio?.close();
+  }
+
+  /**
+   * Ángulo para contrarrotar los iconos. Solo se aplica cuando la página **no** ha girado con
+   * el móvil (p. ej. si algún día se bloquea la orientación): si el navegador ya puso la
+   * interfaz en horizontal, los iconos deben quedarse como están.
+   */
+  private readDeviceOrientation(): number {
+    const raw =
+      typeof screen !== 'undefined' && screen.orientation && typeof screen.orientation.angle === 'number'
+        ? screen.orientation.angle
+        : typeof (window as { orientation?: number }).orientation === 'number'
+          ? Number((window as { orientation?: number }).orientation)
+          : 0;
+    const norm = ((raw % 360) + 360) % 360;
+    const angle = norm === 90 ? 90 : norm === 270 ? -90 : norm === 180 ? 180 : 0;
+    const pageLandscape = typeof window !== 'undefined' && window.innerWidth > window.innerHeight;
+    return pageLandscape ? 0 : angle;
   }
 
   private startSlowHint(): void {

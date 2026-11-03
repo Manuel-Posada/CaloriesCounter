@@ -238,9 +238,11 @@ export class AuthService {
       // El callback llega fuera de la zona de Angular.
       callback: (r: { credential: string }) => this.zone.run(() => onCredential(r.credential)),
     });
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    host.innerHTML = '';
     google.accounts.id.renderButton(host, {
       type: 'standard',
-      theme: 'outline',
+      theme: isDark ? 'filled_black' : 'outline',
       size: 'large',
       shape: 'pill',
       text: 'continue_with',

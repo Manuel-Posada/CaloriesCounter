@@ -1,8 +1,9 @@
 import { HttpClient, HttpEventType, HttpParams } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import { Observable, concat, filter, map, of, startWith, switchMap, timeout } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
+import { Observable, concat, filter, map, of, startWith, switchMap, tap, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CatalogFood, FoodLog, FoodLogCreated, FoodLogDetail, Page, PresignResponse } from '../models';import { PreferencesService } from '../preferences.service';
+import { CatalogFood, FoodLog, FoodLogCreated, FoodLogDetail, Page, PresignResponse } from '../models';
+import { PreferencesService } from '../preferences.service';
 import { PipelineService } from './pipeline.service';
 
 export type AnalyzeEvent =
@@ -17,6 +18,10 @@ export class FoodLogService {
   private readonly pipeline = inject(PipelineService);
   private readonly prefs = inject(PreferencesService);
   private readonly api = environment.apiUrl;
+
+  /** Lista de registros en memoria para sincronizar la galería deslizable entre Historial y Resultado. */
+  readonly cachedHistory = signal<FoodLog[]>([]);
+  private readonly detailCache = new Map<number, FoodLogDetail>();
 
   /** Paso 1: URL prefirmada de subida. */
   presign(contentType: string): Observable<PresignResponse> {
@@ -71,12 +76,29 @@ export class FoodLogService {
   }
 
   list(page = 1): Observable<Page<FoodLog>> {
-    return this.http.get<Page<FoodLog>>(`${this.api}/food-logs/`, { params: new HttpParams().set('page', page) });
+    return this.http
+      .get<Page<FoodLog>>(`${this.api}/food-logs/`, { params: new HttpParams().set('page', page) })
+      .pipe(
+        tap((res) => {
+          if (page === 1) {
+            this.cachedHistory.set(res.results);
+          } else {
+            this.cachedHistory.update((cur) => {
+              const seen = new Set(cur.map((item) => item.id));
+              return [...cur, ...res.results.filter((item) => !seen.has(item.id))];
+            });
+          }
+        }),
+      );
   }
 
   /** Detalle de un análisis guardado (con los alimentos y su tabla nutricional). */
   get(id: number): Observable<FoodLogDetail> {
-    return this.http.get<FoodLogDetail>(`${this.api}/food-logs/${id}/`);
+    const cached = this.detailCache.get(id);
+    if (cached) return of(cached);
+    return this.http
+      .get<FoodLogDetail>(`${this.api}/food-logs/${id}/`)
+      .pipe(tap((detail) => this.detailCache.set(id, detail)));
   }
 
   /** Corrección del usuario: alimento y/o gramos de un item, o el diámetro del plato. */
@@ -84,7 +106,12 @@ export class FoodLogService {
     id: number,
     body: { items?: { index: number; idx?: number; peso_g?: number }[]; plate_diameter_cm?: number },
   ): Observable<FoodLogCreated> {
-    return this.http.patch<FoodLogCreated>(`${this.api}/food-logs/${id}/`, body);
+    return this.http.patch<FoodLogCreated>(`${this.api}/food-logs/${id}/`, body).pipe(
+      tap((updated) => {
+        this.detailCache.set(id, updated);
+        this.cachedHistory.update((cur) => cur.map((item) => (item.id === id ? { ...item, ...updated } : item)));
+      }),
+    );
   }
 
   /** Busca en el catálogo de 323 clases para cambiar un alimento mal clasificado. */

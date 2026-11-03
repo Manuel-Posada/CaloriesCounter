@@ -18,6 +18,8 @@
 }
 
 .drawer {
+  --drawer-drag-x: 0px;
+
   position: fixed;
   inset: 0 0 0 auto;
   width: min(84vw, 340px);
@@ -31,9 +33,21 @@
   background: var(--c-surface);
   box-shadow: -8px 0 48px rgb(15 23 42 / 22%);
   overflow-y: auto;
+  touch-action: pan-y;
   transform: translateX(100%);
   will-change: transform;
   animation: slide-in-right 0.42s var(--ease-spring-sheet, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+
+  &--dragging {
+    animation: none;
+    transition: none;
+  }
+
+  &--rebounding {
+    animation: none;
+    transform: translateX(0);
+    transition: transform 0.36s var(--ease-spring-sheet, cubic-bezier(0.22, 1, 0.36, 1));
+  }
 
   &--closing {
     animation: slide-out-right 0.24s var(--ease-in-accelerate, cubic-bezier(0.32, 0, 0.67, 0)) forwards;
@@ -186,7 +200,7 @@
 
 @keyframes slide-out-right {
   from {
-    transform: translateX(0);
+    transform: translateX(var(--drawer-drag-x, 0px));
   }
   to {
     transform: translateX(100%);

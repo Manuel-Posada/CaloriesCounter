@@ -26,7 +26,18 @@
   margin-top: var(--space-3);
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 100%;
+  background-color: transparent;
+  color-scheme: dark;
+
+  ::ng-deep > div,
+  ::ng-deep iframe {
+    border-radius: 999px;
+    overflow: hidden;
+    background-color: transparent !important;
+    color-scheme: normal;
+  }
 }
 
 .status {

@@ -67,6 +67,8 @@
     svg {
       width: 28px;
       height: 28px;
+      transform: rotate(calc(var(--icon-rot, 0deg) * -1));
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
   }
 
@@ -253,6 +255,12 @@
   line-height: 1;
   cursor: pointer;
   transition: transform 0.15s ease, background 0.2s ease;
+
+  &__icon {
+    display: inline-block;
+    transform: rotate(calc(var(--icon-rot, 0deg) * -1));
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
   &:active {
     transform: scale(0.92);
@@ -604,6 +612,8 @@
   svg {
     width: 22px;
     height: 22px;
+    transform: rotate(calc(var(--icon-rot, 0deg) * -1));
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   &:hover {

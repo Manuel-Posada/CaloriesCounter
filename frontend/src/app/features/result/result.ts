@@ -1,4 +1,4 @@
-import { DecimalPipe, DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe, Location } from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -9,14 +9,15 @@ import {
   signal,
   untracked,
   viewChild,
+  viewChildren,
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FoodLogService } from '../../core/food-log/food-log.service';
 import { ResultStore } from '../../core/food-log/result.store';
 import { I18nService } from '../../core/i18n/i18n.service';
-import { CatalogFood, Confidence, DetectedFood, PipelineWarning } from '../../core/models';
 import { MessageKey } from '../../core/i18n/messages';
+import { CatalogFood, Confidence, DetectedFood, FoodLogCreated, PipelineWarning } from '../../core/models';
 import { TILT_WARN_DEG } from '../../core/tilt.service';
 
 /** Traducción de los motivos que bajan la confianza del análisis. */
@@ -36,6 +37,9 @@ const CONFIDENCE_REASONS: Record<string, MessageKey> = {
 const PLATE_SIZES_CM = [22, 26, 30] as const;
 /** Duración de la animación de salida del bottom-sheet (sincronizada con `result.scss`). */
 const SHEET_CLOSE_MS = 240;
+/** Umbral en píxeles (o velocidad en px/ms) para cerrar la hoja al arrastrar hacia abajo. */
+const SHEET_SWIPE_PX = 100;
+const SHEET_SWIPE_VELOCITY = 0.45;
 /** Duración del conteo progresivo (count-up) de las calorías totales al revelar el resultado. */
 const KCAL_COUNT_MS = 550;
 
@@ -123,185 +127,250 @@ interface RenderedSegment {
   selector: 'app-result',
   imports: [DecimalPipe, DatePipe, RouterLink],
   template: `
-    @if (result(); as r) {
-      <section class="page">
+    @if (gallerySlides().length) {
+      <section class="page" [class.page--gallery]="fromHistory()">
         @if (fromHistory()) {
-          <a class="back-link" routerLink="/history">← {{ i18n.t('result.backHistory') }}</a>
-        }
-
-        <figure class="photo" [style.aspect-ratio]="aspect()">
-          @if (photo(); as src) {
-            <img [src]="src" [attr.alt]="i18n.t('result.photoAlt')" (load)="onPhotoLoad($event)" />
-          }
-
-          <!-- Zonas segmentadas: contorno + etiqueta con nombre y calorías -->
-          @if (photo() && segments().length) {
-            <svg class="overlay" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
-              @for (s of segments(); track s.key) {
-                <polygon [attr.points]="s.points" pathLength="1" [style.--i]="$index" />
-                @if (s.ly !== s.cy) {
-                  <line
-                    [attr.x1]="s.cx"
-                    [attr.y1]="s.cy"
-                    [attr.x2]="s.lx"
-                    [attr.y2]="s.ly"
-                    pathLength="1"
-                    [style.--i]="$index"
-                  />
-                }
+          <header class="gallery-header">
+            <div class="gallery-header__top">
+              <a class="back-link" routerLink="/history">← {{ i18n.t('result.backHistory') }}</a>
+              @if (gallerySlides().length > 1) {
+                <span class="chip gallery-counter" aria-live="polite">
+                  {{ activeSlideIndex() + 1 }} / {{ gallerySlides().length }}
+                </span>
               }
-            </svg>
-
-            @for (s of segments(); track s.key) {
-              <span
-                class="tag"
-                [class.tag--below]="s.below"
-                [style.left.%]="s.lx * 100"
-                [style.top.%]="s.ly * 100"
-                [style.--i]="$index"
-              >
-                <span class="tag-idx" aria-hidden="true">{{ s.n }}</span>
-                <b>{{ s.label }}</b>
-                <span class="tag-kcal">{{ s.kcal | number: '1.0-0' }} kcal</span>
-              </span>
-            }
-          }
-
-          <figcaption class="chip">{{ r.fecha_hora | date: i18n.shortDate() : undefined : i18n.dateLocale() }}</figcaption>
-          @if (tiltOk(); as t) {
-            <span class="chip tilt-ok">{{ i18n.t('result.centered', { deg: (t | number: '1.0-0') ?? '' }) }}</span>
-          }
-        </figure>
-
-        <div class="results-panel">
-          <!-- Aviso de foto no cenital: el volumen puede estar sobreestimado -->
-          @if (scaleWarning()) {
-            <aside class="card tilt-warn" role="status">
-              <span class="icon" aria-hidden="true">📏</span>
-              <div>
-                <strong>{{ i18n.t('result.scaleTitle') }}</strong>
-                <p>{{ i18n.t('result.scaleBody') }}</p>
-              </div>
-            </aside>
-          }
-
-          @if (tiltWarning(); as t) {
-            <aside class="card tilt-warn" role="status">
-              <span class="icon" aria-hidden="true">📐</span>
-              <div>
-                <strong>{{ i18n.t('result.tiltTitle', { deg: (t | number: '1.0-0') ?? '' }) }}</strong>
-                <p>{{ i18n.t('result.tiltBody') }}</p>
-              </div>
-            </aside>
-          }
-
-          <!-- Consejo de Gemini -->
-          @if (r.consejo_nutricional) {
-            <aside class="advice" [attr.aria-label]="i18n.t('result.advice')">
-              <span class="spark" aria-hidden="true">✨</span>
-              <p>{{ r.consejo_nutricional }}</p>
-            </aside>
-          }
-
-          <!-- Resumen calórico -->
-          <div class="card summary">
-            <div class="kcal">
-              <strong>{{ animatedKcal() | number: '1.0-0' }}</strong>
-              <span>{{ i18n.t('result.kcalTotal') }}</span>
             </div>
 
-            @if (r.peso_total) {
-              <p class="grams-total">
-                {{ i18n.t('result.totalWeight', { grams: (r.peso_total | number: '1.0-0') ?? '' }) }}
-              </p>
-            }
-
-            @if (r.confianza; as c) {
-              <div class="confidence" [class.confidence--media]="c.nivel === 'media'" [class.confidence--baja]="c.nivel === 'baja'">
-                <span class="confidence__dot" aria-hidden="true"></span>
-                <b>{{ i18n.t('result.confidenceLevel', { level: i18n.t(confidenceLabel(c)) }) }}</b>
-                @if (c.motivos.length) {
-                  <ul class="confidence__reasons">
-                    @for (reason of c.motivos; track reason) {
-                      <li>{{ i18n.t(reasonLabel(reason)) }}</li>
-                    }
-                  </ul>
-                }
-              </div>
-            }
-
-            @if (r.escala_origen === 'plate') {
-              <div class="plate-size" role="group" [attr.aria-label]="i18n.t('result.plateSize')">
-                <span class="plate-size__label">{{ i18n.t('result.plateSize') }}</span>
-                @for (cm of plateSizes; track cm) {
+            @if (gallerySlides().length > 1) {
+              <nav #thumbsBar class="gallery-thumbs" [attr.aria-label]="i18n.t('app.history')">
+                @for (item of gallerySlides(); track item.id) {
                   <button
                     type="button"
-                    class="plate-size__btn"
-                    [class.is-active]="r.plate_diameter_cm === cm"
-                    [disabled]="saving()"
-                    (click)="setPlate(cm)"
+                    class="gallery-thumb"
+                    [class.gallery-thumb--active]="item.id === activeId()"
+                    [attr.data-thumb-id]="item.id"
+                    [attr.aria-current]="item.id === activeId() ? 'true' : null"
+                    (click)="scrollToSlide(item.id, 'smooth')"
                   >
-                    {{ cm }} cm
+                    @if (slidePhoto(item); as thumbSrc) {
+                      <img [src]="thumbSrc" alt="" loading="lazy" />
+                    } @else {
+                      <span class="gallery-thumb__kcal">{{ item.calorias_totales | number: '1.0-0' }}</span>
+                    }
                   </button>
                 }
-              </div>
+              </nav>
             }
+          </header>
+        }
 
-            <div class="split" role="img" [attr.aria-label]="splitLabel()">
-              <span class="seg protein" [style.flex-grow]="split().p"></span>
-              <span class="seg carbs" [style.flex-grow]="split().c"></span>
-              <span class="seg fat" [style.flex-grow]="split().f"></span>
-            </div>
+        <div
+          #galleryTrack
+          class="gallery-track"
+          [class.gallery-track--single]="!fromHistory() || gallerySlides().length <= 1"
+        >
+          @for (r of gallerySlides(); track r.id) {
+            <article #slideEl class="gallery-slide" [attr.data-log-id]="r.id">
+              <div class="gallery-slide__inner">
+                <figure
+                  class="photo"
+                  [class.photo--hero]="r.id === activeId()"
+                  [style.aspect-ratio]="slideAspect(r.id)"
+                >
+                  @if (slidePhoto(r); as src) {
+                    <img
+                      [src]="src"
+                      [attr.alt]="i18n.t('result.photoAlt')"
+                      (load)="onSlidePhotoLoad(r.id, $event)"
+                    />
+                  }
 
-            <ul class="macros">
-              <li>
-                <i class="protein"></i>{{ i18n.t('result.protein') }}
-                <b>{{ r.macronutrientes.proteinas_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
-              </li>
-              <li>
-                <i class="carbs"></i>{{ i18n.t('result.carbs') }}
-                <b>{{ r.macronutrientes.carbohidratos_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
-              </li>
-              <li>
-                <i class="fat"></i>{{ i18n.t('result.fat') }}
-                <b>{{ r.macronutrientes.grasas_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
-              </li>
-            </ul>
-          </div>
+                  <!-- Zonas segmentadas: contorno + etiqueta con nombre y calorías -->
+                  @if (slidePhoto(r) && segmentsFor(r).length) {
+                    <svg class="overlay" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
+                      @for (s of segmentsFor(r); track s.key) {
+                        <polygon [attr.points]="s.points" pathLength="1" [style.--i]="$index" />
+                        @if (s.ly !== s.cy) {
+                          <line
+                            [attr.x1]="s.cx"
+                            [attr.y1]="s.cy"
+                            [attr.x2]="s.lx"
+                            [attr.y2]="s.ly"
+                            pathLength="1"
+                            [style.--i]="$index"
+                          />
+                        }
+                      }
+                    </svg>
 
-          <!-- Detalle por alimento -->
-          @if (r.alimentos.length) {
-            <h2>{{ i18n.t('result.foods', { count: r.alimentos.length }) }}</h2>
-            <ul class="foods">
-              @for (f of r.alimentos; track $index) {
-                <li class="food-item" [style.--i]="$index">
-                  <button type="button" class="food" (click)="openSheet(f, $index)">
-                    <span class="food-idx" aria-hidden="true">{{ $index + 1 }}</span>
-                    <span class="food-name">{{ foodName(f) }}</span>
-                    <span class="food-kcal">{{ f.nutricion.calorias_kcal | number: '1.0-0' }} kcal</span>
-                    @if (needsReview(f)) {
+                    @for (s of segmentsFor(r); track s.key) {
                       <span
-                        class="food-check"
-                        [attr.title]="i18n.t('result.reviewFood')"
-                        [attr.aria-label]="i18n.t('result.reviewFood')"
-                        >?</span
+                        class="tag"
+                        [class.tag--below]="s.below"
+                        [style.left.%]="s.lx * 100"
+                        [style.top.%]="s.ly * 100"
+                        [style.--i]="$index"
                       >
+                        <span class="tag-idx" aria-hidden="true">{{ s.n }}</span>
+                        <b>{{ s.label }}</b>
+                        <span class="tag-kcal">{{ s.kcal | number: '1.0-0' }} kcal</span>
+                      </span>
                     }
-                    <span class="chev" aria-hidden="true">›</span>
-                  </button>
-                </li>
-              }
-            </ul>
-          } @else if (r.contornos.length) {
-            <p class="note">{{ i18n.t('result.oldScan') }}</p>
-          }
+                  }
 
-          @for (w of otherWarnings(); track $index) {
-            <p class="note">ℹ️ {{ warningText(w) }}</p>
-          }
-          <p class="note">{{ i18n.t('result.estimateNote') }}</p>
+                  <figcaption class="chip">
+                    {{ r.fecha_hora | date: i18n.shortDate() : undefined : i18n.dateLocale() }}
+                  </figcaption>
+                  @if (tiltOkFor(r); as t) {
+                    <span class="chip tilt-ok">
+                      {{ i18n.t('result.centered', { deg: (t | number: '1.0-0') ?? '' }) }}
+                    </span>
+                  }
+                </figure>
 
-          <a class="btn btn--primary btn--block" routerLink="/">{{ i18n.t('result.another') }}</a>
+                <div class="results-panel">
+                  <!-- Aviso de foto no cenital: el volumen puede estar sobreestimado -->
+                  @if (scaleWarningFor(r)) {
+                    <aside class="card tilt-warn" role="status">
+                      <span class="icon" aria-hidden="true">📏</span>
+                      <div>
+                        <strong>{{ i18n.t('result.scaleTitle') }}</strong>
+                        <p>{{ i18n.t('result.scaleBody') }}</p>
+                      </div>
+                    </aside>
+                  }
+
+                  @if (tiltWarningFor(r); as t) {
+                    <aside class="card tilt-warn" role="status">
+                      <span class="icon" aria-hidden="true">📐</span>
+                      <div>
+                        <strong>{{ i18n.t('result.tiltTitle', { deg: (t | number: '1.0-0') ?? '' }) }}</strong>
+                        <p>{{ i18n.t('result.tiltBody') }}</p>
+                      </div>
+                    </aside>
+                  }
+
+                  <!-- Consejo de Gemini -->
+                  @if (r.consejo_nutricional) {
+                    <aside class="advice" [attr.aria-label]="i18n.t('result.advice')">
+                      <span class="spark" aria-hidden="true">✨</span>
+                      <p>{{ r.consejo_nutricional }}</p>
+                    </aside>
+                  }
+
+                  <!-- Resumen calórico -->
+                  <div class="card summary">
+                    <div class="kcal">
+                      <strong>
+                        {{ (r.id === activeId() ? animatedKcal() : r.calorias_totales) | number: '1.0-0' }}
+                      </strong>
+                      <span>{{ i18n.t('result.kcalTotal') }}</span>
+                    </div>
+
+                    @if (r.peso_total) {
+                      <p class="grams-total">
+                        {{ i18n.t('result.totalWeight', { grams: (r.peso_total | number: '1.0-0') ?? '' }) }}
+                      </p>
+                    }
+
+                    @if (r.confianza; as c) {
+                      <div
+                        class="confidence"
+                        [class.confidence--media]="c.nivel === 'media'"
+                        [class.confidence--baja]="c.nivel === 'baja'"
+                      >
+                        <span class="confidence__dot" aria-hidden="true"></span>
+                        <b>{{ i18n.t('result.confidenceLevel', { level: i18n.t(confidenceLabel(c)) }) }}</b>
+                        @if (c.motivos.length) {
+                          <ul class="confidence__reasons">
+                            @for (reason of c.motivos; track reason) {
+                              <li>{{ i18n.t(reasonLabel(reason)) }}</li>
+                            }
+                          </ul>
+                        }
+                      </div>
+                    }
+
+                    @if (r.escala_origen === 'plate') {
+                      <div class="plate-size" role="group" [attr.aria-label]="i18n.t('result.plateSize')">
+                        <span class="plate-size__label">{{ i18n.t('result.plateSize') }}</span>
+                        @for (cm of plateSizes; track cm) {
+                          <button
+                            type="button"
+                            class="plate-size__btn"
+                            [class.is-active]="r.plate_diameter_cm === cm"
+                            [disabled]="saving()"
+                            (click)="setPlate(cm)"
+                          >
+                            {{ cm }} cm
+                          </button>
+                        }
+                      </div>
+                    }
+
+                    <div class="split" role="img" [attr.aria-label]="splitLabelFor(r)">
+                      <span class="seg protein" [style.flex-grow]="splitFor(r).p"></span>
+                      <span class="seg carbs" [style.flex-grow]="splitFor(r).c"></span>
+                      <span class="seg fat" [style.flex-grow]="splitFor(r).f"></span>
+                    </div>
+
+                    <ul class="macros">
+                      <li>
+                        <i class="protein"></i>{{ i18n.t('result.protein') }}
+                        <b>{{ r.macronutrientes.proteinas_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
+                      </li>
+                      <li>
+                        <i class="carbs"></i>{{ i18n.t('result.carbs') }}
+                        <b>{{ r.macronutrientes.carbohidratos_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
+                      </li>
+                      <li>
+                        <i class="fat"></i>{{ i18n.t('result.fat') }}
+                        <b>{{ r.macronutrientes.grasas_g | number: '1.0-1' : i18n.dateLocale() }} g</b>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- Detalle por alimento -->
+                  @if (r.alimentos.length) {
+                    <h2>{{ i18n.t('result.foods', { count: r.alimentos.length }) }}</h2>
+                    <ul class="foods">
+                      @for (f of r.alimentos; track $index) {
+                        <li class="food-item" [style.--i]="$index">
+                          <button type="button" class="food" (click)="openSheet(f, $index)">
+                            <span class="food-idx" aria-hidden="true">{{ $index + 1 }}</span>
+                            <span class="food-name">{{ foodName(f) }}</span>
+                            <span class="food-kcal">{{ f.nutricion.calorias_kcal | number: '1.0-0' }} kcal</span>
+                            @if (needsReview(f)) {
+                              <span
+                                class="food-check"
+                                [attr.title]="i18n.t('result.reviewFood')"
+                                [attr.aria-label]="i18n.t('result.reviewFood')"
+                                >?</span
+                              >
+                            }
+                            <span class="chev" aria-hidden="true">›</span>
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  } @else if (isSlideDetailLoading(r)) {
+                    <div class="card">
+                      <div class="skeleton" style="height: 16px; width: 48%"></div>
+                      <div class="skeleton" style="height: 14px; margin-top: 10px; width: 82%"></div>
+                    </div>
+                  } @else if (r.contornos.length) {
+                    <p class="note">{{ i18n.t('result.oldScan') }}</p>
+                  }
+
+                  @for (w of otherWarningsFor(r); track $index) {
+                    <p class="note">ℹ️ {{ warningText(w) }}</p>
+                  }
+                  <p class="note">{{ i18n.t('result.estimateNote') }}</p>
+
+                  <a class="btn btn--primary btn--block" routerLink="/">{{ i18n.t('result.another') }}</a>
+                </div>
+              </div>
+            </article>
+          }
         </div>
 
         <!-- Hoja de detalle nutricional -->
@@ -310,12 +379,27 @@ interface RenderedSegment {
           class="sheet"
           [class.sheet--open]="isSheetOpen() && !isSheetClosing()"
           [class.sheet--closing]="isSheetClosing()"
+          [class.sheet--dragging]="isSheetDragging()"
+          [class.sheet--rebounding]="isSheetRebounding()"
+          [style.--sheet-drag-y]="sheetDragY() + 'px'"
+          [style.transform]="
+            isSheetDragging()
+              ? 'translateY(' + sheetDragY() + 'px)'
+              : isSheetRebounding()
+                ? 'translateY(0px)'
+                : null
+          "
           (click)="onSheetClick($event)"
           (cancel)="onSheetCancel($event)"
           (close)="onSheetNativeClose()"
+          (touchstart)="onSheetTouchStart($event)"
+          (touchmove)="onSheetTouchMove($event)"
+          (touchend)="onSheetTouchEnd()"
+          (touchcancel)="onSheetTouchEnd()"
         >
           @if (selected(); as f) {
             <article>
+              <div class="sheet__handle" aria-hidden="true"></div>
               <header class="sheet-head">
                 <div>
                   <p class="eyebrow">{{ i18n.t('result.food', { n: selectedIndex() + 1 }) }}</p>
@@ -500,10 +584,14 @@ export class Result implements OnDestroy {
   private readonly store = inject(ResultStore);
   private readonly logs = inject(FoodLogService);
   private readonly route = inject(ActivatedRoute);
+  private readonly location = inject(Location);
   protected readonly i18n = inject(I18nService);
   protected readonly result = this.store.result;
 
   private readonly sheet = viewChild<ElementRef<HTMLDialogElement>>('sheet');
+  private readonly galleryTrack = viewChild<ElementRef<HTMLElement>>('galleryTrack');
+  private readonly thumbsBar = viewChild<ElementRef<HTMLElement>>('thumbsBar');
+  private readonly slideEls = viewChildren<ElementRef<HTMLElement>>('slideEl');
 
   protected readonly plateSizes = PLATE_SIZES_CM;
   protected readonly saving = signal(false);
@@ -515,13 +603,65 @@ export class Result implements OnDestroy {
   protected readonly notFound = signal(false);
   protected readonly fromHistory = signal(false);
   protected readonly isSheetClosing = signal(false);
+  protected readonly sheetDragY = signal(0);
+  protected readonly isSheetDragging = signal(false);
+  protected readonly isSheetRebounding = signal(false);
   protected readonly animatedKcal = signal(0);
+  /** ID del registro activo en el carrusel horizontal con Scroll Snap. */
+  protected readonly activeId = signal<number | null>(null);
+
+  /** Detalles completos (`alimentos` incluidos) ya descargados por ID para la galería. */
+  private readonly detailsById = signal<Record<number, FoodLogCreated>>({});
+  private readonly loadingSlideIds = signal<Record<number, boolean>>({});
+  /** Proporción real por foto (`w / h`) para que cada contorno coincida con su imagen. */
+  private readonly aspectsById = signal<Record<number, string>>({});
+
   private searchTimer?: ReturnType<typeof setTimeout>;
   private sheetCloseTimer?: ReturnType<typeof setTimeout>;
   private kcalRafId?: number;
-  /** Último total ya mostrado: en las correcciones se anima desde aquí, no desde cero. */
-  private lastKcalTarget?: number;
   private loadSub?: Subscription;
+  private initialScrollSynced = false;
+  private canDragSheet = false;
+  private sheetStartX = 0;
+  private sheetStartY = 0;
+  private sheetStartTime = 0;
+
+  /**
+   * Paneles del carrusel horizontal (`100vw` cada uno con `scroll-snap-align: center`):
+   * - Si venimos de `/history`, combina la lista del historial con los detalles ya cargados.
+   * - Si venimos de `/capture` (`/result`), muestra únicamente el plato recién analizado.
+   */
+  protected readonly gallerySlides = computed<FoodLogCreated[]>(() => {
+    const current = this.result();
+    if (!this.fromHistory()) {
+      return current ? [current] : [];
+    }
+
+    const list = this.logs.cachedHistory();
+    const details = this.detailsById();
+    const slides = list.map(
+      (item): FoodLogCreated =>
+        details[item.id] ??
+        (current?.id === item.id
+          ? current
+          : {
+              ...item,
+              alimentos: [],
+              advertencias: item.advertencias ?? [],
+            }),
+    );
+
+    if (current && !slides.some((s) => s.id === current.id)) {
+      return [current, ...slides];
+    }
+    return slides;
+  });
+
+  protected readonly activeSlideIndex = computed(() => {
+    const id = this.activeId();
+    const idx = this.gallerySlides().findIndex((s) => s.id === id);
+    return idx >= 0 ? idx : 0;
+  });
 
   constructor() {
     // Bloquea el scroll y aplica el efecto 3D de profundidad sobre `<main>` mientras la hoja está abierta.
@@ -531,22 +671,61 @@ export class Result implements OnDestroy {
       onCleanup(() => document.body.classList.remove('sheet-open'));
     });
 
-    // Interpola el contador de calorías totales: de 0 al total la primera vez y, en las
-    // correcciones, desde el valor que ya se estaba mostrando.
+    // Interpola el contador de calorías totales (0 -> calorias_totales) con ease-out-quart cuando cambia el plato activo.
+    let lastAnimatedId: number | null = null;
+    let lastTarget = 0;
     effect((onCleanup) => {
       const res = this.result();
       if (!res) {
+        lastAnimatedId = null;
+        lastTarget = 0;
         this.cancelKcalRaf();
-        this.lastKcalTarget = undefined;
         this.animatedKcal.set(0);
         return;
       }
-      const target = Math.round(res.calorias_totales);
-      // Leer el valor animado sin crear dependencia: si no, el efecto se relanzaría cada frame.
-      const from = this.lastKcalTarget === undefined ? 0 : untracked(() => this.animatedKcal());
-      this.lastKcalTarget = target;
-      this.animateKcal(target, from);
+      const nextTarget = Math.round(res.calorias_totales);
+      const isSameRecord = lastAnimatedId === res.id;
+      const from = isSameRecord ? untracked(() => this.animatedKcal()) : 0;
+      lastAnimatedId = res.id;
+      lastTarget = nextTarget;
+      this.animateKcal(lastTarget, from);
       onCleanup(() => this.cancelKcalRaf());
+    });
+
+    // Sincroniza el carrusel CSS Scroll Snap mediante IntersectionObserver al deslizar entre platos.
+    effect((onCleanup) => {
+      const track = this.galleryTrack()?.nativeElement;
+      const slides = this.slideEls();
+      const isHistory = this.fromHistory();
+      if (!track || slides.length === 0) return;
+
+      const targetId = untracked(() => this.activeId());
+      if (isHistory && !this.initialScrollSynced && targetId !== null) {
+        // Se centra en el siguiente frame: el ancho de los paneles aún no está medido al crear el efecto.
+        requestAnimationFrame(() => {
+          this.centerSlide(targetId, 'auto');
+          this.initialScrollSynced = true;
+        });
+      }
+
+      if (!isHistory || slides.length <= 1 || typeof IntersectionObserver === 'undefined') return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+              const snappedId = Number(entry.target.getAttribute('data-log-id'));
+              if (snappedId && snappedId !== untracked(() => this.activeId())) {
+                this.onSlideSnapped(snappedId);
+              }
+            }
+          }
+        },
+        { root: track, threshold: 0.6 },
+      );
+
+      slides.forEach((ref) => observer.observe(ref.nativeElement));
+      onCleanup(() => observer.disconnect());
     });
 
     // /result/:id abre un análisis guardado (desde el historial); /result llega del store en
@@ -555,38 +734,126 @@ export class Result implements OnDestroy {
       const raw = params.get('id');
       if (!raw) {
         this.fromHistory.set(false);
+        this.initialScrollSynced = false;
+        this.activeId.set(this.store.result()?.id ?? null);
         return;
       }
+
+      const id = Number(raw);
       this.fromHistory.set(true);
-      this.load(Number(raw));
+      this.initialScrollSynced = false;
+      this.activeId.set(id);
+
+      // Si el usuario entra directo a /result/:id sin pasar antes por /history, precargamos la lista.
+      if (this.logs.cachedHistory().length === 0) {
+        this.logs.list(1).subscribe({ error: () => void 0 });
+      }
+
+      this.load(id);
     });
   }
 
-  /** Proporción real de la foto, para que el contorno y la imagen coincidan exactamente. */
-  protected readonly aspect = signal<string | null>(null);
   protected readonly selected = signal<DetectedFood | null>(null);
   protected readonly selectedIndex = signal(0);
   protected readonly isSheetOpen = computed(() => this.selected() !== null);
 
-  /** Foto local (instantánea) y, si se recarga la página, la URL prefirmada de R2. */
-  protected readonly photo = computed(() => this.store.preview() ?? this.store.result()?.imagen_url ?? null);
+  /** Desplaza suavemente el carrusel al plato seleccionado al tocar una miniatura. */
+  protected scrollToSlide(id: number, behavior: ScrollBehavior = 'smooth'): void {
+    this.centerSlide(id, behavior);
+    if (id !== this.activeId()) {
+      this.onSlideSnapped(id);
+    }
+  }
+
+  /** Centra un panel en el carrusel sin tocar el scroll vertical de la página. */
+  private centerSlide(id: number, behavior: ScrollBehavior = 'smooth'): void {
+    const track = this.galleryTrack()?.nativeElement;
+    const slide = track?.querySelector<HTMLElement>(`[data-log-id="${id}"]`);
+    if (!track || !slide) return;
+    const left = slide.offsetLeft - (track.clientWidth - slide.clientWidth) / 2;
+    track.scrollTo({ left: Math.max(0, left), behavior });
+  }
+
+  /** Se ejecuta cuando un panel hace snap en el carrusel o se elige desde las miniaturas. */
+  private onSlideSnapped(id: number): void {
+    this.activeId.set(id);
+    if (this.fromHistory()) {
+      this.location.replaceState(`/result/${id}`);
+    }
+
+    // Mantiene visible la miniatura activa en la tira superior (solo en horizontal).
+    const bar = this.thumbsBar()?.nativeElement;
+    const thumb = bar?.querySelector<HTMLElement>(`[data-thumb-id="${id}"]`);
+    if (bar && thumb) {
+      const left = thumb.offsetLeft - (bar.clientWidth - thumb.clientWidth) / 2;
+      bar.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+    }
+
+    const existing = this.detailsById()[id];
+    if (existing) {
+      this.store.set(existing, null);
+    } else {
+      this.ensureSlideDetail(id, true);
+    }
+    this.prefetchNeighbors(id);
+  }
+
+  /** Foto local (instantánea) para captura reciente o la URL prefirmada de R2 del registro. */
+  protected slidePhoto(slide: FoodLogCreated): string | null {
+    if (!this.fromHistory() && this.store.preview()) {
+      return this.store.preview();
+    }
+    return slide.imagen_url ?? null;
+  }
+
+  protected slideAspect(id: number): string | null {
+    return this.aspectsById()[id] ?? null;
+  }
+
+  protected onSlidePhotoLoad(id: number, event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img.naturalWidth && img.naturalHeight) {
+      const ratio = `${img.naturalWidth} / ${img.naturalHeight}`;
+      this.aspectsById.update((cur) => ({ ...cur, [id]: ratio }));
+    }
+  }
+
+  protected isSlideDetailLoading(slide: FoodLogCreated): boolean {
+    return !!this.loadingSlideIds()[slide.id] && slide.alimentos.length === 0;
+  }
 
   /**
-   * Zonas segmentadas con su etiqueta colocada. Si dos etiquetas caen cerca se empujan
-   * hacia abajo y se une el punto con una línea, para que no se pisen.
+   * Zonas segmentadas con su etiqueta colocada para un registro dado.
+   * Si el detalle aún está cargando, usa los `contornos` resumidos del listado para pintar al instante.
    */
-  protected readonly segments = computed<RenderedSegment[]>(() => {
-    const foods = this.store.result()?.alimentos ?? [];
+  protected segmentsFor(slide: FoodLogCreated): RenderedSegment[] {
     const out: RenderedSegment[] = [];
     const placed: { lx: number; ly: number }[] = [];
     const GAP = 0.13;
 
-    foods.forEach((f, i) => {
-      const points = f.poligono ?? [];
+    const items =
+      slide.alimentos.length > 0
+        ? slide.alimentos.map((f, i) => ({
+            key: `${slide.id}-${i}-${f.idx}`,
+            poligono: f.poligono ?? [],
+            centroide: f.centroide,
+            label: this.foodName(f),
+            kcal: f.nutricion.calorias_kcal,
+          }))
+        : (slide.contornos ?? []).map((c, i) => ({
+            key: `${slide.id}-c-${i}`,
+            poligono: c.poligono ?? [],
+            centroide: c.centroide,
+            label: this.pretty(c.nombre),
+            kcal: c.kcal,
+          }));
+
+    items.forEach((item, i) => {
+      const points = item.poligono;
       if (points.length < 3) return;
 
-      const cx = clamp(f.centroide?.[0] ?? mean(points, 0), 0.04, 0.96);
-      const cy = clamp(f.centroide?.[1] ?? mean(points, 1), 0.04, 0.96);
+      const cx = clamp(item.centroide?.[0] ?? mean(points, 0), 0.04, 0.96);
+      const cy = clamp(item.centroide?.[1] ?? mean(points, 1), 0.04, 0.96);
       const below = cy < 0.25;
       const lx = clamp(cx, 0.3, 0.66);
 
@@ -596,72 +863,64 @@ export class Result implements OnDestroy {
       placed.push({ lx, ly });
 
       out.push({
-        key: `${i}-${f.idx}`,
+        key: item.key,
         n: i + 1,
         cx,
         cy,
         lx,
         ly,
         below,
-        label: this.foodName(f),
-        kcal: f.nutricion.calorias_kcal,
+        label: item.label,
+        kcal: item.kcal,
         points: points.map((p) => `${p[0]},${p[1]}`).join(' '),
       });
     });
 
     return out;
-  });
+  }
 
-  /** Reparto energético (Atwater: 4/4/9 kcal por gramo) para la barra. */
-  protected readonly split = computed(() => {
-    const m = this.store.result()?.macronutrientes;
+  /** Reparto energético (Atwater: 4/4/9 kcal por gramo) para la barra de macros de cada tarjeta. */
+  protected splitFor(slide: FoodLogCreated): { p: number; c: number; f: number } {
+    const m = slide.macronutrientes;
     if (!m) return { p: 1, c: 1, f: 1 };
     return { p: m.proteinas_g * 4, c: m.carbohidratos_g * 4, f: m.grasas_g * 9 };
-  });
+  }
 
-  protected readonly splitLabel = computed(() => {
-    const { p, c, f } = this.split();
+  protected splitLabelFor(slide: FoodLogCreated): string {
+    const { p, c, f } = this.splitFor(slide);
     const t = p + c + f || 1;
     return this.i18n.t('result.splitLabel', {
       p: Math.round((p / t) * 100),
       c: Math.round((c / t) * 100),
       f: Math.round((f / t) * 100),
     });
-  });
+  }
 
   /** Inclinación por encima del umbral: el resultado merece una advertencia. */
-  protected readonly tiltWarning = computed(() => {
-    const deg = this.store.result()?.angulo_camara_deg;
+  protected tiltWarningFor(slide: FoodLogCreated): number | null {
+    const deg = slide.angulo_camara_deg;
     return deg != null && deg > TILT_WARN_DEG ? deg : null;
-  });
+  }
 
   /** Foto razonablemente cenital: se refuerza con un chip discreto. `null` = no se sabe. */
-  protected readonly tiltOk = computed(() => {
-    const deg = this.store.result()?.angulo_camara_deg;
+  protected tiltOkFor(slide: FoodLogCreated): number | null {
+    const deg = slide.angulo_camara_deg;
     return deg != null && deg <= TILT_WARN_DEG ? deg : null;
-  });
+  }
 
-  /**
-   * Advertencias del pipeline menos la de inclinación: ésa ya la cuenta la tarjeta de arriba
-   * con más contexto, y repetirla en la lista solo añade ruido.
-   */
-  protected readonly otherWarnings = computed(() =>
-    (this.store.result()?.advertencias ?? []).filter((w) =>
+  protected otherWarningsFor(slide: FoodLogCreated): (string | PipelineWarning)[] {
+    return (slide.advertencias ?? []).filter((w) =>
       typeof w === 'string'
         ? !w.includes('poco cenital')
         : w.code !== 'tilt' && w.code !== 'no_plate_reference',
-    ),
-  );
+    );
+  }
 
-  /**
-   * Sin borde de plato no hay escala: el volumen que da el modelo de profundidad en primeros
-   * planos puede estar muy desviado, así que se avisa arriba, no en la letra pequeña.
-   */
-  protected readonly scaleWarning = computed(() =>
-    (this.store.result()?.advertencias ?? []).some(
+  protected scaleWarningFor(slide: FoodLogCreated): boolean {
+    return (slide.advertencias ?? []).some(
       (w) => typeof w !== 'string' && w.code === 'no_plate_reference',
-    ),
-  );
+    );
+  }
 
   /** Traduce un aviso por su código; los strings sueltos son de un Modal antiguo. */
   protected warningText(w: string | PipelineWarning): string {
@@ -705,13 +964,6 @@ export class Result implements OnDestroy {
     );
   }
 
-  protected onPhotoLoad(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    if (img.naturalWidth && img.naturalHeight) {
-      this.aspect.set(`${img.naturalWidth} / ${img.naturalHeight}`);
-    }
-  }
-
   protected pretty(name: string): string {
     const text = name.replace(/_/g, ' ').trim();
     return text.charAt(0).toUpperCase() + text.slice(1);
@@ -742,24 +994,31 @@ export class Result implements OnDestroy {
   protected openSheet(food: DetectedFood, index: number): void {
     this.clearSheetCloseTimer();
     this.isSheetClosing.set(false);
+    this.isSheetDragging.set(false);
+    this.isSheetRebounding.set(false);
+    this.sheetDragY.set(0);
     this.selected.set(food);
     this.selectedIndex.set(index);
     this.editError.set(null);
     this.searchResults.set([]);
     const dialog = this.sheet()?.nativeElement;
-    if (dialog && !dialog.open) {
-      dialog.showModal();
+    if (dialog) {
+      dialog.scrollTop = 0;
+      if (!dialog.open) dialog.showModal();
     }
   }
 
   protected closeSheet(): void {
     if (!this.isSheetOpen() || this.isSheetClosing()) return;
+    this.isSheetDragging.set(false);
+    this.isSheetRebounding.set(false);
     this.isSheetClosing.set(true);
     this.sheetCloseTimer = setTimeout(() => {
       this.sheetCloseTimer = undefined;
       this.sheet()?.nativeElement.close();
       this.selected.set(null);
       this.isSheetClosing.set(false);
+      this.sheetDragY.set(0);
     }, SHEET_CLOSE_MS);
   }
 
@@ -772,6 +1031,89 @@ export class Result implements OnDestroy {
     this.clearSheetCloseTimer();
     this.selected.set(null);
     this.isSheetClosing.set(false);
+    this.isSheetDragging.set(false);
+    this.isSheetRebounding.set(false);
+    this.sheetDragY.set(0);
+  }
+
+  /**
+   * Inicia el gesto de arrastre hacia abajo únicamente si el contenedor `.sheet` (y el `article`)
+   * está arriba del todo (`scrollTop === 0`). Si el usuario ha hecho scroll dentro del detalle,
+   * se respeta el desplazamiento vertical nativo sin cerrar la hoja accidentalmente.
+   */
+  protected onSheetTouchStart(ev: TouchEvent): void {
+    const dialog = this.sheet()?.nativeElement;
+    if (!dialog || !this.isSheetOpen() || this.isSheetClosing() || ev.touches.length !== 1) return;
+
+    const article = dialog.querySelector('article');
+    if (dialog.scrollTop > 0 || (article && article.scrollTop > 0)) {
+      this.canDragSheet = false;
+      return;
+    }
+
+    const target = ev.target as HTMLElement | null;
+    if (target?.closest('.search-results, input, select')) {
+      this.canDragSheet = false;
+      return;
+    }
+
+    const t = ev.touches[0]!;
+    this.canDragSheet = true;
+    this.sheetStartX = t.clientX;
+    this.sheetStartY = t.clientY;
+    this.sheetStartTime = performance.now();
+    this.isSheetDragging.set(false);
+    this.sheetDragY.set(0);
+  }
+
+  protected onSheetTouchMove(ev: TouchEvent): void {
+    if (!this.canDragSheet || ev.touches.length !== 1) return;
+    const dialog = this.sheet()?.nativeElement;
+    if (!dialog) return;
+
+    if (dialog.scrollTop > 0) {
+      this.canDragSheet = false;
+      this.isSheetDragging.set(false);
+      this.sheetDragY.set(0);
+      return;
+    }
+
+    const t = ev.touches[0]!;
+    const dy = t.clientY - this.sheetStartY;
+    const dx = t.clientX - this.sheetStartX;
+
+    if (!this.isSheetDragging()) {
+      if (Math.hypot(dx, dy) < 8) return;
+      // Si el usuario desliza el dedo hacia arriba (dy < 0) para bajar por la tabla nutricional
+      // o el movimiento es horizontal, cedemos el control al scroll nativo de `.sheet`.
+      if (dy <= 0 || Math.abs(dx) > Math.abs(dy)) {
+        this.canDragSheet = false;
+        return;
+      }
+      this.isSheetRebounding.set(false);
+      this.isSheetDragging.set(true);
+    }
+
+    if (ev.cancelable) ev.preventDefault();
+    this.sheetDragY.set(Math.max(0, dy));
+  }
+
+  protected onSheetTouchEnd(): void {
+    this.canDragSheet = false;
+    if (!this.isSheetDragging()) return;
+
+    const offset = this.sheetDragY();
+    const dt = Math.max(1, performance.now() - this.sheetStartTime);
+    const velocity = offset / dt;
+    this.isSheetDragging.set(false);
+
+    if (offset >= SHEET_SWIPE_PX || (offset > 35 && velocity >= SHEET_SWIPE_VELOCITY)) {
+      this.closeSheet();
+      return;
+    }
+
+    this.isSheetRebounding.set(true);
+    this.sheetDragY.set(0);
   }
 
   /** Corrige los gramos del alimento abierto. */
@@ -828,6 +1170,7 @@ export class Result implements OnDestroy {
     this.logs.update(current.id, body).subscribe({
       next: (updated) => {
         // El servidor devuelve los totales y el detalle ya recalculados.
+        this.detailsById.update((cur) => ({ ...cur, [updated.id]: updated }));
         this.store.set(updated, this.store.preview() ?? updated.imagen_url);
         this.selected.set(updated.alimentos[this.selectedIndex()] ?? null);
         this.saving.set(false);
@@ -896,17 +1239,51 @@ export class Result implements OnDestroy {
   private load(id: number): void {
     this.loading.set(true);
     this.notFound.set(false);
+    this.ensureSlideDetail(id, true, () => {
+      this.loading.set(false);
+      this.prefetchNeighbors(id);
+    });
+  }
+
+  private ensureSlideDetail(id: number, makeActive = false, onDone?: () => void): void {
+    const existing = this.detailsById()[id];
+    if (existing) {
+      if (makeActive) this.store.set(existing, null);
+      onDone?.();
+      return;
+    }
+
+    this.loadingSlideIds.update((cur) => ({ ...cur, [id]: true }));
     this.logs.get(id).subscribe({
       next: (detail) => {
-        // El servidor no guarda los avisos del pipeline; la ficha funciona igual sin ellos.
-        this.store.set({ ...detail, advertencias: [] }, null);
-        this.loading.set(false);
+        const record: FoodLogCreated = { ...detail, advertencias: detail.advertencias ?? [] };
+        this.detailsById.update((cur) => ({ ...cur, [id]: record }));
+        this.loadingSlideIds.update((cur) => ({ ...cur, [id]: false }));
+        if (makeActive && this.activeId() === id) {
+          this.store.set(record, null);
+        }
+        onDone?.();
       },
       error: () => {
-        this.loading.set(false);
-        this.notFound.set(true);
+        this.loadingSlideIds.update((cur) => ({ ...cur, [id]: false }));
+        if (makeActive && this.gallerySlides().length === 0) {
+          this.notFound.set(true);
+        }
+        onDone?.();
       },
     });
+  }
+
+  /** Precarga silenciosamente el detalle de los paneles vecinos para que deslizar sea instantáneo. */
+  private prefetchNeighbors(centerId: number): void {
+    const slides = this.gallerySlides();
+    const idx = slides.findIndex((s) => s.id === centerId);
+    if (idx < 0) return;
+    for (const neighbor of [slides[idx - 1], slides[idx + 1]]) {
+      if (neighbor && !this.detailsById()[neighbor.id] && !this.loadingSlideIds()[neighbor.id]) {
+        this.ensureSlideDetail(neighbor.id, false);
+      }
+    }
   }
 }
 
@@ -917,5 +1294,3 @@ function clamp(value: number, min: number, max: number): number {
 function mean(points: number[][], axis: 0 | 1): number {
   return points.reduce((acc, p) => acc + p[axis], 0) / points.length;
 }
-
-

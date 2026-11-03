@@ -266,6 +266,12 @@ Cada tarjeta del historial enlaza a `/result/:id`, que carga el análisis guarda
 `GET /api/food-logs/<id>/` (incluye los alimentos y su tabla). Los análisis antiguos, guardados antes
 de existir `items`, se abren igual pero sin detalle editable ni tabla por alimento.
 
+El resultado es una **galería horizontal** con `scroll-snap`: al abrir un análisis desde el historial
+se puede deslizar al anterior o al siguiente sin volver atrás; la URL se actualiza con
+`replaceState`, las miniaturas y el contador superior siguen al plato activo y los detalles se
+precargan en segundo plano. La hoja de detalle y el menú lateral se cierran deslizando (hacia abajo
+y hacia la derecha respectivamente).
+
 La ficha de cada alimento incluye un desplegable **«Ver todos los nutrientes (por 100 g)»** con 30
 valores agrupados en general, grasas, minerales y vitaminas. Los nombres viajan como códigos
 (`sodio_mg`, `vitamina_b12_ug`…) y se traducen en el cliente.
