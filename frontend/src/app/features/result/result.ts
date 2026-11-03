@@ -1275,6 +1275,13 @@ export class Result implements OnDestroy {
           return next;
         });
 
+        // En el resultado recién capturado no hay carrusel: al borrar se vuelve a la cámara.
+        if (!this.fromHistory()) {
+          this.store.clear();
+          void this.router.navigate(['/']);
+          return;
+        }
+
         const remaining = this.logs.cachedHistory();
         if (!remaining.length) {
           this.store.clear();
