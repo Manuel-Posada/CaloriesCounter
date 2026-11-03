@@ -1,4 +1,4 @@
-﻿import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FoodLogService } from '../../core/food-log/food-log.service';
@@ -40,13 +40,20 @@ import { TILT_WARN_DEG } from '../../core/tilt.service';
 
       <ul class="list">
         @for (log of items(); track log.id) {
-          <li>
+          <li [style.--i]="$index % 10">
             @if (hasImage(log)) {
               <!-- Reciente: imagen almacenada en R2. Toda la tarjeta abre el detalle. -->
               <a class="card row" [routerLink]="['/result', log.id]" [attr.aria-label]="i18n.t('history.openDetail')">
                 <figure class="thumb-wrap">
-                  <img class="thumb" [src]="log.imagen_url!" [attr.alt]="i18n.t('history.photoAlt')" loading="lazy"
-                       (load)="onThumbLoad(log.id, $event)" (error)="onImageError(log.id)" />
+                  <img
+                    class="thumb"
+                    [class.thumb--loaded]="!!size(log.id)"
+                    [src]="log.imagen_url!"
+                    [attr.alt]="i18n.t('history.photoAlt')"
+                    loading="lazy"
+                    (load)="onThumbLoad(log.id, $event)"
+                    (error)="onImageError(log.id)"
+                  />
                   @if (size(log.id); as s) {
                     @if (log.contornos.length) {
                       <svg class="thumb-overlay" [attr.viewBox]="'0 0 ' + s.w + ' ' + s.h"
@@ -159,8 +166,9 @@ export class History implements OnInit {
 
   protected onThumbLoad(id: number, event: Event): void {
     const img = event.target as HTMLImageElement;
-    if (!img.naturalWidth || !img.naturalHeight) return;
-    this.sizes.update((sizes) => ({ ...sizes, [id]: { w: img.naturalWidth, h: img.naturalHeight } }));
+    const w = img.naturalWidth || 1;
+    const h = img.naturalHeight || 1;
+    this.sizes.update((sizes) => ({ ...sizes, [id]: { w, h } }));
   }
 
   protected size(id: number): { w: number; h: number } | undefined {

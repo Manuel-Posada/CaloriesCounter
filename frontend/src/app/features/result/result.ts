@@ -1,5 +1,5 @@
 import { DecimalPipe, DatePipe } from '@angular/common';
-import { Component, ElementRef, OnDestroy, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FoodLogService } from '../../core/food-log/food-log.service';
@@ -24,6 +24,8 @@ const CONFIDENCE_REASONS: Record<string, MessageKey> = {
 
 /** Diámetros de plato ofrecidos para reescalar sin reprocesar la foto. */
 const PLATE_SIZES_CM = [22, 26, 30] as const;
+/** Duración de la animación de salida del bottom-sheet (sincronizada con `result.scss`). */
+const SHEET_CLOSE_MS = 240;
 
 /** Nutrientes extendidos, agrupados como en una etiqueta nutricional. */
 const NUTRIENT_GROUPS: {
@@ -124,13 +126,14 @@ interface RenderedSegment {
           @if (photo() && segments().length) {
             <svg class="overlay" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
               @for (s of segments(); track s.key) {
-                <polygon [attr.points]="s.points" [style.--i]="$index" />
+                <polygon [attr.points]="s.points" pathLength="1" [style.--i]="$index" />
                 @if (s.ly !== s.cy) {
                   <line
                     [attr.x1]="s.cx"
                     [attr.y1]="s.cy"
                     [attr.x2]="s.lx"
                     [attr.y2]="s.ly"
+                    pathLength="1"
                     [style.--i]="$index"
                   />
                 }
@@ -293,9 +296,11 @@ interface RenderedSegment {
         <dialog
           #sheet
           class="sheet"
-          [class.sheet--open]="isSheetOpen()"
+          [class.sheet--open]="isSheetOpen() && !isSheetClosing()"
+          [class.sheet--closing]="isSheetClosing()"
           (click)="onSheetClick($event)"
-          (close)="selected.set(null)"
+          (cancel)="onSheetCancel($event)"
+          (close)="onSheetNativeClose()"
         >
           @if (selected(); as f) {
             <article>
@@ -497,10 +502,19 @@ export class Result implements OnDestroy {
   protected readonly loading = signal(false);
   protected readonly notFound = signal(false);
   protected readonly fromHistory = signal(false);
+  protected readonly isSheetClosing = signal(false);
   private searchTimer?: ReturnType<typeof setTimeout>;
+  private sheetCloseTimer?: ReturnType<typeof setTimeout>;
   private loadSub?: Subscription;
 
   constructor() {
+    // Bloquea el scroll y aplica el efecto 3D de profundidad sobre `<main>` mientras la hoja está abierta.
+    effect((onCleanup) => {
+      const active = this.isSheetOpen() && !this.isSheetClosing();
+      document.body.classList.toggle('sheet-open', active);
+      onCleanup(() => document.body.classList.remove('sheet-open'));
+    });
+
     // /result/:id abre un análisis guardado (desde el historial); /result llega del store en
     // memoria que acaba de rellenar la captura.
     this.loadSub = this.route.paramMap.subscribe((params) => {
@@ -692,15 +706,38 @@ export class Result implements OnDestroy {
   }
 
   protected openSheet(food: DetectedFood, index: number): void {
+    this.clearSheetCloseTimer();
+    this.isSheetClosing.set(false);
     this.selected.set(food);
     this.selectedIndex.set(index);
     this.editError.set(null);
     this.searchResults.set([]);
-    this.sheet()?.nativeElement.showModal();
+    const dialog = this.sheet()?.nativeElement;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
   }
 
   protected closeSheet(): void {
-    this.sheet()?.nativeElement.close();
+    if (!this.isSheetOpen() || this.isSheetClosing()) return;
+    this.isSheetClosing.set(true);
+    this.sheetCloseTimer = setTimeout(() => {
+      this.sheetCloseTimer = undefined;
+      this.sheet()?.nativeElement.close();
+      this.selected.set(null);
+      this.isSheetClosing.set(false);
+    }, SHEET_CLOSE_MS);
+  }
+
+  protected onSheetCancel(event: Event): void {
+    event.preventDefault();
+    this.closeSheet();
+  }
+
+  protected onSheetNativeClose(): void {
+    this.clearSheetCloseTimer();
+    this.selected.set(null);
+    this.isSheetClosing.set(false);
   }
 
   /** Corrige los gramos del alimento abierto. */
@@ -775,7 +812,15 @@ export class Result implements OnDestroy {
 
   ngOnDestroy(): void {
     if (this.searchTimer !== undefined) clearTimeout(this.searchTimer);
+    this.clearSheetCloseTimer();
     this.loadSub?.unsubscribe();
+  }
+
+  private clearSheetCloseTimer(): void {
+    if (this.sheetCloseTimer !== undefined) {
+      clearTimeout(this.sheetCloseTimer);
+      this.sheetCloseTimer = undefined;
+    }
   }
 
   private load(id: number): void {

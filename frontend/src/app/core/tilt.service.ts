@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, NgZone, computed, inject, signal } from '@angular/core';
 
 /** Estado del permiso del sensor de orientación. */
 export type TiltPermission = 'unknown' | 'granted' | 'denied' | 'unsupported';
@@ -42,14 +42,18 @@ function screenAngleDeg(): number {
 /**
  * Posición de la burbuja en ejes de pantalla. La burbuja sube hacia el lado alto:
  * con `beta > 0` el borde superior está levantado, con `gamma > 0` el derecho está bajo.
+ *
+ * En CSS el eje +Y apunta hacia abajo (sentido horario), mientras que `screen.orientation.angle`
+ * mide el giro físico del dispositivo en sentido antihorario (90° = landscape-primary), por lo
+ * que la rotación al sistema de pantalla invierte el signo del seno.
  */
 export function bubbleOffset(betaDeg: number, gammaDeg: number): BubbleOffset {
   const rad = (screenAngleDeg() * Math.PI) / 180;
   const x = -gammaDeg;
   const y = -betaDeg;
   return {
-    x: x * Math.cos(rad) - y * Math.sin(rad),
-    y: x * Math.sin(rad) + y * Math.cos(rad),
+    x: x * Math.cos(rad) + y * Math.sin(rad),
+    y: -x * Math.sin(rad) + y * Math.cos(rad),
   };
 }
 
@@ -64,6 +68,8 @@ export function bubbleOffset(betaDeg: number, gammaDeg: number): BubbleOffset {
  */
 @Injectable({ providedIn: 'root' })
 export class TiltService {
+  private readonly ngZone = inject(NgZone);
+
   readonly tilt = signal<number | null>(null);
   readonly beta = signal<number | null>(null);
   readonly gamma = signal<number | null>(null);
@@ -74,8 +80,10 @@ export class TiltService {
   readonly available = computed(() => this.tilt() !== null);
 
   private listening = false;
-  private smoothBeta: number | null = null;
-  private smoothGamma: number | null = null;
+  /** Vector normal suavizado en 3D para evitar discontinuidades de Euler (gimbal lock en ±90°). */
+  private smoothNx: number | null = null;
+  private smoothNy: number | null = null;
+  private smoothNz: number | null = null;
   private silenceTimer?: ReturnType<typeof setTimeout>;
   private lastEmit = 0;
 
@@ -88,17 +96,42 @@ export class TiltService {
     if (now - this.lastEmit < 50) return;
     this.lastEmit = now;
 
-    if (this.silenceTimer) clearTimeout(this.silenceTimer);
-    this.silent.set(false);
+    if (this.silenceTimer) {
+      clearTimeout(this.silenceTimer);
+      this.silenceTimer = undefined;
+    }
 
-    this.smoothBeta = this.smoothBeta === null ? e.beta : this.smoothBeta + SMOOTHING * (e.beta - this.smoothBeta);
-    this.smoothGamma =
-      this.smoothGamma === null ? e.gamma : this.smoothGamma + SMOOTHING * (e.gamma - this.smoothGamma);
+    // Proyectamos (beta, gamma) a la normal unitaria 3D de la pantalla antes de suavizar:
+    // así evitamos el salto brusco de Euler cuando gamma salta entre +89° y -89° en vertical.
+    const betaRad = (e.beta * Math.PI) / 180;
+    const gammaRad = (e.gamma * Math.PI) / 180;
+    const nx = -Math.cos(betaRad) * Math.sin(gammaRad);
+    const ny = -Math.sin(betaRad);
+    const nz = Math.cos(betaRad) * Math.cos(gammaRad);
 
-    this.beta.set(this.smoothBeta);
-    this.gamma.set(this.smoothGamma);
-    this.tilt.set(tiltDegrees(this.smoothBeta, this.smoothGamma));
-    this.bubble.set(bubbleOffset(this.smoothBeta, this.smoothGamma));
+    this.smoothNx = this.smoothNx === null ? nx : this.smoothNx + SMOOTHING * (nx - this.smoothNx);
+    this.smoothNy = this.smoothNy === null ? ny : this.smoothNy + SMOOTHING * (ny - this.smoothNy);
+    this.smoothNz = this.smoothNz === null ? nz : this.smoothNz + SMOOTHING * (nz - this.smoothNz);
+
+    const len = Math.hypot(this.smoothNx, this.smoothNy, this.smoothNz) || 1;
+    const ux = this.smoothNx / len;
+    const uy = this.smoothNy / len;
+    const uz = this.smoothNz / len;
+
+    const smoothBeta = (Math.asin(Math.min(1, Math.max(-1, -uy))) * 180) / Math.PI;
+    const smoothGamma = (Math.atan2(-ux, uz) * 180) / Math.PI;
+    const tiltDeg = (Math.acos(Math.min(1, Math.max(-1, uz))) * 180) / Math.PI;
+
+    const bubble = bubbleOffset(smoothBeta, smoothGamma);
+
+    // Reentramos en la zona de Angular únicamente a 20 Hz al actualizar las señales.
+    this.ngZone.run(() => {
+      this.silent.set(false);
+      this.beta.set(smoothBeta);
+      this.gamma.set(smoothGamma);
+      this.tilt.set(tiltDeg);
+      this.bubble.set(bubble);
+    });
   };
 
   /** Pide permiso (iOS) y empieza a escuchar. Devuelve si hay sensor utilizable. */
@@ -108,32 +141,38 @@ export class TiltService {
       return false;
     }
 
-    const ctor = window.DeviceOrientationEvent as unknown as OrientationPermission;
-    if (typeof ctor.requestPermission === 'function') {
-      try {
-        if ((await ctor.requestPermission()) !== 'granted') {
+    if (this.permission() !== 'granted') {
+      const ctor = window.DeviceOrientationEvent as unknown as OrientationPermission;
+      if (typeof ctor.requestPermission === 'function') {
+        try {
+          if ((await ctor.requestPermission()) !== 'granted') {
+            this.permission.set('denied');
+            return false;
+          }
+        } catch {
           this.permission.set('denied');
           return false;
         }
-      } catch {
-        this.permission.set('denied');
-        return false;
       }
+      this.permission.set('granted');
     }
 
-    this.permission.set('granted');
     this.listen();
     return true;
   }
 
   disable(): void {
     if (this.listening) {
-      window.removeEventListener('deviceorientation', this.onOrientation);
+      this.ngZone.runOutsideAngular(() => {
+        window.removeEventListener('deviceorientation', this.onOrientation);
+      });
       this.listening = false;
     }
-    if (this.silenceTimer) clearTimeout(this.silenceTimer);
-    this.silenceTimer = undefined;
-    this.smoothBeta = this.smoothGamma = null;
+    if (this.silenceTimer) {
+      clearTimeout(this.silenceTimer);
+      this.silenceTimer = undefined;
+    }
+    this.smoothNx = this.smoothNy = this.smoothNz = null;
     this.tilt.set(null);
     this.beta.set(null);
     this.gamma.set(null);
@@ -143,12 +182,19 @@ export class TiltService {
 
   private listen(): void {
     if (!this.listening) {
-      window.addEventListener('deviceorientation', this.onOrientation);
+      this.ngZone.runOutsideAngular(() => {
+        window.addEventListener('deviceorientation', this.onOrientation, { passive: true });
+      });
       this.listening = true;
     }
+    if (this.silenceTimer) clearTimeout(this.silenceTimer);
     // Si en 1,5 s no ha llegado nada, el dispositivo no tiene giroscopio (típico en desktop).
-    this.silenceTimer = setTimeout(() => {
-      if (this.tilt() === null) this.silent.set(true);
-    }, SILENCE_MS);
+    this.silenceTimer = this.ngZone.runOutsideAngular(() =>
+      setTimeout(() => {
+        if (this.tilt() === null) {
+          this.ngZone.run(() => this.silent.set(true));
+        }
+      }, SILENCE_MS),
+    );
   }
 }

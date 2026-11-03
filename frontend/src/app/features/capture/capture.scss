@@ -1,4 +1,5 @@
 :host {
+  --c-success: #16a34a;
   display: block;
 }
 
@@ -17,7 +18,10 @@
   position: relative;
   display: grid;
   place-items: center;
-  min-height: calc(100dvh - var(--topbar-h, 60px) - var(--nav-h) - var(--safe-bottom));
+  min-height: calc(
+    100dvh - var(--topbar-h, 60px) - env(safe-area-inset-top, 0px) - var(--nav-h, 64px) -
+      var(--safe-bottom, 0px) - var(--space-4, 20px)
+  );
   padding: var(--space-5);
   background: #090d16;
   color: #fff;
@@ -80,16 +84,22 @@
     transform: scale(1.05);
   }
 
-  &:active {
+  &:active:not(:disabled) {
     transform: scale(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: wait;
+    pointer-events: none;
   }
 }
 
 .idle-alert {
   position: absolute;
   top: var(--space-4);
-  left: var(--space-4);
-  right: var(--space-4);
+  left: calc(var(--space-4) + env(safe-area-inset-left, 0px));
+  right: calc(var(--space-4) + env(safe-area-inset-right, 0px));
   z-index: 3;
   max-width: 380px;
   margin: 0 auto;
@@ -106,7 +116,7 @@
 .idle-fallback {
   position: absolute;
   bottom: var(--space-5);
-  left: var(--space-5);
+  left: calc(var(--space-5) + env(safe-area-inset-left, 0px));
   z-index: 3;
   display: inline-flex;
   align-items: center;
@@ -118,6 +128,11 @@
   color: rgb(255 255 255 / 85%);
   font-size: 0.78rem;
   cursor: pointer;
+
+  &:focus-within {
+    outline: 2px solid var(--c-primary);
+    outline-offset: 2px;
+  }
 }
 
 .preview {
@@ -126,12 +141,15 @@
   border-radius: var(--radius-lg);
   aspect-ratio: 4 / 3;
   background: #0f172a;
+  view-transition-name: plate-hero;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     opacity: 0.85;
+    will-change: transform;
+    animation: preview-breathe 3s ease-in-out infinite alternate;
   }
 
   .scan {
@@ -142,7 +160,22 @@
     height: 3px;
     background: linear-gradient(90deg, transparent, var(--c-primary), transparent);
     box-shadow: 0 0 18px var(--c-primary);
-    animation: scan 2s ease-in-out infinite alternate;
+    animation: scan 2.2s ease-in-out infinite alternate;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 100%;
+      height: 56px;
+      background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--c-primary) 34%, transparent),
+        transparent
+      );
+      pointer-events: none;
+    }
   }
 }
 
@@ -152,6 +185,15 @@
   }
   to {
     top: calc(100% - 3px);
+  }
+}
+
+@keyframes preview-breathe {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.02);
   }
 }
 
@@ -195,7 +237,7 @@
 .close {
   position: absolute;
   top: calc(var(--space-4) + env(safe-area-inset-top, 0px));
-  left: var(--space-4);
+  left: calc(var(--space-4) + env(safe-area-inset-left, 0px));
   z-index: 4;
   display: grid;
   place-items: center;
@@ -217,7 +259,7 @@
   }
 }
 
-/* ---------- Guía Morfológica: 4 Cuartos de Círculo ---------- */
+/* ---------- Guía Morfológica: SVG con 4 Cuartos de Círculo ---------- */
 
 .frame {
   --up: 0px;
@@ -229,72 +271,73 @@
   inset: 0;
   z-index: 1;
   width: min(64vw, 240px);
-  aspect-ratio: 1;
+  height: min(64vw, 240px);
   margin: auto;
+  overflow: visible;
   pointer-events: none;
+  /* Halo oscuro de contraste para que los arcos blancos destaquen sobre platos o manteles blancos. */
+  filter: drop-shadow(0 1px 4px rgb(0 0 0 / 65%)) drop-shadow(0 0 1px rgb(0 0 0 / 85%));
+  transition: filter 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: frame-enter 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 
   .arc {
-    position: absolute;
-    width: 50%;
-    height: 50%;
-    border-color: rgb(255 255 255 / 72%);
-    border-style: solid;
-    border-width: 0;
-    will-change: transform, border-color;
+    fill: none;
+    stroke: rgb(255 255 255 / 88%);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    will-change: transform, stroke;
     transition:
-      transform 0.12s linear,
-      border-color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-      filter 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      transform 0.06s linear,
+      stroke 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 
+    /*
+     * Cada cuarto se desplaza en su eje principal y aporta un 45 % de apertura ortogonal
+     * para que al inclinar un único eje (p. ej. solo `--down`) los dos arcos de ese lado
+     * se separen entre sí abriendo el círculo exactamente por el borde bajo.
+     */
     &--tl {
-      top: 0;
-      left: 0;
-      border-top-width: 2.5px;
-      border-left-width: 2.5px;
-      border-top-left-radius: 100%;
-      transform: translate(calc(var(--left) * -1), calc(var(--up) * -1));
+      transform: translate(
+        calc((var(--left) + var(--up) * 0.45) * -1),
+        calc((var(--up) + var(--left) * 0.45) * -1)
+      );
     }
 
     &--tr {
-      top: 0;
-      right: 0;
-      border-top-width: 2.5px;
-      border-right-width: 2.5px;
-      border-top-right-radius: 100%;
-      transform: translate(var(--right), calc(var(--up) * -1));
+      transform: translate(
+        calc(var(--right) + var(--up) * 0.45),
+        calc((var(--up) + var(--right) * 0.45) * -1)
+      );
     }
 
     &--br {
-      bottom: 0;
-      right: 0;
-      border-bottom-width: 2.5px;
-      border-right-width: 2.5px;
-      border-bottom-right-radius: 100%;
-      transform: translate(var(--right), var(--down));
+      transform: translate(
+        calc(var(--right) + var(--down) * 0.45),
+        calc(var(--down) + var(--right) * 0.45)
+      );
     }
 
     &--bl {
-      bottom: 0;
-      left: 0;
-      border-bottom-width: 2.5px;
-      border-left-width: 2.5px;
-      border-bottom-left-radius: 100%;
-      transform: translate(calc(var(--left) * -1), var(--down));
+      transform: translate(
+        calc((var(--left) + var(--down) * 0.45) * -1),
+        calc(var(--down) + var(--left) * 0.45)
+      );
     }
   }
 
   &--ready {
+    filter: drop-shadow(0 0 10px rgb(22 163 74 / 55%)) drop-shadow(0 1px 3px rgb(0 0 0 / 65%));
+
     .arc {
-      border-color: var(--c-primary);
-      filter: drop-shadow(0 0 10px rgb(22 163 74 / 50%));
+      stroke: var(--c-success);
     }
   }
 }
 
-/* Grados e instrucción de la guía clásica: sin recuadro, sobre el obturador. */
+/* Grados e instrucción de la guía clásica: pastilla oscura translúcida sobre el obturador. */
 .shutter-readout {
   position: absolute;
-  bottom: calc(100% + 10px);
+  bottom: calc(100% + 12px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -303,9 +346,16 @@
   gap: 2px;
   width: max-content;
   max-width: 78vw;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  background: rgb(9 13 22 / 72%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 35%);
   text-align: center;
   color: #fff;
-  text-shadow: 0 1px 8px rgb(0 0 0 / 65%);
+  text-shadow: 0 1px 4px rgb(0 0 0 / 65%);
   pointer-events: none;
 
   strong {
@@ -317,27 +367,32 @@
   span {
     font-size: 0.78rem;
     line-height: 1.3;
-    color: rgb(255 255 255 / 82%);
+    color: rgb(255 255 255 / 88%);
+  }
+
+  &--ok {
+    border-color: rgb(22 163 74 / 40%);
   }
 
   &--ok strong,
   &--ok span {
-    color: var(--c-primary);
+    color: #4ade80;
   }
 }
 
 /* Aro abierto del inicio: los cuatro lados separados, como si faltara encuadrar. */
 .frame--open {
-  --up: 28px;
-  --down: 28px;
-  --left: 28px;
-  --right: 28px;
+  --up: 20px;
+  --down: 20px;
+  --left: 20px;
+  --right: 20px;
 }
 
 .countdown {
   position: absolute;
   inset: 0;
-  z-index: 2;  display: grid;
+  z-index: 2;
+  display: grid;
   place-items: center;
   background: rgb(15 23 42 / 42%);
   backdrop-filter: blur(8px);
@@ -376,9 +431,23 @@
   }
 }
 
+@keyframes frame-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Aviso superpuesto en la zona superior (bajo el botón `.close`) para no pisar `.shutter-readout`. */
 .notice {
   position: absolute;
-  inset: auto var(--space-4) calc(128px + var(--safe-bottom));
+  top: calc(var(--space-4) + 44px + var(--space-3) + env(safe-area-inset-top, 0px));
+  left: calc(var(--space-4) + env(safe-area-inset-left, 0px));
+  right: calc(var(--space-4) + env(safe-area-inset-right, 0px));
   z-index: 4;
   max-width: 360px;
   margin: 0 auto;
@@ -406,7 +475,8 @@
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  padding: var(--space-6) var(--space-5) calc(var(--space-5) + var(--safe-bottom));
+  padding: var(--space-6) calc(var(--space-5) + env(safe-area-inset-right, 0px))
+    calc(var(--space-5) + var(--safe-bottom)) calc(var(--space-5) + env(safe-area-inset-left, 0px));
   background: linear-gradient(
     to top,
     rgb(0 0 0 / 80%) 0%,
@@ -483,17 +553,17 @@
     box-shadow: 0 2px 10px rgb(0 0 0 / 25%);
     will-change: transform;
     transition:
-      transform 0.12s linear,
+      transform 0.06s linear,
       background 0.25s cubic-bezier(0.22, 1, 0.36, 1),
       box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   &--ready {
-    border-color: var(--c-primary);
+    border-color: var(--c-success);
     box-shadow: 0 0 0 4px rgb(22 163 74 / 28%);
 
     .shutter__bubble {
-      background: var(--c-primary);
+      background: var(--c-success);
       box-shadow: 0 0 16px rgb(22 163 74 / 55%);
     }
   }
@@ -545,9 +615,14 @@
     transform: scale(0.92);
   }
 
+  &:focus-within {
+    outline: 2px solid var(--c-primary);
+    outline-offset: 2px;
+  }
+
   &--idle {
     position: absolute;
-    right: var(--space-5);
+    right: calc(var(--space-5) + env(safe-area-inset-right, 0px));
     bottom: var(--space-5);
     z-index: 3;
   }
@@ -584,17 +659,34 @@
     border-radius: 50%;
     border: 2px solid var(--c-border);
     font-size: 0.8rem;
+    transition:
+      background 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease;
   }
 
   .done .dot {
     background: var(--c-primary);
     border-color: var(--c-primary);
     color: #fff;
+    animation: check-pop 0.42s var(--ease-spring-pop, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
   }
 
   .pct {
     margin-left: auto;
     font-variant-numeric: tabular-nums;
+  }
+}
+
+@keyframes check-pop {
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.16);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 

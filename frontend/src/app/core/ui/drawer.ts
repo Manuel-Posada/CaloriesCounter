@@ -1,8 +1,11 @@
-import { Component, ElementRef, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, effect, inject, signal, viewChild } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { I18nService } from '../i18n/i18n.service';
 import { Avatar } from './avatar';
+
+/** Duración de la animación de salida del menú lateral (sincronizada con `drawer.scss`). */
+const DRAWER_CLOSE_MS = 240;
 
 /**
  * Menú lateral de cuenta. Se abre desde el avatar de la barra inferior y sustituye al
@@ -13,11 +16,17 @@ import { Avatar } from './avatar';
   imports: [Avatar, RouterLink, RouterLinkActive],
   template: `
     @if (open()) {
-      <div class="scrim" [class.scrim--open]="open()" (click)="close()"></div>
+      <div
+        class="scrim"
+        [class.scrim--open]="open() && !isClosing()"
+        [class.scrim--closing]="isClosing()"
+        (click)="close()"
+      ></div>
 
       <aside
         class="drawer"
-        [class.drawer--open]="open()"
+        [class.drawer--open]="open() && !isClosing()"
+        [class.drawer--closing]="isClosing()"
         role="dialog"
         aria-modal="true"
         aria-labelledby="drawer-name"
@@ -66,22 +75,27 @@ import { Avatar } from './avatar';
   styleUrl: './drawer.scss',
   host: { '(document:keydown.escape)': 'close()' },
 })
-export class Drawer {
+export class Drawer implements OnDestroy {
   protected readonly auth = inject(AuthService);
   protected readonly i18n = inject(I18nService);
   protected readonly open = signal(false);
+  protected readonly isClosing = signal(false);
 
   private readonly closeBtn = viewChild<ElementRef<HTMLButtonElement>>('closeBtn');
+  private closeTimer?: ReturnType<typeof setTimeout>;
 
   constructor() {
-    // Bloquea el scroll del fondo mientras el menú está abierto.
+    // Bloquea el scroll y empuja el fondo en 3D mientras el menú está activo (y no cerrándose).
     effect((onCleanup) => {
-      document.body.classList.toggle('menu-open', this.open());
+      const active = this.open() && !this.isClosing();
+      document.body.classList.toggle('menu-open', active);
       onCleanup(() => document.body.classList.remove('menu-open'));
     });
   }
 
   openMenu(): void {
+    this.clearCloseTimer();
+    this.isClosing.set(false);
     this.open.set(true);
     // El perfil puede faltar tras un login lento o un fallo de red: se reintenta al abrir.
     this.auth.loadProfile();
@@ -89,11 +103,28 @@ export class Drawer {
   }
 
   close(): void {
-    this.open.set(false);
+    if (!this.open() || this.isClosing()) return;
+    this.isClosing.set(true);
+    this.closeTimer = setTimeout(() => {
+      this.closeTimer = undefined;
+      this.open.set(false);
+      this.isClosing.set(false);
+    }, DRAWER_CLOSE_MS);
+  }
+
+  ngOnDestroy(): void {
+    this.clearCloseTimer();
   }
 
   protected logout(): void {
     this.close();
     this.auth.logout();
+  }
+
+  private clearCloseTimer(): void {
+    if (this.closeTimer !== undefined) {
+      clearTimeout(this.closeTimer);
+      this.closeTimer = undefined;
+    }
   }
 }

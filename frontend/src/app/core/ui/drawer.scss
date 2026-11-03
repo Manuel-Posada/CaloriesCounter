@@ -9,7 +9,12 @@
   background: rgb(15 23 42 / 45%);
   opacity: 0;
   will-change: opacity;
-  animation: fade-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: fade-in 0.32s var(--ease-out-quart, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+
+  &--closing {
+    animation: fade-out 0.22s ease forwards;
+    pointer-events: none;
+  }
 }
 
 .drawer {
@@ -19,13 +24,21 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: calc(var(--space-5) + env(safe-area-inset-top, 0px)) var(--space-5) var(--space-5);
+  padding: calc(var(--space-5) + env(safe-area-inset-top, 0px))
+    calc(var(--space-5) + env(safe-area-inset-right, 0px))
+    calc(var(--space-5) + var(--safe-bottom, env(safe-area-inset-bottom, 0px)))
+    var(--space-5);
   background: var(--c-surface);
   box-shadow: -8px 0 48px rgb(15 23 42 / 22%);
   overflow-y: auto;
   transform: translateX(100%);
   will-change: transform;
-  animation: slide-in-right 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: slide-in-right 0.42s var(--ease-spring-sheet, cubic-bezier(0.22, 1, 0.36, 1)) forwards;
+
+  &--closing {
+    animation: slide-out-right 0.24s var(--ease-in-accelerate, cubic-bezier(0.32, 0, 0.67, 0)) forwards;
+    pointer-events: none;
+  }
 }
 
 .head {
@@ -171,11 +184,29 @@
   }
 }
 
+@keyframes slide-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }

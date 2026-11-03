@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, OnDestroy, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { readFocal35mm } from '../../core/exif.util';
@@ -31,8 +31,6 @@ const HOME_TITLE_KEYS: readonly MessageKey[] = [
 const COUNTDOWN_STEP_MS = 1000;
 /** Tiempo que hay que mantener el nivel antes de disparar solo (si el auto-disparo está activo). */
 const HOLD_MS = 500;
-/** Frecuencia con la que se evalúa la inclinación. */
-const WATCH_MS = 100;
 /** Tiempo que permanece visible un aviso superpuesto en cámara antes de ocultarse. */
 const NOTICE_TIMEOUT_MS = 3500;
 /** Tras este tiempo analizando se avisa de que el backend puede estar despertando. */
@@ -55,14 +53,14 @@ const ARC_FULL_DEG = 30;
         <div class="idle-stage">
           <h1 class="sr-only">{{ dynamicTitle() }}</h1>
 
-          <div class="frame frame--open" aria-hidden="true">
-            <span class="arc arc--tl"></span>
-            <span class="arc arc--tr"></span>
-            <span class="arc arc--br"></span>
-            <span class="arc arc--bl"></span>
-          </div>
+          <svg class="frame frame--open" viewBox="0 0 200 200" aria-hidden="true">
+            <path class="arc arc--tl" d="M 4 100 A 96 96 0 0 1 100 4" />
+            <path class="arc arc--tr" d="M 100 4 A 96 96 0 0 1 196 100" />
+            <path class="arc arc--br" d="M 196 100 A 96 96 0 0 1 100 196" />
+            <path class="arc arc--bl" d="M 100 196 A 96 96 0 0 1 4 100" />
+          </svg>
 
-          <button type="button" class="idle-trigger" (click)="openCamera()">
+          <button type="button" class="idle-trigger" [disabled]="isOpeningCamera()" (click)="openCamera()">
             <span class="idle-trigger__icon" aria-hidden="true">
               <svg
                 viewBox="0 0 24 24"
@@ -86,13 +84,27 @@ const ARC_FULL_DEG = 30;
 
           @if (cameraFailed()) {
             <label class="idle-fallback">
-              <input class="sr-only" type="file" accept="image/*" capture="environment" (change)="onFile($event)" />
+              <input
+                class="sr-only"
+                type="file"
+                accept="image/*"
+                capture="environment"
+                [disabled]="isOpeningCamera()"
+                (change)="onFile($event)"
+              />
               <span aria-hidden="true">📸</span> {{ i18n.t('capture.systemCamera') }}
             </label>
           }
 
-          <label class="gallery-btn gallery-btn--idle" [attr.aria-label]="i18n.t('capture.gallery')">
-            <input class="sr-only" type="file" accept="image/*" (change)="onFile($event)" />
+          <label class="gallery-btn gallery-btn--idle">
+            <input
+              class="sr-only"
+              type="file"
+              accept="image/*"
+              [disabled]="isOpeningCamera()"
+              [attr.aria-label]="i18n.t('capture.gallery')"
+              (change)="onFile($event)"
+            />
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -121,8 +133,9 @@ const ARC_FULL_DEG = 30;
             ✕
           </button>
 
-          <div
+          <svg
             class="frame"
+            viewBox="0 0 200 200"
             [class.frame--ready]="isLevel()"
             [style.--up]="gaps().up"
             [style.--down]="gaps().down"
@@ -130,11 +143,11 @@ const ARC_FULL_DEG = 30;
             [style.--right]="gaps().right"
             aria-hidden="true"
           >
-            <span class="arc arc--tl"></span>
-            <span class="arc arc--tr"></span>
-            <span class="arc arc--br"></span>
-            <span class="arc arc--bl"></span>
-          </div>
+            <path class="arc arc--tl" d="M 4 100 A 96 96 0 0 1 100 4" />
+            <path class="arc arc--tr" d="M 100 4 A 96 96 0 0 1 196 100" />
+            <path class="arc arc--br" d="M 196 100 A 96 96 0 0 1 100 196" />
+            <path class="arc arc--bl" d="M 100 196 A 96 96 0 0 1 4 100" />
+          </svg>
 
           @if (isCounting() && countdown() > 0) {
             <div class="countdown" aria-live="assertive">
@@ -160,6 +173,7 @@ const ARC_FULL_DEG = 30;
                 [class.shutter--ready]="canShoot()"
                 [class.shutter--counting]="isCounting()"
                 [disabled]="isCounting()"
+                [attr.aria-disabled]="!canShoot() ? 'true' : null"
                 [attr.aria-label]="canShoot() ? i18n.t('capture.shoot') : i18n.t('capture.shootDisabled')"
                 (click)="triggerCapture()"
               >
@@ -169,11 +183,9 @@ const ARC_FULL_DEG = 30;
                 <span class="shutter__bubble" [style.transform]="bubbleStyle()"></span>
               </button>
 
-              @if (prefs.bubbleLevel()) {
+              @if (prefs.bubbleLevel() && tilt.tilt() !== null) {
                 <div class="shutter-readout" [class.shutter-readout--ok]="isLevel()" aria-hidden="true">
-                  @if (tilt.tilt() !== null) {
-                    <strong>{{ levelDegrees() }}°</strong>
-                  }
+                  <strong>{{ levelDegrees() }}°</strong>
                   @if (levelHint(); as hint) {
                     <span>{{ i18n.t(hint) }}</span>
                   }
@@ -181,8 +193,14 @@ const ARC_FULL_DEG = 30;
               }
             </div>
 
-            <label class="gallery-btn" [attr.aria-label]="i18n.t('capture.gallery')">
-              <input class="sr-only" type="file" accept="image/*" (change)="onFile($event)" />
+            <label class="gallery-btn">
+              <input
+                class="sr-only"
+                type="file"
+                accept="image/*"
+                [attr.aria-label]="i18n.t('capture.gallery')"
+                (change)="onFile($event)"
+              />
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -255,12 +273,12 @@ export class Capture implements OnDestroy {
 
   private sub?: Subscription;
   private handedOver = false;
-  private stream?: MediaStream;
-  private watchTimer?: ReturnType<typeof setInterval>;
+  private destroyed = false;
+  private readonly stream = signal<MediaStream | undefined>(undefined);
+  private holdTimer?: ReturnType<typeof setTimeout>;
   private countdownTimer?: ReturnType<typeof setInterval>;
   private noticeTimeout?: ReturnType<typeof setTimeout>;
   private slowTimer?: ReturnType<typeof setTimeout>;
-  private stableSince = 0;
   private capturing = false;
   private audio?: AudioContext;
 
@@ -268,6 +286,7 @@ export class Capture implements OnDestroy {
   protected readonly dynamicTitle = computed(() => this.i18n.t(HOME_TITLE_KEYS[this.titleIndex]));
   protected readonly steps = STEPS;
   protected readonly mode = signal<Mode>('idle');
+  protected readonly isOpeningCamera = signal(false);
   protected readonly step = signal<Step>('presign');
   protected readonly progress = signal(0);
   protected readonly error = signal<MessageKey | null>(null);
@@ -287,15 +306,20 @@ export class Capture implements OnDestroy {
   /**
    * Separación de cada lado del aro (0..28 px) según el eje que esté desviado: el arco se
    * abre por el lado bajo, que es el que hay que levantar. `bubble` ya viene rotado con la
-   * pantalla, así que funciona igual en vertical y en horizontal.
+   * pantalla, y la rampa arranca en `levelEnter()` para evitar saltos bruscos al nivelar.
    */
   protected readonly gaps = computed(() => {
     const closed = { up: '0px', down: '0px', left: '0px', right: '0px' };
-    if (this.mode() !== 'camera' || this.isLevel()) return closed;
+    const tilt = this.tilt.tilt();
+    if (this.mode() !== 'camera' || this.isLevel() || tilt === null) return closed;
 
+    const enter = this.prefs.levelEnter();
+    const ramp = Math.min(1, Math.max(0, (tilt - enter) / (ARC_FULL_DEG - enter)));
     const { x, y } = this.tilt.bubble();
-    const open = (deg: number) =>
-      `${Math.round(ARC_SPREAD_PX * Math.min(1, Math.max(0, deg) / ARC_FULL_DEG))}px`;
+    const open = (deg: number) => {
+      const axisRatio = Math.min(1, Math.max(0, deg) / ARC_FULL_DEG);
+      return `${(ARC_SPREAD_PX * axisRatio * ramp).toFixed(1)}px`;
+    };
 
     // bubble.y < 0: el borde superior está alto (el bajo es el de abajo), y viceversa.
     return { up: open(y), down: open(-y), left: open(x), right: open(-x) };
@@ -320,75 +344,154 @@ export class Capture implements OnDestroy {
 
   protected readonly levelDegrees = computed(() => Math.round(this.tilt.tilt() ?? 0));
 
-  /** Instrucción de la guía clásica: se corrige primero el eje más desviado. */
+  /** Instrucción de la guía clásica en coordenadas de pantalla: se corrige primero el eje más desviado. */
   protected readonly levelHint = computed<MessageKey | null>(() => {
     if (this.tilt.tilt() === null) return null;
     if (this.isLevel()) return 'gauge.perfect';
-    const beta = this.tilt.beta() ?? 0;
-    const gamma = this.tilt.gamma() ?? 0;
-    if (Math.abs(beta) >= Math.abs(gamma)) {
-      return beta > 0 ? 'gauge.lowerBottom' : 'gauge.lowerTop';
+    const { x, y } = this.tilt.bubble();
+    if (Math.abs(y) >= Math.abs(x)) {
+      return y < 0 ? 'gauge.lowerBottom' : 'gauge.lowerTop';
     }
-    return gamma > 0 ? 'gauge.lowerRight' : 'gauge.lowerLeft';
+    return x < 0 ? 'gauge.lowerRight' : 'gauge.lowerLeft';
   });
 
   constructor() {
-    // El <video> sólo existe cuando `mode` pasa a 'camera': enganchamos el stream al aparecer.
+    // El <video> sólo existe cuando `mode` pasa a 'camera': enganchamos el stream reactivamente.
     effect(() => {
       const el = this.videoRef()?.nativeElement;
-      const stream = this.stream;
+      const stream = this.stream();
       if (!el || !stream) return;
       if (el.srcObject !== stream) el.srcObject = stream;
       void el.play().catch(() => this.failCamera('capture.cameraPreviewError'));
     });
+
+    // Bloquea el scroll y el rubber-banding (overscroll) del body en iOS Safari mientras la cámara está activa.
+    effect((onCleanup) => {
+      const active = this.mode() === 'camera';
+      document.body.classList.toggle('camera-open', active);
+      document.body.style.overflow = active ? 'hidden' : '';
+      document.body.style.overscrollBehavior = active ? 'none' : '';
+      onCleanup(() => {
+        document.body.classList.remove('camera-open');
+        document.body.style.overflow = '';
+        document.body.style.overscrollBehavior = '';
+      });
+    });
+
+    // Deriva reactivamente el estado de nivel con histéresis a partir de las señales de TiltService (sin setInterval).
+    effect(() => {
+      if (this.mode() !== 'camera') {
+        this.clearHoldTimer();
+        return;
+      }
+
+      const angle = this.tilt.tilt();
+      const enter = this.prefs.levelEnter();
+      const exit = this.prefs.levelExit();
+      const autoShoot = this.prefs.autoShoot();
+
+      const wasLevel = untracked(() => this.isLevel());
+      const isCounting = untracked(() => this.isCounting());
+
+      if (angle === null) {
+        this.clearHoldTimer();
+        if (wasLevel) this.isLevel.set(false);
+        if (isCounting) this.cancelCountdown(true);
+        return;
+      }
+
+      const level = angle <= (wasLevel ? exit : enter);
+      if (level !== wasLevel) {
+        this.isLevel.set(level);
+        if (level) {
+          this.chime(720);
+        }
+      }
+
+      if (!level) {
+        this.clearHoldTimer();
+        if (isCounting) {
+          // Si se mueve y supera la histéresis durante los 3 s, se aborta de inmediato.
+          this.cancelCountdown(true);
+        }
+        return;
+      }
+
+      // Disparo automático (opcional): nivelado y estable durante HOLD_MS.
+      if (autoShoot && !isCounting && !this.capturing) {
+        this.holdTimer ??= setTimeout(() => {
+          this.holdTimer = undefined;
+          this.startCountdown();
+        }, HOLD_MS);
+      } else if (!autoShoot) {
+        this.clearHoldTimer();
+      }
+    });
   }
 
   async openCamera(): Promise<void> {
+    if (this.isOpeningCamera() || this.mode() !== 'idle') return;
+
+    this.isOpeningCamera.set(true);
     this.error.set(null);
     this.cameraFailed.set(false);
 
+    // En iOS Safari el AudioContext debe crearse/reanudarse de forma síncrona en el click.
+    this.unlockAudio();
+
     if (!navigator.mediaDevices?.getUserMedia) {
+      this.isOpeningCamera.set(false);
       this.failCamera('capture.noCameraApi');
       return;
     }
 
-    // En iOS el permiso del sensor sólo se concede dentro del gesto del usuario, así que
-    // se pide antes de cualquier otra espera.
-    await this.tilt.enable();
-
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
+      // En iOS el permiso del sensor sólo se concede dentro del gesto del usuario.
+      await this.tilt.enable();
+      if (this.destroyed || this.mode() !== 'idle') {
+        this.tilt.disable();
+        return;
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
         audio: false,
       });
+
+      if (this.destroyed || this.mode() !== 'idle') {
+        stream.getTracks().forEach((track) => track.stop());
+        this.tilt.disable();
+        return;
+      }
+
+      this.stopStream();
+      this.stream.set(stream);
     } catch (err) {
-      this.failCamera(this.cameraMessage(err));
+      if (!this.destroyed && this.mode() === 'idle') {
+        this.failCamera(this.cameraMessage(err));
+      }
       return;
+    } finally {
+      this.isOpeningCamera.set(false);
     }
 
     this.isLevel.set(false);
     this.isCounting.set(false);
     this.countdown.set(0);
-    this.stableSince = 0;
+    this.clearHoldTimer();
     this.clearNotice();
     this.capturing = false;
     this.mode.set('camera');
-    this.watchTimer = setInterval(() => this.evaluateTilt(), WATCH_MS);
   }
 
-  closeCamera(): void {
+  closeCamera(resetMode = true): void {
     this.cancelCountdown();
     this.clearNotice();
-    if (this.watchTimer !== undefined) {
-      clearInterval(this.watchTimer);
-      this.watchTimer = undefined;
-    }
-    this.stream?.getTracks().forEach((track) => track.stop());
-    this.stream = undefined;
+    this.clearHoldTimer();
+    this.stopStream();
     this.tilt.disable();
     this.isLevel.set(false);
-    this.stableSince = 0;
-    if (this.mode() === 'camera') this.mode.set('idle');
+    if (resetMode && this.mode() === 'camera') this.mode.set('idle');
   }
 
   /**
@@ -432,12 +535,19 @@ export class Capture implements OnDestroy {
     }
     ctx.drawImage(video, 0, 0);
 
-    const shot = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+    // Pasamos a 'working' y liberamos la cámara antes de codificar el JPEG.
+    this.closeCamera(false);
+    this.step.set('presign');
+    this.progress.set(0);
+    this.mode.set('working');
 
-    this.closeCamera();
+    const shot = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.95));
     this.capturing = false;
 
+    if (this.destroyed || this.mode() !== 'working') return;
+
     if (!shot) {
+      this.mode.set('idle');
       this.error.set('capture.shotFailed');
       return;
     }
@@ -448,16 +558,18 @@ export class Capture implements OnDestroy {
     const input = ev.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = ''; // permite volver a elegir la misma foto
-    if (file) {
-      if (this.mode() === 'camera') this.closeCamera();
+    if (file && !this.isOpeningCamera()) {
+      if (this.mode() === 'camera') this.closeCamera(false);
       void this.analyze(file);
     }
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.sub?.unsubscribe();
+    this.sub = undefined;
     this.clearSlowHint();
-    this.closeCamera();
+    this.closeCamera(false);
     this.revokePreview();
     void this.audio?.close();
   }
@@ -475,49 +587,10 @@ export class Capture implements OnDestroy {
     this.slowServer.set(false);
   }
 
-  /**
-   * Vigila la inclinación con histéresis:
-   * - Entra en verde al alcanzar `levelEnter()` (8° por defecto).
-   * - Sale de verde si supera `levelExit()` (histéresis).
-   * - No dispara automáticamente; pero si hay una cuenta regresiva activa y se pierde el nivel,
-   *   cancela de inmediato el temporizador y notifica al usuario.
-   */
-  private evaluateTilt(): void {
-    if (this.mode() !== 'camera') return;
-
-    const angle = this.tilt.tilt();
-    if (angle === null) {
-      this.isLevel.set(false);
-      if (this.isCounting()) {
-        this.cancelCountdown(true);
-      }
-      return;
-    }
-
-    const level = angle <= (this.isLevel() ? this.prefs.levelExit() : this.prefs.levelEnter());
-    if (level && !this.isLevel()) {
-      this.chime(720);
-    }
-    if (!level) {
-      this.stableSince = 0;
-      if (this.isCounting()) {
-        // Si se mueve y supera la histéresis durante los 3 s, se aborta de inmediato.
-        this.cancelCountdown(true);
-      }
-    }
-    this.isLevel.set(level);
-
-    // Disparo automático (opcional): nivelado y estable durante HOLD_MS.
-    if (this.prefs.autoShoot() && level && !this.isCounting() && !this.capturing) {
-      if (this.stableSince === 0) this.stableSince = Date.now();
-      if (Date.now() - this.stableSince >= HOLD_MS) this.startCountdown();
-    }
-  }
-
   private startCountdown(): void {
     if (this.capturing || this.isCounting() || this.countdownTimer !== undefined) return;
 
-    this.stableSince = 0;
+    this.clearHoldTimer();
     this.isCounting.set(true);
     this.countdown.set(3);
     this.chime(880);
@@ -539,9 +612,9 @@ export class Capture implements OnDestroy {
       clearInterval(this.countdownTimer);
       this.countdownTimer = undefined;
     }
+    this.clearHoldTimer();
     this.isCounting.set(false);
     this.countdown.set(0);
-    this.stableSince = 0;
     this.capturing = false;
 
     if (interruptedByMotion) {
@@ -588,8 +661,35 @@ export class Capture implements OnDestroy {
     }
   }
 
+  private clearHoldTimer(): void {
+    if (this.holdTimer !== undefined) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = undefined;
+    }
+  }
+
+  private stopStream(): void {
+    const el = this.videoRef()?.nativeElement;
+    if (el) {
+      el.pause();
+      el.srcObject = null;
+      el.load();
+    }
+    this.stream()?.getTracks().forEach((track) => track.stop());
+    this.stream.set(undefined);
+  }
+
   private async analyze(source: Blob): Promise<void> {
+    this.sub?.unsubscribe();
+    this.sub = undefined;
+    this.clearSlowHint();
     this.error.set(null);
+    this.handedOver = false;
+    this.revokePreview();
+
+    this.step.set('presign');
+    this.progress.set(0);
+    this.mode.set('working');
 
     let blob: Blob;
     let focal35: number | null = null;
@@ -600,20 +700,21 @@ export class Capture implements OnDestroy {
         source instanceof File ? readFocal35mm(source) : Promise.resolve(null),
       ]);
     } catch {
-      this.error.set('capture.readError');
-      this.mode.set('idle');
+      if (!this.destroyed) {
+        this.error.set('capture.readError');
+        this.mode.set('idle');
+      }
       return;
     }
 
-    this.revokePreview();
+    if (this.destroyed || this.mode() !== 'working') return;
+
     this.previewUrl.set(URL.createObjectURL(blob));
-    this.step.set('presign');
-    this.progress.set(0);
-    this.mode.set('working');
     this.startSlowHint();
 
     this.sub = this.logs.analyze(blob, focal35).subscribe({
       next: (e) => {
+        if (this.destroyed) return;
         if (e.step === 'done') {
           this.clearSlowHint();
           this.store.set(e.result, this.previewUrl());
@@ -625,6 +726,7 @@ export class Capture implements OnDestroy {
         if (e.step === 'upload') this.progress.set(e.progress);
       },
       error: (err: HttpErrorResponse) => {
+        if (this.destroyed) return;
         this.clearSlowHint();
         this.mode.set('idle');
         this.error.set(this.messageFor(err));
@@ -667,16 +769,31 @@ export class Capture implements OnDestroy {
   }
 
   /**
+   * Inicializa y desbloquea el `AudioContext` de forma síncrona dentro del gesto del usuario
+   * para que iOS Safari permita reproducir los pitidos durante el nivelado y la cuenta atrás.
+   */
+  private unlockAudio(): void {
+    try {
+      const Ctx = window.AudioContext;
+      if (!Ctx) return;
+      this.audio ??= new Ctx();
+      if (this.audio.state === 'suspended') {
+        void this.audio.resume();
+      }
+    } catch {
+      // Sin soporte de Web Audio API.
+    }
+  }
+
+  /**
    * Pitido corto. Con el móvil plano el usuario no ve la pantalla, así que el sonido es
    * la única confirmación fiable (iOS no soporta navigator.vibrate).
    */
   private chime(frequency: number): void {
     try {
-      const Ctx = window.AudioContext;
-      if (!Ctx) return;
-      this.audio ??= new Ctx();
+      this.unlockAudio();
       const ctx = this.audio;
-      if (ctx.state === 'suspended') void ctx.resume();
+      if (!ctx) return;
 
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -686,6 +803,10 @@ export class Capture implements OnDestroy {
       gain.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
       osc.connect(gain).connect(ctx.destination);
+      osc.onended = () => {
+        osc.disconnect();
+        gain.disconnect();
+      };
       osc.start();
       osc.stop(ctx.currentTime + 0.2);
     } catch {
