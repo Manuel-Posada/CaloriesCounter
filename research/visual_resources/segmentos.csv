@@ -1,0 +1,4 @@
+﻿segmento,clase_detectada,nombre_detectado,confianza,volumen_cm3,densidad_g_cm3,peso_g,kcal,altura_media_cm,altura_max_cm,plano,area_frac,clase_corregida,densidad_corregida,peso_corregido_g,kcal_corregido,peso_real_g
+1,chicken,pollo,0.0398,97.87,1.055,103.25,189.99,4.0,5.42,ring,0.0265,plátano,0.793,77.61,69.07,34.0
+2,pork_n_s,cerdo,0.0541,234.67,0.812,190.55,573.55,1.85,3.45,ring,0.1283,cerdo,0.812,190.55,573.56,163.0
+3,caprese_salad_tomato_mozzarella,ensalada caprese con tomate y mozzarella,0.11,85.06,0.676,57.5,79.93,1.3,3.19,ring,0.0654,patata asada,1.06,90.16,83.85,105.0

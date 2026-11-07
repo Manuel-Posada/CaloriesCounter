@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CaloriesCounter · Recursos visuales del pipeline</title>
+<style>
+  :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --blue:#2563eb; --green:#16a34a; --amber:#d97706; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color:var(--ink); background:#f8fafc; }
+  header { max-width:1180px; margin:0 auto; padding:46px 24px 8px; }
+  h1 { font-size:2rem; margin:0 0 8px; letter-spacing:-0.02em; }
+  .sub { color:var(--muted); font-size:1.05rem; margin:0 0 18px; }
+  .pill { display:inline-block; padding:3px 10px; border-radius:999px; background:#e0f2fe; color:#0369a1; font-size:.8rem; font-weight:600; margin-right:6px; }
+  main { max-width:1180px; margin:0 auto; padding:16px 24px 56px; }
+  .grid { display:grid; grid-template-columns:1fr; gap:26px; }
+  @media (min-width:900px) { .grid { grid-template-columns:1fr 1fr; } .wide { grid-column:1 / -1; } }
+  .card { background:white; border:1px solid var(--line); border-radius:16px; padding:16px 16px 12px; box-shadow:0 8px 24px rgba(15,23,42,.05); }
+  .card h2 { font-size:1.05rem; margin:2px 0 6px; }
+  .card p { color:var(--muted); font-size:.9rem; margin:0 0 12px; line-height:1.45; }
+  .card img { width:100%; height:auto; border-radius:10px; border:1px solid var(--line); display:block; }
+  .step { display:flex; gap:10px; align-items:flex-start; margin:10px 0; }
+  .num { min-width:26px; height:26px; border-radius:50%; background:var(--blue); color:white; display:grid; place-items:center; font-weight:700; font-size:.8rem; }
+  code { background:#f1f5f9; padding:1px 5px; border-radius:5px; font-size:.85em; }
+  table { width:100%; border-collapse:collapse; font-size:.9rem; }
+  th, td { text-align:left; padding:9px 8px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .ok { color:var(--green); font-weight:700; }
+  .warn { color:var(--amber); font-weight:700; }
+  .note { background:#fff7ed; border:1px solid #fed7aa; border-radius:12px; padding:12px 14px; color:#7c2d12; font-size:.9rem; line-height:1.5; }
+  footer { max-width:1180px; margin:0 auto; padding:0 24px 40px; color:var(--muted); font-size:.85rem; }
+  footer code { font-size:.8rem; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <span class="pill">Opción B</span><span class="pill">Depth Anything V2</span><span class="pill">Mask2Former + Inception-V4</span>
+  </div>
+  <h1>De la foto al peso: mapa de profundidad y volumen</h1>
+  <p class="sub">Recursos generados con la foto real de prueba y el pipeline real de la app. Los pesos anotados en la foto son 34 g de plátano, 163 g de cerdo y 105 g de patata asada (302 g en total).</p>
+</header>
+
+<main>
+  <section class="card wide" style="margin-bottom:26px">
+    <h2>El pipeline en 7 pasos</h2>
+    <div class="step"><div class="num">1</div><div><b>Foto</b> — se corrige la orientación EXIF y se limita el lado mayor a 1024 px.</div></div>
+    <div class="step"><div class="num" style="background:#0891b2">2</div><div><b>Segmentación</b> — Mask2Former agnóstico propone las máscaras de cada alimento.</div></div>
+    <div class="step"><div class="num" style="background:#16a34a">3</div><div><b>Clasificación</b> — Inception-V4 etiqueta cada recorte con una de las 323 clases.</div></div>
+    <div class="step"><div class="num" style="background:#d97706">4</div><div><b>Profundidad</b> — Depth Anything V2 métrico devuelve <code>z(x, y)</code> en metros.</div></div>
+    <div class="step"><div class="num" style="background:#dc2626">5</div><div><b>Escala con el plato</b> — Hough detecta el plato de 26 cm y corrige la distancia: <code>z_real = k · z_modelo</code>.</div></div>
+    <div class="step"><div class="num" style="background:#7c3aed">6</div><div><b>Geometría 3D</b> — modelo pinhole + plano RANSAC → altura de cada píxel sobre la mesa.</div></div>
+    <div class="step"><div class="num" style="background:#0f766e">7</div><div><b>Volumen → peso</b> — <code>V = Σ h · A_px</code>, <code>peso = V · densidad</code>, kcal por 100 g.</div></div>
+  </section>
+
+  <div class="grid">
+    <section class="card wide">
+      <h2>1 · Flujo completo</h2>
+      <p>Infografía de los siete pasos, con la foto, las máscaras y el mapa de profundidad corregido.</p>
+      <img src="01_flujo_pipeline.png" alt="Flujo del pipeline">
+    </section>
+
+    <section class="card wide">
+      <h2>2 · Del mapa de profundidad al volumen</h2>
+      <p>La profundidad monocular estima ~1,58 m de mediana; el plato de 26 cm corrige la escala a ~0,30 m. Después, cada píxel se retroproyecta a 3D y se mide su altura sobre el plano de la mesa.</p>
+      <img src="02_mapa_profundidad.png" alt="Mapa de profundidad y altura sobre la mesa">
+    </section>
+
+    <section class="card">
+      <h2>3 · Superficie 3D de cada alimento</h2>
+      <p>Altura sobre la mesa (cm) y volumen aparente. El volumen solo cuenta lo visible desde la cámara.</p>
+      <img src="03_volumen_3d.png" alt="Superficies 3D y volúmenes">
+    </section>
+
+    <section class="card">
+      <h2>4 · Resultado sobre el plato</h2>
+      <p>Máscaras, clases detectadas, volumen, densidad, peso y calorías. La tarjeta resume el total.</p>
+      <img src="04_resultado_plato.png" alt="Resultado del pipeline sobre la foto">
+    </section>
+
+    <section class="card">
+      <h2>5 · Peso estimado frente al real</h2>
+      <p>La clase solo cambia la densidad; el volumen sale de la profundidad. El cerdo es el caso más cercano.</p>
+      <img src="05_pesos_vs_reales.png" alt="Pesos estimados frente a reales">
+    </section>
+
+    <section class="card">
+      <h2>6 · Cambiar la clase en la app</h2>
+      <p>Las máscaras y los volúmenes son los mismos; al corregir la clase cambia la densidad y, con ella, el peso.</p>
+      <img src="06_deteccion_vs_correccion.png" alt="Detección frente a corrección de clase">
+    </section>
+
+    <section class="card wide" style="margin-top:8px">
+      <span class="pill" style="background:#f3e8ff;color:#6b21a8">Mapeo nutricional</span>
+      <h2>Cómo se construyó la tabla de 323 clases</h2>
+      <p>El mapeo asigna a cada clase del dataset un alimento de <b>USDA FoodData Central</b>, sus nutrientes por 100 g y una <b>densidad</b> (g/cm³) para pasar de volumen a gramos. Se revisaron las 323 filas a mano y se validó la coherencia energética y una muestra de 20 clases. <a href="../README_mapeo%20nutricional.md">Detalle completo del mapeo</a>.</p>
+    </section>
+
+    <section class="card wide">
+      <h2>7 · Flujo del mapeo</h2>
+      <p>De las 323 clases originales a la tabla final: candidatos USDA, revisión manual, nutrientes, densidad, validación y CSV para la app.</p>
+      <img src="07_mapeo_flujo.png" alt="Flujo del mapeo nutricional">
+    </section>
+
+    <section class="card">
+      <h2>8 · Cobertura y calidad</h2>
+      <p>Match exacto 183, manual 73, close 41, receta 15, proxy 10 y composite 1. La densidad sale de USDA (203), tablas publicadas (60), cálculo geométrico (43), recetas (15) y referencias (2).</p>
+      <img src="08_mapeo_cobertura.png" alt="Cobertura y calidad del mapeo">
+    </section>
+
+    <section class="card">
+      <h2>9 · Tres ejemplos reales</h2>
+      <p>Plátano (medida USDA), cerdo (cálculo geométrico) y patata asada (tabla publicada). Abajo, el paso de volumen a gramos con los volúmenes medidos en la foto.</p>
+      <img src="09_mapeo_ejemplo.png" alt="Ejemplos del mapeo nutricional">
+    </section>
+
+    <section class="card wide">
+      <h2>Resultado numérico</h2>
+      <table>
+        <thead><tr><th>Segmento</th><th>Detectado</th><th class="num">Volumen</th><th class="num">Peso detectado</th><th>Corregido</th><th class="num">Peso corregido</th><th class="num">Peso real</th></tr></thead>
+        <tbody>
+          <tr><td>Izquierdo</td><td>pollo</td><td class="num">97,9 cm³</td><td class="num">103,2 g</td><td>plátano</td><td class="num">77,6 g</td><td class="num">34 g</td></tr>
+          <tr><td>Central</td><td>cerdo</td><td class="num">234,7 cm³</td><td class="num">190,6 g</td><td>cerdo</td><td class="num">190,6 g</td><td class="num">163 g</td></tr>
+          <tr><td>Inferior</td><td>ensalada caprese</td><td class="num">85,1 cm³</td><td class="num">57,5 g</td><td>patata asada</td><td class="num">90,2 g</td><td class="num">105 g</td></tr>
+          <tr><td><b>Total</b></td><td></td><td class="num"><b>417,6 cm³</b></td><td class="num"><b>351,3 g</b></td><td></td><td class="num ok"><b>358,4 g</b></td><td class="num"><b>302 g</b></td></tr>
+        </tbody>
+      </table>
+      <div class="note" style="margin-top:14px">
+        <b>Ojo:</b> esta foto es difícil. El pipeline confunde el plátano con pollo y la patata con ensalada caprese; la app permite corregir la clase sin repetir la medición. El cerdo queda en 190,6 g frente a 163 g reales (<span class="warn">+17 %</span>). El volumen del plátano está sobreestimado, probablemente porque la máscara incluye parte del brillo/borde del plato.
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Generado con <code>python presentación/tests/Recursos_visuales/generar_recursos.py</code> (inferencia + figuras) y <code>generar_mapeo.py</code> (mapeo nutricional). Los datos crudos están en <code>resultado_pipeline_B.json</code>, <code>segmentos.csv</code>, <code>datos_visuales.npz</code> y <code>ml/data/nutrition_wide_densidad.csv</code>.
+</footer>
+</body>
+</html>

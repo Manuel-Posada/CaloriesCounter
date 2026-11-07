@@ -1,0 +1,15 @@
+﻿slot,run,pesos_M,epocas,planeadas,DONE,cuadernillo,resultado,estado
+A1,A1_yolo26m,54.5,40.0,40,sí,A1_yolo26_agnostico_v2_m.ipynb,sí,completo con resultado
+A2,A2_yolo26n,6.6,40.0,40,sí,A2_yolo26n_agnostico_corregido.ipynb,sí,completo con resultado
+A4,A4_mask2former_swin_tiny,189.9,6.0,6,sí,A4_mask2former_agnostico_opt.ipynb,sí,completo con resultado
+A4,A4_mask2former_swin_tiny_pilot,189.9,1.0,6,sí,—,no,piloto
+B1,B1_yolo26m,166.0,39.0,40,no,B1_yolo26_clases_v4_final_m.ipynb,sí,incompleto
+B2,B2_yolo26n,6.9,40.0,40,sí,B2_yolo26n_clases_corregido.ipynb,sí,completo con resultado
+B4,B4_mask2former_swin_tiny,190.2,20.0,20,sí,B4_mask2former_clases_FIX.ipynb,sí,completo con resultado
+B4,B4_mask2former_swin_tiny_pilot,190.2,1.0,1,sí,—,no,piloto
+C1,C1_cnn_propia,45.9,40.0,40,sí,C1_cnn_propia_b_c.ipynb,sí,completo con resultado
+C2,C2_mobilenetv3_large_100,18.7,15.0,30,sí,C2_mobilenetv3_224.ipynb,sí,completo con resultado
+C2,C2_mobilenetv3_large_100_pilot,18.7,1.0,15,sí,—,no,piloto
+C2,C2_mobilenetv5_300m_pilot,,,15,no,—,no,sin pesos
+C3,C3_inception_v4,167.2,17.0,20,sí,C3_inception_v_unificado.ipynb,sí,completo con resultado
+C3,C3_inception_v4_pilot,167.2,1.0,20,sí,—,no,piloto

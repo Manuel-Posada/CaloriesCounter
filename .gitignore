@@ -29,3 +29,10 @@ media/
 Thumbs.db
 .idea/
 .vscode/
+
+# Artefactos de investigación generados localmente
+research/visual_resources/datos_visuales.npz
+research/**/runs/
+research/**/predicciones/
+research/**/predicciones_pilot/
+research/**/.ipynb_checkpoints/

@@ -1,0 +1,337 @@
+{
+  "pipeline": "B",
+  "imagen": {
+    "ancho": 1024,
+    "alto": 768
+  },
+  "alimentos": [
+    {
+      "idx": 294,
+      "nombre": "chicken",
+      "nombre_es": "pollo",
+      "confianza": 0.0398,
+      "volumen_cm3": 97.87,
+      "peso_g": 103.25,
+      "densidad_g_cm3": 1.055,
+      "densidad_asumida": false,
+      "poligono": [
+        [
+          0.3931,
+          0.6022
+        ],
+        [
+          0.3491,
+          0.5163
+        ],
+        [
+          0.3306,
+          0.5007
+        ],
+        [
+          0.313,
+          0.5007
+        ],
+        [
+          0.2534,
+          0.5189
+        ],
+        [
+          0.2329,
+          0.5397
+        ],
+        [
+          0.2222,
+          0.5736
+        ],
+        [
+          0.2144,
+          0.6348
+        ],
+        [
+          0.2222,
+          0.6556
+        ],
+        [
+          0.2427,
+          0.6738
+        ],
+        [
+          0.2847,
+          0.6921
+        ],
+        [
+          0.3198,
+          0.6921
+        ],
+        [
+          0.3647,
+          0.6738
+        ],
+        [
+          0.3853,
+          0.6478
+        ],
+        [
+          0.3931,
+          0.6243
+        ]
+      ],
+      "centroide": [
+        0.3024,
+        0.6007
+      ],
+      "nutricion": {
+        "calorias_kcal": 189.99,
+        "proteinas_g": 24.81,
+        "carbohidratos_g": 0.0,
+        "grasas_g": 9.28,
+        "por_100g": {
+          "calorias_kcal": 184.0,
+          "proteinas_g": 24.03,
+          "carbohidratos_g": 0.0,
+          "grasas_g": 8.99
+        }
+      },
+      "debug_volumen": {
+        "plano": "ring",
+        "escala": 0.188,
+        "escala_origen": "plate",
+        "area_frac": 0.0265,
+        "altura_media_cm": 4.0,
+        "altura_max_cm": 5.42,
+        "saturado_frac": 0.0
+      }
+    },
+    {
+      "idx": 316,
+      "nombre": "pork_n_s",
+      "nombre_es": "cerdo",
+      "confianza": 0.0541,
+      "volumen_cm3": 234.67,
+      "peso_g": 190.55,
+      "densidad_g_cm3": 0.812,
+      "densidad_asumida": false,
+      "poligono": [
+        [
+          0.313,
+          0.36
+        ],
+        [
+          0.3081,
+          0.4056
+        ],
+        [
+          0.3315,
+          0.502
+        ],
+        [
+          0.3911,
+          0.6009
+        ],
+        [
+          0.4507,
+          0.627
+        ],
+        [
+          0.4751,
+          0.6582
+        ],
+        [
+          0.5288,
+          0.6712
+        ],
+        [
+          0.6196,
+          0.6478
+        ],
+        [
+          0.6694,
+          0.6087
+        ],
+        [
+          0.6929,
+          0.5671
+        ],
+        [
+          0.6978,
+          0.4824
+        ],
+        [
+          0.6821,
+          0.4303
+        ],
+        [
+          0.5835,
+          0.2689
+        ],
+        [
+          0.5054,
+          0.1908
+        ],
+        [
+          0.4751,
+          0.1908
+        ],
+        [
+          0.4458,
+          0.2116
+        ],
+        [
+          0.3882,
+          0.2949
+        ],
+        [
+          0.3442,
+          0.321
+        ]
+      ],
+      "centroide": [
+        0.5061,
+        0.4465
+      ],
+      "nutricion": {
+        "calorias_kcal": 573.55,
+        "proteinas_g": 51.71,
+        "carbohidratos_g": 0.0,
+        "grasas_g": 40.76,
+        "por_100g": {
+          "calorias_kcal": 301.0,
+          "proteinas_g": 27.14,
+          "carbohidratos_g": 0.0,
+          "grasas_g": 21.39
+        }
+      },
+      "debug_volumen": {
+        "plano": "ring",
+        "escala": 0.188,
+        "escala_origen": "plate",
+        "area_frac": 0.1283,
+        "altura_media_cm": 1.85,
+        "altura_max_cm": 3.45,
+        "saturado_frac": 0.0
+      }
+    },
+    {
+      "idx": 174,
+      "nombre": "caprese_salad_tomato_mozzarella",
+      "nombre_es": "ensalada caprese con tomate y mozzarella",
+      "confianza": 0.11,
+      "volumen_cm3": 85.06,
+      "peso_g": 57.5,
+      "densidad_g_cm3": 0.676,
+      "densidad_asumida": false,
+      "poligono": [
+        [
+          0.3521,
+          0.7337
+        ],
+        [
+          0.3677,
+          0.7884
+        ],
+        [
+          0.4253,
+          0.8691
+        ],
+        [
+          0.4517,
+          0.8874
+        ],
+        [
+          0.4839,
+          0.89
+        ],
+        [
+          0.646,
+          0.8379
+        ],
+        [
+          0.729,
+          0.7676
+        ],
+        [
+          0.7476,
+          0.7311
+        ],
+        [
+          0.7495,
+          0.6908
+        ],
+        [
+          0.7104,
+          0.6647
+        ],
+        [
+          0.6411,
+          0.6647
+        ],
+        [
+          0.4927,
+          0.6934
+        ],
+        [
+          0.4097,
+          0.6595
+        ],
+        [
+          0.3677,
+          0.6829
+        ],
+        [
+          0.3521,
+          0.7116
+        ]
+      ],
+      "centroide": [
+        0.5409,
+        0.7627
+      ],
+      "nutricion": {
+        "calorias_kcal": 79.93,
+        "proteinas_g": 4.12,
+        "carbohidratos_g": 2.22,
+        "grasas_g": 6.27,
+        "por_100g": {
+          "calorias_kcal": 139.0,
+          "proteinas_g": 7.17,
+          "carbohidratos_g": 3.86,
+          "grasas_g": 10.9
+        }
+      },
+      "debug_volumen": {
+        "plano": "ring",
+        "escala": 0.188,
+        "escala_origen": "plate",
+        "area_frac": 0.0654,
+        "altura_media_cm": 1.3,
+        "altura_max_cm": 3.19,
+        "saturado_frac": 0.0
+      }
+    }
+  ],
+  "totales": {
+    "volumen_cm3": 417.6,
+    "peso_g": 351.3,
+    "calorias_kcal": 843.47,
+    "proteinas_g": 80.64,
+    "carbohidratos_g": 2.22,
+    "grasas_g": 56.31,
+    "clases_detectadas": [
+      294,
+      316,
+      174
+    ]
+  },
+  "escala": {
+    "origen": "plate",
+    "factor": 0.1881,
+    "plate_diameter_cm": 26.0
+  },
+  "angulo_camara_deg": 6.9,
+  "advertencias": [],
+  "tiempos_ms": {
+    "segmentacion": 0,
+    "profundidad": 2643,
+    "total": 4079
+  }
+}

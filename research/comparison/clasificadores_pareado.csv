@@ -1,0 +1,4 @@
+﻿A,B,dif_top1,lo,hi,veredicto
+C1_cnn_propia,C2_mobilenetv3_large_100,-0.07272977,-0.08437543045729398,-0.0620428690686822,B > A
+C1_cnn_propia,C3_inception_v4,-0.071634024,-0.08272839337587357,-0.059991780668497086,B > A
+C2_mobilenetv3_large_100,C3_inception_v4,0.0010957404,-0.009043281618505716,0.011782632838003335,sin diferencia clara
