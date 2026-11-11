@@ -77,13 +77,15 @@ def run_inference(
     pipeline: str = "B",
     fov_deg: float | None = None,
     f35_mm: float | None = None,
+    depth_model: str = "small",
 ) -> dict:
     """Envía la imagen al endpoint de Modal con el header X-Modal-Secret.
 
     `f35_mm` es la focal equivalente en 35 mm leída del EXIF en el navegador: la subida
     va recomprimida (sin EXIF), así que el pipeline no puede leerla por su cuenta.
+    `depth_model` selecciona la variante de Depth Anything V2 ("small" o "large").
     """
-    params = {"pipeline": pipeline}
+    params = {"pipeline": pipeline, "depth_model": depth_model}
     if fov_deg is not None:
         params["fov_deg"] = fov_deg
     if f35_mm is not None:

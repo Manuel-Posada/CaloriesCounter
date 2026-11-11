@@ -44,6 +44,7 @@ class FoodLogCreateSerializer(serializers.Serializer):
 
     id_imagen_r2 = serializers.CharField(max_length=512)
     pipeline = serializers.ChoiceField(choices=["A", "B"], default="B")
+    depth_model = serializers.ChoiceField(choices=["small", "large"], default="small")
     fov_deg = serializers.FloatField(required=False, min_value=10, max_value=170)
     # Focal equivalente en 35 mm del EXIF original (p. ej. 26 en la cámara principal de un móvil).
     f35_mm = serializers.FloatField(required=False, min_value=5, max_value=300)

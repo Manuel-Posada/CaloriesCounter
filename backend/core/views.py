@@ -136,7 +136,12 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
             image_bytes, content_type = services.download_image_from_r2(data["id_imagen_r2"])
             t1 = time.perf_counter()
             inference = services.run_inference(
-                image_bytes, content_type, data["pipeline"], data.get("fov_deg"), data.get("f35_mm")
+                image_bytes,
+                content_type,
+                data["pipeline"],
+                data.get("fov_deg"),
+                data.get("f35_mm"),
+                data.get("depth_model", "small"),
             )
             t2 = time.perf_counter()
         except services.ServiceError as exc:
