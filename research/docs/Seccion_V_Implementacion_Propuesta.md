@@ -692,7 +692,7 @@ La API filtra siempre por `usuario=request.user`; un usuario no puede leer ni mo
 
 La inferencia vive en Modal, en una GPU A10G. El servicio carga los modelos de segmentación, clasificación y profundidad, junto con la tabla nutricional, y expone un endpoint protegido por el secreto compartido `X-Modal-Secret`. El frontend no puede llamarlo directamente.
 
-El servicio recibe la imagen y los parámetros de cámara (`pipeline`, `fov_deg`, `f35_mm`) y devuelve el JSON con alimentos, volúmenes, pesos, calorías, macros, polígonos, centroides y advertencias. El timeout del backend es de 90 s. El primer análisis tras un periodo de inactividad puede tardar más por el *cold start*; después, la instancia se mantiene caliente durante unos minutos.
+El servicio recibe la imagen y los parámetros de inferencia (`pipeline`, `depth_model`, `fov_deg`, `f35_mm`) y devuelve el JSON con alimentos, volúmenes, pesos, calorías, macros, polígonos, centroides y advertencias. El timeout del backend es de 90 s. El primer análisis tras un periodo de inactividad puede tardar más por el *cold start*; después, la instancia se mantiene caliente durante unos minutos.
 
 #### G.5 Despliegue y operación
 
@@ -740,7 +740,7 @@ El despliegue se reparte así:
 - El historial no se usa para personalizar el consejo de Gemini; el consejo se refiere solo al plato actual.
 - Si Gemini falla, el análisis se guarda pero el consejo puede quedar vacío.
 - Las imágenes desaparecen a las 72 h; los análisis antiguos se pueden abrir, pero sin foto.
-- El pipeline B es el predeterminado; el selector A/B está pensado para administradores y solo afecta al dispositivo.
+- El pipeline B y Depth Anything V2 Small son los predeterminados; el menú de administración permite conmutar tanto el pipeline de percepción (A/B) como el predictor de profundidad (Small vs Large), guardando las opciones en el dispositivo para pruebas comparativas.
 
 #### G.8 Qué establece esta sección
 

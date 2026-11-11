@@ -164,11 +164,11 @@ python -m venv .venv
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install transformers timm pillow opencv-python-headless numpy pytest
 
-# Ejecutar sobre una imagen de prueba (usando Pipeline B: Mask2Former + Inception)
+# Ejecutar sobre una imagen de prueba (usando Pipeline B: Mask2Former + Inception y Depth Small predeterminado)
 python run_local.py samples/pizza.jpg --pipeline B
 
-# Evaluar variante Depth Anything V2 Large con calibración
-python run_local.py samples/pizza.jpg --pipeline B --depth-model depth-anything/Depth-Anything-V2-Metric-Indoor-Large-hf
+# Evaluar con variante Depth Anything V2 Large calibrada
+python run_local.py samples/pizza.jpg --pipeline B --depth-size large
 ```
 
 ### 2. Pruebas Unitarias de Geometría y Nutrición
