@@ -1,0 +1,6 @@
+dish_id,food_name,real_mass_g,dist_gt_cm,dist_small_raw_cm,mae_small_raw_cm,mae_small_calib_cm,dist_large_raw_cm,mae_large_raw_cm,mae_large_calib_cm,mass_small_calib_g,err_small_pct,mass_large_calib_g,err_large_pct
+dish_1556572657,Pollo a la plancha con arroz y ensalada,285.0,38.5,110.6,74.27,12.12,172.0,136.61,12.12,251.4,11.8,246.7,13.4
+dish_1556573450,Pasta a la boloñesa,340.0,39.0,112.3,75.58,12.57,173.0,137.3,12.57,363.9,7.0,342.2,0.6
+dish_1556574120,Plato de frutas variadas,195.0,38.0,115.5,79.62,13.67,174.9,139.93,13.67,225.8,15.8,200.6,2.9
+dish_1556575005,Carne de res con vegetales salteados,410.0,39.5,112.7,75.09,13.25,173.2,136.37,13.25,473.0,15.4,396.9,3.2
+dish_1556576210,Arroz con frijoles y aguacate,250.0,38.8,111.8,74.49,12.76,172.7,135.97,12.76,257.2,2.9,272.8,9.1

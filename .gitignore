@@ -7,11 +7,16 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
-# Pesos de los modelos: van al Volume de Modal, no a Git (159-181 MB cada uno)
+# Modelos y pesos locales (no subir a Git, van en Modal Volume o uso local)
 *.pt
 *.pth
 *.onnx
 *.safetensors
+/runs/
+
+# Documentos locales / paper (no versionar en git)
+/calorie counter paper.pdf
+*.pdf
 
 # Frontend
 node_modules/
@@ -31,6 +36,7 @@ Thumbs.db
 .vscode/
 
 # Artefactos de investigación generados localmente
+research/data/
 research/visual_resources/datos_visuales.npz
 research/**/runs/
 research/**/predicciones/

@@ -1,29 +1,184 @@
-# caloriescounter.app – Scaffolding
+# Calorie Counter: A Decoupled Modular Pipeline for Monocular 3D Food Portion Estimation and Grounded LLM Nutritional Guidance
 
-## Estructura
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Angular](https://img.shields.io/badge/Angular-20-DD0031?logo=angular&logoColor=white)](https://angular.dev/)
+[![Django](https://img.shields.io/badge/Django-6.1-092E20?logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Modal](https://img.shields.io/badge/Deployment-Modal_GPU_A10G-00FF66)](https://modal.com/)
+[![Gemini](https://img.shields.io/badge/LLM-Gemini_Flash_Lite-8E75B2?logo=google-gemini&logoColor=white)](https://ai.google.dev/)
+
+**Calorie Counter** es un sistema inteligente desacoplado para la estimación nutricional y volumétrica de alimentos en 3D a partir de una única fotografía tomada con un smartphone en entornos reales no controlados.
+
+El proyecto aborda las alucinaciones aritméticas de los modelos multimodales extremo a extremo (*end-to-end*) y las limitaciones de hardware de los sistemas RGB-D/LiDAR mediante un **pipeline desacoplado en cuatro etapas**:
+1. **Percepción visual (segmentación y clasificación por instancia).**
+2. **Profundidad monocular métrica y estimación volumétrica 3D.**
+3. **Mapeo gravimétrico y nutricional estandarizado (USDA FoodData Central).**
+4. **Razonamiento metabólico guiado por LLM (Google Gemini Flash Lite).**
+
+---
+
+## 🏗️ Arquitectura del Sistema
+
+```
+[ Fotografía de Smartphone ]
+             │
+             ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 1. PERCEPCIÓN VISUAL (Instancia primero)                               │
+│    • Pipeline B (Producción / Desacoplado):                            │
+│        Mask2Former Swin-Tiny (Agnóstico) ──> Recortes ──> Inception-V4 │
+│    • Pipeline A (Alternativa Ligera / Conjunto):                       │
+│        YOLO26-seg (Segmentación + Clasificación en una pasada)         │
+└────────────────────────────────────┬───────────────────────────────────┘
+                                     │ Máscaras 2D + Clases
+                                     ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 2. PROFUNDIDAD MÉTRICA Y VOLUMEN 3D                                    │
+│    • Profundidad métrica: Depth Anything V2 (Metric Indoor Small / L)  │
+│    • Calibración de escala: Detección de plato (Hough circular + f_px) │
+│    • Geometría 3D: Ajuste de plano de mesa con RANSAC                  │
+│    • Integración: Altura h sobre el plano x diferencial de área (cm³)  │
+└────────────────────────────────────┬───────────────────────────────────┘
+                                     │ Volumen aparente V (cm³)
+                                     ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 3. MAPEO GRAVIMÉTRICO Y NUTRICIONAL (Determinista)                     │
+│    • Densidad aparente ρ (g/cm³) calibrada para 323 clases             │
+│    • Masa calculada: m = V · ρ (gramos)                                │
+│    • Catálogo USDA FoodData Central (323 clases x 219 nutrientes)      │
+│    • Macros: kcal = (m / 100) · kcal_100g, proteínas, carbos, grasas   │
+└────────────────────────────────────┬───────────────────────────────────┘
+                                     │ JSON estructurado
+                                     ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 4. RAZONAMIENTO METABÓLICO (Google Gemini Flash Lite)                  │
+│    • Recepción exclusiva de datos agregados (sin recálculo numérico)   │
+│    • Consejo conciso (≤3 frases): impacto glucémico, saciedad y macros │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📊 Resultados Experimentales y Validación
+
+Evaluación exhaustiva sobre la taxonomía armonizada de **323 clases** de *Food Recognition 2022* (hold-out test set estratificado, $N = 7.301$ anotaciones):
+
+### Segmentación de Instancia (Test Set)
+
+| Modelo / Configuración | Modo de Evaluación | AP50 | AP (0.5:0.95) | AR100 | Parámetros | Latencia GPU |
+|---|---|:---:|:---:|:---:|:---:|:---:|
+| **A4 · Mask2Former Swin-T** (640px) | Agnóstico | **0.752** | **0.548** | **0.726** | 47.4 M | 111.3 ms |
+| **A1 · YOLO26m-seg** (640px) | Agnóstico | 0.682 | 0.475 | 0.551 | 26.9 M | 20.8 ms |
+| **A2 · YOLO26n-seg** (224px) | Agnóstico | 0.651 | 0.445 | 0.535 | 3.1 M | 16.0 ms |
+| **B4 · Mask2Former Swin-T** (224px) | 323 Clases (Agnóstico) | 0.352 (0.657) | 0.265 (0.454) | 0.605 (0.709) | 47.5 M | 74.2 ms |
+| **B1 · YOLO26m-seg** (640px) | 323 Clases (Agnóstico) | 0.325 (0.670) | 0.232 (0.433) | 0.326 (0.567) | 27.5 M | 19.9 ms |
+| **B2 · YOLO26n-seg** (224px) | 323 Clases (Agnóstico) | 0.207 (0.601) | 0.148 (0.387) | 0.236 (0.553) | 3.3 M | 15.8 ms |
+
+### Clasificadores de Recortes (Ground-Truth Crops, $N = 7.301$)
+
+| Modelo | Top-1 Accuracy (95% CI) | Top-5 Accuracy | Macro-F1 | Parámetros | Latencia por recorte |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **C2 · MobileNetV3-Large** | **0.579** (0.567 – 0.590) | **0.840** | 0.423 | **4.62 M** | **10.7 ms** |
+| **C3 · Inception-V4** | 0.578 (0.566 – 0.590) | 0.835 | **0.427** | 41.64 M | 30.6 ms |
+| **C1 · Custom CNN Baseline** | 0.506 (0.493 – 0.517) | 0.776 | 0.308 | 11.44 M | 6.9 ms |
+
+### Validación Volumétrica y Gravimétrica en Escena Real
+
+Evaluado sobre un plato real de tres ingredientes no homogéneos pesados en báscula digital ($302.0\text{ g}$ totales):
+
+| Alimento | Volumen Aparente | Densidad $\rho$ | Peso Estimado | Peso Real (Báscula) | Error Gravimétrico |
+|---|:---:|:---:|:---:|:---:|:---:|
+| Plátano (*Banana*) | $97.9\text{ cm}^3$ | $0.793\text{ g/cm}^3$ | $77.6\text{ g}$ | $34.0\text{ g}$ | Sobreestimado (derrame en borde) |
+| Cerdo a la plancha (*Pork*) | $234.7\text{ cm}^3$ | $0.812\text{ g/cm}^3$ | $190.6\text{ g}$ | $163.0\text{ g}$ | **+17.0%** |
+| Patata cocida (*Baked Potato*) | $85.1\text{ cm}^3$ | $1.060\text{ g/cm}^3$ | $90.2\text{ g}$ | $105.0\text{ g}$ | **-14.1%** |
+| **Total Plato** | **$417.6\text{ cm}^3$** | — | **$358.4\text{ g}$** | **$302.0\text{ g}$** | **+18.7%** |
+
+---
+
+## 📁 Estructura del Repositorio
 
 ```
 CaloriesCounter/
-├── backend/                  # Django + DRF
-│   ├── config/               # settings.py, urls.py, wsgi/asgi (startproject)
-│   ├── apps/                 # apps de dominio (vacío por ahora)
-│   ├── manage.py
-│   ├── requirements.txt
-│   └── .env.example
-├── frontend/                 # Angular
-│   └── src/
-│       ├── app/
-│       │   ├── core/         # servicios singleton, interceptores
-│       │   ├── shared/       # módulo compartido
-│       │   └── features/     # módulos por funcionalidad (lazy)
-│       └── environments/     # environment.ts / environment.prod.ts
-├── .gitignore
-└── README.md
+├── backend/                  # API REST en Django 6.1 (Orquestación, R2, Auth, Gemini)
+│   ├── config/               # Configuración central (settings, urls, wsgi)
+│   ├── core/                 # Aplicación de dominio (modelos, serializers, vistas, nutrition)
+│   │   ├── data/             # nutrition_catalog.csv (catálogo de consulta rápida para backend)
+│   │   └── services.py       # Integración con Google Gemini Flash Lite
+│   └── requirements.txt      # Dependencias del backend
+│
+├── frontend/                 # Aplicación Web Progresiva en Angular 20
+│   ├── src/app/
+│   │   ├── core/             # Servicios de sesión, giroscopio (TiltService), API
+│   │   └── features/         # Vistas: captura con nivel cenital, resultado con SVG, historial
+│   └── package.json          # Dependencias de frontend
+│
+├── ml/                       # Módulos de inferencia y despliegue del pipeline
+│   ├── pipeline/             # Módulos modulares desacoplados:
+│   │   ├── segmentation.py   # Inferencia con YOLO26-seg o Mask2Former
+│   │   ├── classification.py # Clasificación de recortes con Inception-V4 / MobileNet
+│   │   ├── depth.py          # Depth Anything V2 (Small y Large métricos)
+│   │   ├── plate.py          # Detección de plato por Hough circular y escala
+│   │   ├── volume.py         # Ajuste RANSAC de mesa e integración volumétrica en cm³
+│   │   └── nutrition.py      # Conversión determinista a gramos, calorías y macros
+│   ├── data/                 # nutrition_wide_densidad.csv y food_names_es.csv
+│   ├── run_local.py          # Script CLI para ejecutar el pipeline 100% en local
+│   ├── modal_app.py          # Definición del contenedor serverless GPU en Modal
+│   └── tests/test_core.py    # Pruebas unitarias de volumen, geometría y nutrición
+│
+├── research/                 # Investigación experimental y cuadernillos de entrenamiento
+│   ├── notebooks/            # Cuadernillos reproducibles (00 a 99)
+│   │   ├── 00_datos_food_recognition_v4_sam2.ipynb
+│   │   ├── A1..A4 (Segmentadores agnósticos YOLO / Mask2Former)
+│   │   ├── B1..B4 (Segmentadores multiclase)
+│   │   ├── C1..C3 (Clasificadores de recortes CNN, MobileNetV3, Inception-V4)
+│   │   ├── D1_calibracion_profundidad_volumen_nutrition5k.ipynb (Profundidad y Nutrition5k)
+│   │   └── 99_comparacion_resultados.ipynb (Comparación global de métricas)
+│   ├── nutrition_mapping/    # Construcción y auditoría de la tabla nutricional USDA
+│   └── visual_resources/    # Scripts generadores de figuras y visualizaciones 3D
+│
+├── docs/                     # Auditorías técnicas, motion plans e investigación
+│   ├── audit_report.md       # Auditoría exhaustiva de ciclo de vida, DOM y giroscopio
+│   └── motion_plan.md        # Especificación de animaciones morfológicas
+│
+├── .gitignore                # Reglas estrictas de exclusión (pesos, temporales, runs)
+└── ROADMAP.md                # Registro de hitos completados y trabajo futuro
 ```
 
-## 1. Backend (Django 6.1 + PostgreSQL + DRF)
+> [!NOTE]
+> **Gestión de pesos y privacidad:** Los archivos de pesos (`*.pt`, `*.pth`) y las carpetas de ejecuciones locales (`/runs/`) están excluidos de Git mediante `.gitignore` para no sobrecargar el repositorio ni violar políticas de tamaño. En producción, los pesos se alojan en un *Modal Volume* privado (`caloriescounter-models`).
 
-Requiere Python ≥ 3.12 y PostgreSQL en ejecución.
+---
+
+## 🚀 Ejecución y Pruebas en Local
+
+### 1. Inferencia Local del Pipeline de Machine Learning
+
+Puedes probar el pipeline completo localmente (en CPU o GPU CUDA) sin depender de la nube de Modal:
+
+```powershell
+cd ml
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# Instalar PyTorch y dependencias
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install transformers timm pillow opencv-python-headless numpy pytest
+
+# Ejecutar sobre una imagen de prueba (usando Pipeline B: Mask2Former + Inception)
+python run_local.py samples/pizza.jpg --pipeline B
+
+# Evaluar variante Depth Anything V2 Large con calibración
+python run_local.py samples/pizza.jpg --pipeline B --depth-model depth-anything/Depth-Anything-V2-Metric-Indoor-Large-hf
+```
+
+### 2. Pruebas Unitarias de Geometría y Nutrición
+
+```powershell
+cd ml
+pytest tests/test_core.py -v
+```
+
+### 3. Ejecutar el Backend (Django)
 
 ```powershell
 cd backend
@@ -31,410 +186,37 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
-# Crea el proyecto en el directorio actual (genera manage.py y config/)
-django-admin startproject config .
-mkdir apps
-Copy-Item .env.example .env      # y edita los valores
-
-# Base de datos
-psql -U postgres -c "CREATE DATABASE caloriescounter;"
-```
-
-### Cambios en `config/settings.py`
-
-```python
-from pathlib import Path
-from decouple import config, Csv
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-SECRET_KEY = config("DJANGO_SECRET_KEY")
-DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
-ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS", default="localhost", cast=Csv())
-
-INSTALLED_APPS = [
-    # ... apps por defecto de Django ...
-    "corsheaders",
-    "rest_framework",
-]
-
-MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",   # antes de CommonMiddleware
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    # ... resto por defecto ...
-]
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("POSTGRES_DB", default="caloriescounter"),
-        "USER": config("POSTGRES_USER", default="postgres"),
-        "PASSWORD": config("POSTGRES_PASSWORD", default=""),
-        "HOST": config("POSTGRES_HOST", default="localhost"),
-        "PORT": config("POSTGRES_PORT", default="5432"),
-    }
-}
-
-REST_FRAMEWORK = {
-    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],  # endurecer luego
-}
-
-# CORS (desarrollo)
-CORS_ALLOWED_ORIGINS = config(
-    "CORS_ALLOWED_ORIGINS",
-    default="http://localhost:4200,http://127.0.0.1:4200",
-    cast=Csv(),
-)
-CORS_ALLOW_CREDENTIALS = True
-CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
-```
-
-```powershell
+# Configurar variables de entorno (.env)
 python manage.py migrate
-python manage.py runserver   # http://localhost:8000
+python manage.py runserver
 ```
 
-## 2. Frontend (Angular modular)
-
-Requiere Node LTS. `--no-standalone` genera un proyecto basado en NgModules.
+### 4. Ejecutar el Frontend (Angular)
 
 ```powershell
-cd frontend/..   # raíz del repo
-npm install -g @angular/cli
-ng new frontend --no-standalone --routing --style=scss --skip-git
 cd frontend
-ng generate module core
-ng generate module shared
-ng generate module features --routing
-ng generate environments      # crea src/environments/ (ya incluido en este repo)
-ng serve                      # http://localhost:4200
+npm install
+npm start
 ```
 
-> Si `ng new` pregunta por el directorio existente, ejecútalo tras mover/borrar `frontend/src/environments` y vuelve a copiarlo, o usa `ng generate environments` después.
+La aplicación web estará disponible en `http://localhost:4200` con captura interactiva, retícula de nivelación cenital y visualización de macros.
 
-Los archivos `environment.ts` (apunta a `http://localhost:8000/api`) y `environment.prod.ts` ya están creados. Si `ng generate environments` los regenera, conserva `apiUrl`.
+---
 
-### Modo guiado cenital
+## 🌐 Despliegue en la Nube
 
-La pantalla de captura abre la cámara dentro de la página (`getUserMedia`) y usa `DeviceOrientationEvent`
-para medir la inclinación del móvil: el aro y el disparador se ponen verdes cuando la cámara está
-perpendicular a la mesa (≤ 8°, con histéresis hasta 12°) y, si se mantiene, dispara solo con cuenta atrás.
-Es lo que garantiza que el cálculo de volumen reciba una foto cenital. Si no hay sensor (escritorio) o
-no se concede el permiso, cae a la guía estática y a la cámara del sistema.
+El stack productivo opera de manera desacoplada y sin costes fijos de computación en reposo:
+* **Frontend:** Desplegado en **Vercel** (Edge CDN).
+* **API de Orquestación:** Desplegado en **Render** (Django REST + Python 3.12).
+* **Base de Datos & Almacenamiento:** **Neon PostgreSQL** (almacenamiento de logs y usuarios con retención de 30 días) y **Cloudflare R2** (fotos de platos con presigned URLs y ciclo de vida de 72 h).
+* **Inferencia GPU:** Contenedor serverless en **Modal** con GPU NVIDIA A10G (auto-escalado a cero tras 5 minutos de inactividad).
+* **Capa de Razonamiento:** **Google Gemini Flash Lite** vía API de Google Generative AI con tiempos de respuesta `< 2 s`.
 
-El aro está partido en cuatro arcos y **cada lado se abre por el lado bajo**, que es el que hay que
-levantar: los arcos de arriba/abajo siguen el eje de inclinación y los de izquierda/derecha el de
-balanceo (usando `bubble`, que ya viene rotado con la pantalla). Así se ve de un vistazo qué eje
-corregir.
+---
 
-El propio **obturador es el nivel**: su burbuja se desplaza hacia el lado alto y crece al centrarse
-(de 0,7× a 1,2×), así que no hace falta mirar a otro sitio. La guía clásica es opcional en
-**Configuración → Cámara → Guía de nivel clásica** y añade la cruz y los grados dentro del botón
-(«23°», «Levanta el borde inferior»), sin recuadro ni fondo.
+## 📖 Referencias y Dataset
 
-Al abrir la cámara se entra en **pantalla completa y se bloquea la orientación en vertical**
-(`requestFullscreen` + `screen.orientation.lock`), para que la interfaz no gire mientras se sujeta el
-móvil de lado; los iconos se contrarrotan solo si la página no ha girado. Chrome Android lo soporta;
-iOS Safari no ofrece ninguna de las dos APIs, así que allí la página sigue girando (limitación de la
-plataforma web).
-
-### Aviso de foto no cenital
-
-La guía solo actúa en la captura en vivo; las fotos de la galería pueden venir torcidas. Para ese caso
-el pipeline mide la inclinación *a posteriori*: el plano de apoyo que ajusta `volume.py` (RANSAC sobre el
-anillo alrededor de la comida) es la mesa, así que el ángulo entre su normal y el eje óptico da
-`angulo_camara_deg`. Solo se reporta cuando el plano viene del anillo; si la salvaguarda lo sustituye,
-el campo vale `null` en vez de un `0°` falso.
-
-A partir de 15° (`TILT_WARN_DEG` en el pipeline, `TILT_WARN_DEG` en `core/tilt.service.ts`) el resultado
-muestra una tarjeta ámbar avisando de que el volumen puede estar sobreestimado. No se bloquea la subida:
-la inferencia ya está pagada.
-
-### Resultado: zonas segmentadas y detalle nutricional
-
-El pipeline devuelve, por cada alimento, el contorno de su máscara (`poligono`, ≤ 40 puntos normalizados
-a 0..1) y su `centroide`. El resultado los pinta sobre la foto con un `<svg>` superpuesto y una etiqueta
-por zona con el número, el nombre y las kcal. El `<figure>` toma la proporción real de la imagen al
-cargarla, así que el contorno coincide exactamente aunque la foto no sea 4:3.
-
-Las etiquetas que caen demasiado juntas se separan en vertical y se unen a su centro con una línea
-discontinua. Para leerlas sin solapar nada, el `viewBox` va de 0 a 1 y los trazos usan
-`vector-effect: non-scaling-stroke` para no deformarse con la escala.
-
-Debajo, la lista de alimentos abre una hoja (`<dialog>`) con dos bloques: **en tu porción** (gramos,
-kcal y macros calculados) y **por 100 g** (los valores del CSV tal cual, `nutricion.por_100g`). Ahí
-también se ve el volumen, la densidad —avisando si se asumió 1 g/cm³— y la confianza del clasificador.
-
-Los contornos se guardan en `FoodLog.contornos` (`JSONField`) para pintarlos en la miniatura del
-historial. Solo tienen sentido mientras exista la foto, así que `cleanup_r2_images` los vacía al
-borrar la imagen de R2.
-
-### Metadatos de la foto (EXIF)
-
-La subida se recomprime en el navegador (canvas → JPEG ≤ 1280 px), lo que **borra el EXIF**. Como la
-focal es lo que más afecta al volumen, la captura lee `FocalLengthIn35mmFilm` del fichero original
-(`core/exif.util.ts`, con `exifr`) antes de comprimir y lo manda como `f35_mm` en el `POST`.
-
-Prioridad del pipeline para la focal (`resolve_focal_px`): `fov_deg` explícito > `f35_mm` > 65°.
-
-### Escala: el plato como referencia
-
-El modelo de profundidad (Depth Anything V2 métrico) **no es fiable en primeros planos**: una foto de
-plato tomada a 30 cm la sitúa a 1,5 m. Como el volumen va con la distancia al cubo, el error se
-multiplica (~130×) y 300 g de comida salían como 57 litros / 120 000 kcal.
-
-El plato es el único objeto de tamaño conocido de la escena, así que `pipeline/plate.py` detecta su
-borde (Hough + validación: el círculo tiene que ser grande y contener toda la comida) y recalcula la
-distancia real con geometría pinhole:
-
-```
-z_cm = f_px · PLATE_DIAMETER_CM / diámetro_plato_px
-```
-
-Ese factor corrige toda la profundidad antes de medir. Diámetro asumido: **26 cm**
-(`PLATE_DIAMETER_CM`). Validación con una foto de pesos conocidos (34 g plátano + 163 g cerdo +
-105 g papa):
-
-| | Antes | Con el plato | Real |
-|---|---|---|---|
-| Peso total | 45 kg | 305 g | 302 g |
-| Volumen | 57 L | 390 cm³ | ~0,3 L |
-
-Si no se detecta el plato se aplica una distancia de foto de plato (35 cm) cuando el modelo dice que
-la mesa está a más de 80 cm, y el resultado se marca como **«Cantidades orientativas»** en la
-pantalla de resultados: sin referencia, el volumen sigue siendo poco fiable.
-
-### Sesión e inactividad
-
-- **Cierre por inactividad**: a los 30 min sin actividad (`IdleService`) se cierra la sesión; un
-  minuto antes aparece un aviso con «Seguir conectado», que reinicia la cuenta. Cuentan como
-  actividad puntero, teclado, rueda, scroll, toque y volver a la pestaña.
-- **Por qué no basta el JWT**: el refresh dura 14 días, así que un móvil olvidado seguiría con
-  sesión abierta.
-- **Reentrada rápida**: los tokens viven en `localStorage` y al arrancar se renueva el access si ya
-  caducó (`ensureFreshToken`, leyendo el `exp` del propio JWT), antes de que falle la primera
-  petición.
-- **Un fallo de red ya no saca la sesión**: solo un `401/403` del endpoint de refresh la cierra
-  (motivo «Tu sesión caducó»). Un corte de red se propaga y se reintenta en la siguiente petición.
-- **El perfil no se queda en «Mi cuenta»**: se guarda una copia en `localStorage` (`cc.profile`)
-  para pintar nombre y avatar al instante, y `GET /me/` se pide igualmente al servidor. Si falla,
-  se reintenta (2 veces rápido + hasta 3 cada 15 s) y al volver a la pestaña o recuperar la red.
-- **Auto-acceso de Google** (`auto_select`) en la pantalla de login: tras una caducidad por tiempo
-  se entra sin tocar nada; tras un cierre manual o por inactividad **no**, para que el cierre siga
-  significando algo.
-- Si el script de Google no carga, el login ofrece «Reintentar» en lugar de quedarse en blanco.
-
-### Correcciones del usuario
-
-El detalle por alimento se guarda en `FoodLog.items` (JSON) y los totales del registro son siempre
-su suma, así que ninguna edición escribe números a mano:
-
-- `PATCH /api/food-logs/<id>/` con `{"items": [{"index": 0, "idx": 205}]}` cambia el alimento (el
-  peso sale del volumen medido × la densidad nueva) y `{"index": 0, "peso_g": 163}` fija los gramos
-  (y ajusta el volumen).
-- `{"plate_diameter_cm": 30}` reescala el análisis entero: el volumen va con el diámetro al cubo, así
-  que un plato de 30 cm en vez de 26 multiplica por 1,54 **sin reprocesar la foto**. Los elementos
-  con gramos puestos a mano no se tocan.
-- `GET /api/foods/?q=` busca en las 323 clases (sin tildes y con sinónimos: `papa` → `patata`).
-- Cada corrección **regenera el consejo** de Gemini con el plato actualizado (si Gemini falla se
-  conserva el anterior y la edición no se pierde). El consejo usa el nombre de pila del usuario
-  **aproximadamente 1 de cada 3 veces** (`services.pick_name`), para que no suene repetitivo.
-
-El catálogo vive en `backend/core/data/nutrition_catalog.csv`, generado desde el CSV del pipeline
-con las columnas que hacen falta para recalcular (kcal y macros por 100 g + densidad). Se regenera
-con:
-
-```powershell
-python ml/scripts/build_nutrition_catalog.py
-```
-
-### Confianza y topes de cordura
-
-`core/confidence.py` calcula un nivel (**alta / media / baja**) y sus motivos a partir de la escala
-(plato, supuesta o sin referencia), la inclinación de la cámara, la confianza del clasificador
-—solo de los alimentos que el usuario no ha corregido—, las densidades asumidas y los volúmenes
-recortados. Se recalcula en cada corrección: si el usuario arregla los nombres dudosos, la
-confianza sube.
-
-En la pantalla aparece como chip con sus motivos, y cada alimento que el clasificador dudó lleva un
-**«?»** para invitar a revisarlo.
-
-El pipeline recorta a lo físicamente posible antes de devolver nada: **altura media > 6 cm** en un
-alimento o **más de 2 kg** en total (valores de `config.py`) se escalan y se avisa con
-`volume_clamped`. Es una red de seguridad, no una corrección: la foto sigue siendo mala, pero la
-app no devuelve kilos de comida.
-
-### Historial y detalle nutricional
-Cada tarjeta del historial enlaza a `/result/:id`, que carga el análisis guardado con
-`GET /api/food-logs/<id>/` (incluye los alimentos y su tabla). Los análisis antiguos, guardados antes
-de existir `items`, se abren igual pero sin detalle editable ni tabla por alimento.
-
-El resultado es una **galería horizontal** con `scroll-snap`: al abrir un análisis desde el historial
-se puede deslizar al anterior o al siguiente sin volver atrás; la URL se actualiza con
-`replaceState`, las miniaturas y el contador superior siguen al plato activo y los detalles se
-precargan en segundo plano. La hoja de detalle y el menú lateral se cierran deslizando (hacia abajo
-y hacia la derecha respectivamente).
-
-La lista del historial y la galería comparten caché y paginación: al acercarse al final del carrusel
-se pide la siguiente página sola, y el panel visible siempre dispara la carga de su detalle (si falla,
-muestra «Reintentar» en lugar de quedarse vacío).
-
-Cada análisis se puede **borrar** desde su panel (confirmación en dos pasos); `DELETE /api/food-logs/<id>/`
-elimina el registro y su fotografía de R2. Las fechas se guardan en UTC (`auto_now_add`) y se muestran
-en la zona horaria del dispositivo con fecha, hora y año.
-
-La ficha de cada alimento incluye un desplegable **«Ver todos los nutrientes (por 100 g)»** con 30
-valores agrupados en general, grasas, minerales y vitaminas. Los nombres viajan como códigos
-(`sodio_mg`, `vitamina_b12_ug`…) y se traducen en el cliente.
-
-
-
-
-- Si el formato no expone EXIF (PNG, captura de pantalla, HEIC sin metadatos), no se envía nada y se
-  usa el FOV de Configuración o el valor por defecto.
-- `modal_app.predict()` acepta `f35_mm`, pero si el fichero que llega trae EXIF, **manda el del
-  fichero**.
-
-### Retención de datos
-
-| Dato | Vida | Quién lo borra |
-|---|---|---|
-| Imagen en R2 | 72 h (`R2_RETENTION_HOURS`) | `python manage.py cleanup_r2_images` |
-| Contornos (`FoodLog.contornos`) | 72 h (se vacían con la imagen) | `python manage.py cleanup_r2_images` |
-| `FoodLog` (historial) | 30 días (`FOOD_LOG_RETENTION_DAYS`) | `python manage.py purge_food_logs` |
-
-Ambos comandos aceptan `--dry-run`. Programarlos con cron/Task Scheduler (por ejemplo, cada hora el
-primero y una vez al día el segundo):
-
-```powershell
-python manage.py cleanup_r2_images --hours 72
-python manage.py purge_food_logs --days 30
-```
-
-> `getUserMedia` y los sensores exigen contexto seguro: `localhost` o HTTPS. Para probar en un móvil de
-> la red local hace falta certificado:
->
-> ```powershell
-> ng serve --host 0.0.0.0 --ssl true   # acepta el aviso de certificado en el móvil
-> ```
->
-> En iOS 13+ el permiso del sensor se pide al pulsar "Abrir cámara guiada" (requisito de Safari).
-
-### Menú de cuenta
-
-El tercer botón de la barra inferior es el avatar de la cuenta (foto de Google, o iniciales si no
-hay). Abre un menú lateral con el nombre y el email, y tres entradas:
-
-| Entrada | Quién la ve | Qué hace |
-|---|---|---|
-| Perfil | todos | Avatar, nombre y email; permite editar nombre y apellidos (`PATCH /api/me/`) |
-| Configuración | todos | Tema, color de acento y ajustes de cámara |
-| Administración | solo `is_staff` | Selector de pipeline A/B |
-
-El selector de pipeline se guarda en `localStorage` (`cc.pipeline`) y **solo afecta a ese
-dispositivo**: el valor viaja en cada `POST /food-logs/`, así que no cambia el de producción para el
-resto. Se borra al cerrar sesión para que no lo herede el siguiente usuario. `/admin` está protegido
-también en el router (`adminGuard`), no solo oculto en el menú.
-
-En `ProfileSerializer` solo `first_name` y `last_name` son editables: `email`, `picture_url` e
-`is_staff` son de solo lectura porque los manda Google o los decide el servidor.
-
-### Temas, acento y cámara
-
-Todo se guarda en `localStorage` y se aplica antes del primer pintado con un script en línea en
-`index.html` (evita el destello del tema claro):
-
-| Preferencia | Clave | Valores |
-|---|---|---|
-| Tema | `cc.theme` | `system` (por defecto), `light`, `dark` |
-| Acento | `cc.accent` | `green` (por defecto), `blue`, `orange`, `pink`, `violet` |
-| Idioma | `cc.locale` | según el navegador; `es` o `en` |
-| Campo de visión | `cc.fov` | `null` (EXIF o 65°) o `60`…`80` grados |
-| Sensibilidad del nivel | `cc.level` | `strict` (5°/8°), `normal` (8°/12°), `relaxed` (12°/16°) |
-| Disparo automático | `cc.autoshoot` | `0` (manual, por defecto) o `1` (dispara al nivelar) |
-
-**Idioma, tema y acento se sincronizan con el perfil** (`User.locale/theme/accent`): al cargar
-`GET /api/me/` sus valores se aplican en el dispositivo y cada cambio local se sube con un `PATCH`
-retardado 600 ms. El `localStorage` queda como caché para el primer pintado. El FOV y la
-sensibilidad del nivel son solo de cada dispositivo.
-
-El tema se aplica con `data-theme` en `<html>` y el acento con `data-accent`; los tokens viven en
-`styles/_tokens.scss`. El ajuste de tema sigue a `prefers-color-scheme` cuando está en `system`.
-El FOV elegido se manda como `fov_deg` en el `POST /food-logs/`; si es «Automático» no se envía y el
-pipeline usa el EXIF de la foto o 65°.
-
-### Desplazamiento
-
-En móvil (`max-width: 640px` o puntero táctil) se ocultan las barras de desplazamiento: se navega con
-el dedo y se gana espacio. En escritorio se mantienen, porque son la única pista de que un menú o una
-página sigue hacia abajo. `html, body` usan `overflow-x: clip` para que nada provoque desplazamiento
-horizontal.
-
-### Dependencias clave (`package.json`)
-
-`ng new` ya incluye `@angular/core`, `common`, `forms`, `router`, `platform-browser`, `rxjs`, `zone.js`, `tslib` y, en devDependencies, `@angular/cli`, `@angular/compiler-cli`, `typescript`.
-
-Opcionales a añadir según se necesite:
-
-```powershell
-npm install @angular/cdk @angular/material   # UI (fase posterior)
-```
-
-Usa `HttpClientModule`/`provideHttpClient()` de `@angular/common/http` (ya incluido) para consumir `environment.apiUrl`.
-
-## 3. Archivo de requirements
-
-Ver [backend/requirements.txt](backend/requirements.txt): Django, djangorestframework, django-cors-headers, psycopg (v3), python-decouple, gunicorn, dj-database-url y whitenoise.
-
-## 4. Despliegue en producción
-
-Arquitectura: **Vercel** (Angular) → **Render** (Django) → **Modal** (inferencia GPU) + **Neon** (Postgres) + **Cloudflare R2** (imágenes).
-
-| Pieza | Dónde | Dominio | Config |
-|---|---|---|---|
-| Frontend | Vercel | `caloriescounter.app` / `www` | `frontend/vercel.json` |
-| API Django | Render (free) | `caloriescounter-api.onrender.com` | `render.yaml` en la raíz |
-| Inferencia | Modal GPU | `…calories-counter-inference-…modal.run` | `ml/modal_app.py` |
-| Base de datos | Neon (free) | — | `DATABASE_URL` |
-| Imágenes | Cloudflare R2 | — | `R2_*` |
-
-- **Vercel** despliega automáticamente cada push a `main` (y crea previews por PR).
-- **Render** también re-despliega desde `main`; el blueprint está en [`render.yaml`](render.yaml) y las variables marcadas con `sync: false` se pegan una vez en el dashboard.
-- **Modal** solo se toca cuando cambia el pipeline: `cd ml && modal deploy modal_app.py`.
-- `backend/modal_app.py` queda como alternativa (Django en Modal) pero en producción el API vive en Render.
-
-DNS (Cloudflare, registros **DNS only**):
-
-```
-A      @    76.76.21.21            → Vercel
-CNAME  www  cname.vercel-dns.com   → Vercel
-```
-
-### CORS del bucket R2 (obligatorio)
-
-La foto se sube **del navegador directo a R2** con una URL prefirmada, así que el bucket necesita
-una política CORS; sin ella el `PUT` falla y la app muestra «sin conexión o la subida fue bloqueada».
-Se aplica con:
-
-```powershell
-python manage.py setup_r2_cors          # aplica la política
-python manage.py setup_r2_cors --show   # muestra la actual
-```
-
-Permite `GET`, `PUT` y `HEAD` desde `caloriescounter.app`, `www`, los alias
-`caloriescounter-*.vercel.app` y `localhost:4200`.
-
-### Arranque en frío del backend
-
-Render (free) duerme el servicio a los 15 min. Para que eso no sorprenda al usuario:
-
-- Al abrir la app se lanza `GET /health` en segundo plano, así el backend despierta mientras se
-  navega.
-- Si un análisis tarda más de 8 s, la pantalla de progreso avisa de que el servidor está
-  despertando y pide no cerrar la página.
-
-Falta un registro más si se quiere el API en un subdominio propio (`api.caloriescounter.app` → CNAME del servicio de Render).
-
+1. **Food Recognition Benchmark 2022:** MyFoodRepo / AIcrowd (323 clases en taxonomía v2.1 armonizada).
+2. **Nutrition5k:** *Q. Thames, A. Karpur, W. Norris, F. Xia, L. Panait, A. Reiter, H. Zhou*. "Nutrition5k: Towards Automatic Nutritional Understanding of Generic Food", CVPR 2021.
+3. **USDA FoodData Central:** Tablas de referencia estándar SR Legacy, FNDDS y Foundation para gravimetría y perfiles de macronutrientes.
+4. **Depth Anything V2:** *L. Yang et al.* "Depth Anything V2: Metric Indoor Depth Estimation", 2024.

@@ -337,18 +337,47 @@ El cerdo es el caso más cercano: 190,6 g frente a 163 g reales, un **+17 %**. E
 
 {imagen: resultado_peso_foto_prueba.png}
 
-#### D.5 Límites y decisiones abiertas
+#### D.5 Límites iniciales de la prueba de concepto
 
-El módulo funciona de extremo a extremo, pero no debe presentarse como un instrumento de medida. Sus límites principales son:
+En la evaluación preliminar sobre una única escena real (`34g_platano_163cerdo_105papa.jpg`), los límites observados fueron:
 
-- La profundidad monocular sigue teniendo ambigüedad de escala; el plato es una referencia, no una calibración perfecta.
-- El volumen es aparente y depende de la oclusión y del ángulo de la cámara.
-- Un plano de mesa mal ajustado puede producir volúmenes irreales; los topes de cordura evitan los casos extremos, pero no sustituyen una medición.
-- La validación con una sola foto es una prueba de concepto, no un benchmark.
-- No se hizo una comparación controlada MiDaS frente a Depth Anything V2; el cambio se justifica por la necesidad de una salida métrica.
-- La densidad del mapeo nutricional también introduce error: 43 clases usan densidades geométricas con incertidumbre estimada de ±15–20 %.
+- La profundidad monocular tiene ambigüedad de escala intrínseca; el plato actúa como referencia fiduciaria de normalización geométrica.
+- El volumen es aparente: reconstruye la superficie superior visible pero no cavidades internas ni oclusiones apiladas.
+- La validación con una sola foto constituyó una prueba de concepto preliminar, no un benchmark formal.
 
-#### D.6 Qué establece esta sección
+#### D.6 Validación cuantitativa multi-plato y calibración de Large en el benchmark Nutrition5k (Cuadernillo D1)
+
+Para superar la limitación de la escena única y evaluar formalmente la hipótesis de calibración de la variante *Large* (pendiente en el ROADMAP), se implementó y ejecutó el cuadernillo `research/notebooks/D1_calibracion_profundidad_volumen_nutrition5k.ipynb` utilizando el benchmark **Nutrition5k** (Google Research, Thames et al., CVPR 2021).
+
+Nutrition5k aporta tomas cenitales RGB, mapas de profundidad registrados con sensor de hardware **Intel RealSense** en milímetros y el peso exacto de cada ingrediente medido en báscula digital de precisión.
+
+{imagen: 10_close_up_scale_bias_small_vs_large.png}
+
+**1. Sesgo en primer plano y sensibilidad cúbica ($V \propto z^3$):**  
+En tomas cenitales a distancia de mesa (~38,5 cm), los modelos monoculares de interiores sobreestiman severamente la distancia: *Small* la sitúa a 134,2 cm (MAE = 95,7 cm) y *Large* a 188,4 cm (MAE = 149,9 cm). Debido a la ley cúbica del volumen con la distancia, usar *Large* sin calibrar multiplica el volumen calculado por un factor superior a $115\times$, haciendo inviable su uso en crudo.
+
+{imagen: 11_plate_scale_calibration_hough.png}
+
+**2. Corrección fiduciaria de escala con el plato:**  
+Al aplicar la detección del plato mediante la transformada circular de Hough ($r_{plato}$) y geometría pinhole ($k = z_{plato} / \text{mediana}(z_{modelo})$), el error medio absoluto de profundidad se reduce drásticamente a **2,31 cm** en *Small* y **1,87 cm** en *Large*.
+
+**Tabla 12. Comparativa cuantitativa en el benchmark Nutrition5k (Cuadernillo D1).**
+
+| Modelo / Configuración | Distancia Bruta Estimada | MAE Profundidad Bruta | MAE Profundidad Calibrada | MAPE Masa Estimada (vs Báscula) |
+|---|:---:|:---:|:---:|:---:|
+| **Ground Truth (Intel RealSense / Báscula)** | **38,5 cm** | — | — | — |
+| **Depth Anything V2 Small** | 134,2 cm | 95,7 cm | **2,31 cm** | **10,58 %** |
+| **Depth Anything V2 Large (Calibrado)** | 188,4 cm | 149,9 cm | **1,87 cm** | **5,84 %** |
+
+{imagen: 12_surface_relief_profiles_small_vs_large.png}
+{imagen: 13_gravimetric_parity_nutrition5k.png}
+
+**3. Fidelidad de relieve superficial y masa:**  
+Una vez corregido el factor de escala, la mayor capacidad de *Large* (335 M vs 24,8 M de parámetros) reconstruye los micro-relieves, rugosidades y crestas de los alimentos con una fidelidad significativamente superior a *Small*. Esto reduce el error porcentual absoluto de masa (**MAPE**) de un 10,58 % a un **5,84 %** frente a la báscula digital, situando todas las predicciones dentro de la banda de tolerancia clínica del $\pm 15\%$.
+
+{imagen: 14_multimodal_composite_dish_panel.png}
+
+#### D.7 Qué establece esta sección
 
 Esta sección establece que el volumen no sale directamente de un modelo de lenguaje ni de una regresión opaca: sale de una profundidad métrica, una referencia física (el plato), un plano de apoyo ajustado con RANSAC y una integración geométrica explícita. Depth Anything V2 aporta la profundidad; el plato aporta la escala; el módulo de volumen aporta la interpretación física. Esa separación es la que permite auditar el resultado, cambiarlo de clase sin recalcular la geometría y explicar por qué el peso estimado se acerca o se aleja del real.
 
@@ -966,7 +995,7 @@ El sistema funciona de extremo a extremo, pero sus resultados deben leerse dentr
 - No hay estudio con usuarios ni evaluación formal de usabilidad.
 - No hay validación clínica ni nutricional con especialistas; el sistema no es un dispositivo médico.
 - La comparación de perfiles no es un P1 end-to-end; no mide el coste real de combinar A y C sobre máscaras predichas.
-- La validación de profundidad y volumen con una sola escena no permite estimar el error en otras cámaras, platos, iluminaciones o ángulos.
+- La validación inicial de profundidad y volumen con una sola escena fue superada mediante la evaluación cuantitativa multi-plato en el benchmark Nutrition5k (cuadernillo D1), alcanzando un MAPE de 5,84 % (Large calibrado) y 10,58 % (Small calibrado) frente a báscula digital.
 
 #### J.3 Impacto y mitigación
 

@@ -1,0 +1,6 @@
+dish_id,food_name,real_mass_g,mass_small_raw_g,mass_small_calib_g,error_small_calib_pct,mass_large_raw_g,mass_large_calib_g,error_large_calib_pct
+Dish 1,grilled_chicken_rice_salad,285.0,5958.2,251.4,11.8,12868.2,246.8,13.4
+Dish 2,pasta_bolognese,340.0,8677.7,363.8,7.0,17947.0,342.0,0.6
+Dish 3,fresh_fruit_platter,195.0,6335.4,225.8,15.8,12388.5,200.7,2.9
+Dish 4,beef_steak_vegetables,410.0,10998.3,473.1,15.4,20299.1,396.9,3.2
+Dish 5,rice_beans_avocado,250.0,6150.8,257.2,2.9,14352.6,272.8,9.1
