@@ -30,8 +30,10 @@ def _download_hf_models():
     from pipeline import config
     from transformers import AutoImageProcessor, AutoModelForDepthEstimation, Mask2FormerConfig
 
-    AutoImageProcessor.from_pretrained(config.DEPTH_MODEL_ID)
-    AutoModelForDepthEstimation.from_pretrained(config.DEPTH_MODEL_ID)
+    AutoImageProcessor.from_pretrained(config.DEPTH_MODEL_SMALL_ID)
+    AutoModelForDepthEstimation.from_pretrained(config.DEPTH_MODEL_SMALL_ID)
+    AutoImageProcessor.from_pretrained(config.DEPTH_MODEL_LARGE_ID)
+    AutoModelForDepthEstimation.from_pretrained(config.DEPTH_MODEL_LARGE_ID)
     # De Mask2Former sólo hace falta el preprocesado y la arquitectura: los pesos
     # salen del Volume (mask2former_agnostic.pt).
     AutoImageProcessor.from_pretrained(config.MASK2FORMER_ID)
@@ -102,7 +104,13 @@ class FoodInference:
     def load(self):
         device = "cuda" if torch.cuda.is_available() else "cpu"
         nutrition = NutritionTable.load(config.NUTRITION_CSV)  # 323 clases, falla rápido si no cuadra
-        depth = DepthEstimator(config.DEPTH_MODEL_ID, device)
+        depth_estimators = {
+            "small": DepthEstimator(config.DEPTH_MODEL_SMALL_ID, device),
+        }
+        try:
+            depth_estimators["large"] = DepthEstimator(config.DEPTH_MODEL_LARGE_ID, device)
+        except Exception as exc:
+            print(f"Aviso: Depth Large no inicializado ({exc})")
 
         yolo = YoloSegmenter(config.YOLO_WEIGHTS, device, config.YOLO_CONF, config.YOLO_IMGSZ)
         m2f = Mask2FormerSegmenter(
@@ -112,7 +120,7 @@ class FoodInference:
 
         self.pipeline = FoodPipeline(
             strategies={"A": build_strategy_a(yolo), "B": build_strategy_b(m2f, inception)},
-            depth=depth,
+            depth=depth_estimators,
             nutrition=nutrition,
         )
 
@@ -123,6 +131,7 @@ class FoodInference:
         request: Request,
         file: UploadFile,
         pipeline: str = "B",
+        depth_model: str = "small",
         fov_deg: float | None = None,
         f35_mm: float | None = None,
         x_modal_secret: str | None = Header(default=None),
@@ -135,6 +144,10 @@ class FoodInference:
         pipeline = pipeline.upper()
         if pipeline not in ("A", "B"):
             return _reply(request, {"detail": "pipeline debe ser 'A' o 'B'"}, 400)
+
+        depth_model = depth_model.lower()
+        if depth_model not in ("small", "large"):
+            depth_model = "small"
 
         raw = file.file.read(config.MAX_UPLOAD_BYTES + 1)
         if len(raw) > config.MAX_UPLOAD_BYTES:
@@ -150,7 +163,9 @@ class FoodInference:
             f35 = f35_mm
 
         try:
-            result = self.pipeline.run(img, pipeline, fov_deg=fov_deg, f35_mm=f35)
+            result = self.pipeline.run(
+                img, pipeline, fov_deg=fov_deg, f35_mm=f35, depth_model=depth_model
+            )
         except ValueError as exc:  # p. ej. fov_deg fuera de rango
             return _reply(request, {"detail": str(exc)}, 400)
         return _reply(request, result)

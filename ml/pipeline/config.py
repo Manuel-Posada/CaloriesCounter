@@ -17,13 +17,14 @@ MASK2FORMER_WEIGHTS = os.environ.get("MASK2FORMER_WEIGHTS", f"{MODELS_DIR}/mask2
 # Repos de Hugging Face. Sólo aportan la *arquitectura*/preprocesado cuando hay
 # pesos locales; si no hay, también los pesos.
 MASK2FORMER_ID = os.environ.get("MASK2FORMER_ID", "facebook/mask2former-swin-tiny-coco-instance")
-# Variante *métrica* de Depth Anything V2: devuelve metros (necesario para cm³).
-# Small: la validada de extremo a extremo y la que se usa en producción. La Large sobreestima
-# la distancia en primeros planos (mesa a ~0,4 m -> 1,8 m) y el volumen se dispara.
-# Se puede cambiar sin tocar código con la variable DEPTH_MODEL_ID.
-DEPTH_MODEL_ID = os.environ.get(
-    "DEPTH_MODEL_ID", "depth-anything/Depth-Anything-V2-Metric-Indoor-Small-hf"
-)
+
+# Variantes *métricas* de Depth Anything V2: devuelven metros (necesario para cm³).
+DEPTH_MODEL_SMALL_ID = "depth-anything/Depth-Anything-V2-Metric-Indoor-Small-hf"
+DEPTH_MODEL_LARGE_ID = "depth-anything/Depth-Anything-V2-Metric-Indoor-Large-hf"
+
+# Small: la validada de extremo a extremo y la predeterminada de producción.
+# Large: mayor resolución de textura y relieve, calibrada mediante el plato.
+DEPTH_MODEL_ID = os.environ.get("DEPTH_MODEL_ID", DEPTH_MODEL_SMALL_ID)
 
 NUTRITION_CSV = os.environ.get("NUTRITION_CSV", "/data/nutrition_wide_densidad.csv")
 

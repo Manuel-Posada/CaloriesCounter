@@ -30,6 +30,12 @@ def main() -> int:
     ap.add_argument("--device", default="cpu", help="cpu | cuda | mps")
     ap.add_argument("--fov-deg", type=float, default=None, help="FOV horizontal de la cámara en grados")
     ap.add_argument("--depth-model", default=None, help="repo HF de profundidad (por defecto el de config.py)")
+    ap.add_argument(
+        "--depth-size",
+        default="small",
+        choices=["small", "large"],
+        help="variante de Depth Anything V2 (small | large)",
+    )
     ap.add_argument("--threshold", type=float, default=None, help="umbral de Mask2Former")
     ap.add_argument("--out", type=Path, default=None, help="guarda el JSON de salida en esta ruta")
     args = ap.parse_args()
@@ -42,6 +48,9 @@ def main() -> int:
     os.environ.setdefault("NUTRITION_CSV", str(HERE / "data" / "nutrition_wide_densidad.csv"))
     if args.depth_model:
         os.environ["DEPTH_MODEL_ID"] = args.depth_model
+    elif args.depth_size == "large":
+        from pipeline import config as _cfg
+        os.environ["DEPTH_MODEL_ID"] = _cfg.DEPTH_MODEL_LARGE_ID
 
     from pipeline import config
     from pipeline.classification import InceptionV4Classifier
@@ -84,7 +93,9 @@ def main() -> int:
     image, f35 = load_image(args.image.read_bytes())
     print(f"→ imagen: {image.width}x{image.height}px | f35={f35} | carga {time.perf_counter() - t0:.1f}s", file=sys.stderr)
 
-    result = pipeline.run(image, args.pipeline, fov_deg=args.fov_deg, f35_mm=f35)
+    result = pipeline.run(
+        image, args.pipeline, fov_deg=args.fov_deg, f35_mm=f35, depth_model=args.depth_size
+    )
     payload = json.dumps(result, ensure_ascii=False, indent=2)
 
     if args.out:

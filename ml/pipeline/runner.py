@@ -64,7 +64,12 @@ class FoodPipeline:
         self.nutrition = nutrition
 
     def run(
-        self, image: Image.Image, mode: str, fov_deg: float | None = None, f35_mm: float | None = None
+        self,
+        image: Image.Image,
+        mode: str,
+        fov_deg: float | None = None,
+        f35_mm: float | None = None,
+        depth_model: str = "small",
     ) -> dict:
         if mode not in self.strategies:
             raise ValueError(f"pipeline desconocido: {mode!r} (opciones: {sorted(self.strategies)})")
@@ -81,7 +86,12 @@ class FoodPipeline:
         scale, scale_source = 1.0, "raw"
         t_depth = t_seg
         if segments:
-            depth_m = self.depth.predict(image)
+            # Soporta tanto un único DepthEstimator como un diccionario {"small": ..., "large": ...}
+            if isinstance(self.depth, dict):
+                estimator = self.depth.get(depth_model.lower(), self.depth.get("small", next(iter(self.depth.values()))))
+            else:
+                estimator = self.depth
+            depth_m = estimator.predict(image)
             t_depth = time.perf_counter()
             focal_px = resolve_focal_px(image.width, image.height, fov_deg, f35_mm)
             food_union = np.logical_or.reduce([s.mask for s in segments])
