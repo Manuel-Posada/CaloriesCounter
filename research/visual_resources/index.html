@@ -115,6 +115,42 @@
       <img src="09_mapeo_ejemplo.png" alt="Ejemplos del mapeo nutricional">
     </section>
 
+    <section class="card wide" style="margin-top:16px">
+      <span class="pill" style="background:#ecfdf5;color:#047857">Calibración y Benchmark Nutrition5k</span>
+      <h2>Validación métrica de profundidad y volumen 3D</h2>
+      <p>Evaluación cuantitativa del sesgo de escala monocular, corrección fiduciaria por transformada circular de Hough y paridad gravimétrica frente a pesaje en báscula digital de laboratorio en <b>Nutrition5k (Google Research)</b>. Versiones en inglés disponibles en <code>en/</code>.</p>
+    </section>
+
+    <section class="card wide">
+      <h2>10 · Sesgo de escala en primer plano (Small vs Large)</h2>
+      <p>La profundidad monocular de interiores sobreestima la distancia mesa-cámara (38,5 cm real vs ~112 cm en Small y ~173 cm en Large). Al propagarse cúbicamente (V ∝ Z³), el volumen sin calibrar se dispara entre 27× y 91×.</p>
+      <img src="10_sesgo_primer_plano_small_vs_large.png" alt="Sesgo de escala en primer plano Small vs Large">
+    </section>
+
+    <section class="card wide">
+      <h2>11 · Calibración fiduciaria con el plato (Hough circular)</h2>
+      <p>Detección del contorno circular del plato vajillero (25 cm estándar) mediante transformada de Hough. Con la distancia focal EXIF (f_px), la distancia z_plato = (f_px · D) / d_px normaliza el mapa de profundidad, colapsando el MAE a &lt;2.5 cm.</p>
+      <img src="11_calibracion_escala_plato_hough.png" alt="Calibración fiduciaria de escala mediante Hough">
+    </section>
+
+    <section class="card">
+      <h2>12 · Perfiles de relieve 3D (Small vs Large)</h2>
+      <p>Corte transversal sobre la geometría del plato. El modelo Large (DINOv2-L) resuelve crestas y valles pronunciados con alta fidelidad, mientras Small suaviza la superficie produciendo ligeras sobreestimaciones en pendientes.</p>
+      <img src="12_perfiles_relieve_3d_small_vs_large.png" alt="Perfiles de relieve superficial 3D">
+    </section>
+
+    <section class="card">
+      <h2>13 · Paridad gravimétrica en Nutrition5k</h2>
+      <p>Masa estimada a partir del mapa de elevación 3D frente a la masa real de báscula digital. Ambos modelos calibrados operan dentro de la banda de tolerancia clínica del ±15 % (Small: MAPE 10,58 %, Large: MAPE 5,84 %).</p>
+      <img src="13_paridad_gravimetrica_nutrition5k.png" alt="Paridad gravimétrica en Nutrition5k">
+    </section>
+
+    <section class="card wide">
+      <h2>14 · Panel multimodal completo del plato</h2>
+      <p>Integración de extremo a extremo: imagen RGB, máscaras segmentadas por alimento, relieve tridimensional calibrado y desglose final de gramos, calorías y macronutrientes.</p>
+      <img src="14_panel_comparativo_multimodal_plato.png" alt="Panel multimodal completo">
+    </section>
+
     <section class="card wide">
       <h2>Resultado numérico</h2>
       <table>

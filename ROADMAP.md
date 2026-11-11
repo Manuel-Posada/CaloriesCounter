@@ -39,7 +39,7 @@ no hay sensor de inclinación).
 
 - [x] Menú lateral de configuración con Perfil, Configuración, Administración y cerrar sesión
 - [x] `GET/PATCH /api/me/` (nombre y apellidos editables)
-- [x] Selector de pipeline A/B en Administración
+- [x] Selector de pipeline A/B y tamaño del predictor de profundidad (Small vs Large) en Administración
 - [x] Temas claro/oscuro/sistema con 5 acentos
 - [x] Cámara: FOV horizontal y sensibilidad del nivel
 - [x] Historial: marcar fotos torcidas (> 15°) y pintar sus contornos
@@ -49,7 +49,7 @@ no hay sensor de inclinación).
 
 - [ ] **Recordatorios de comidas** (necesitan permiso de notificaciones y un service worker)
 - [ ] Ver la foto con sus contornos a tamaño completo desde el historial (hoy solo en la miniatura)
-- [x] Calibrar la escala de profundidad con la distancia de captura para poder usar el modelo *Large* (evaluado y calibrado en `research/notebooks/D1_calibracion_profundidad_volumen_nutrition5k.ipynb`)
+- [x] Calibrar la escala de profundidad con la distancia de captura para poder usar el modelo *Large* (evaluado y calibrado en `research/notebooks/D1_calibracion_profundidad_volumen_nutrition5k.ipynb` y validado frente a báscula en Nutrition5k)
 - [ ] Guardar el `nombre_es` también en los contornos del historial (hoy se guardan en inglés)
 - [ ] **Chat con el agente, con control estricto de tema.** Conversación sobre el plato analizado
       (macros, porciones, sustituciones, hábitos), no un asistente general:

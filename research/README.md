@@ -19,29 +19,32 @@ research/
 │   ├── C1_cnn_propia_b_c.ipynb
 │   ├── C2_mobilenetv3_224.ipynb
 │   ├── C3_inception_v_unificado.ipynb
+│   ├── D1_calibracion_profundidad_volumen_nutrition5k.ipynb
 │   └── 99_comparacion_resultados.ipynb
 ├── comparison/
 │   ├── resumen.csv / resumen.json / resumen.xlsx
-│   ├── segmentadores_agnostico.csv
-│   ├── segmentadores_clases.csv
-│   ├── clasificadores.csv
-│   ├── clasificadores_pareado.csv
+│   ├── segmentadores_agnostico.csv / segmentadores_clases.csv
+│   ├── clasificadores.csv / clasificadores_pareado.csv
 │   ├── perfiles_piezas.csv / perfiles_resumen.csv / perfiles_delta.csv
+│   ├── profundidad_volumen_metricas.csv / profundidad_paridad_nutrition5k.png
 │   ├── auditoria_runs.csv
-│   └── *.png
+│   ├── *.png (figuras en español)
+│   └── en/ (figuras 10 a 14 en inglés)
 ├── visual_resources/
-│   ├── index.html
-│   ├── 01_...png ... 09_...png
+│   ├── index.html (galería web navegable)
+│   ├── 01_...png a 09_...png (figuras pipeline y mapeo)
+│   ├── 10_...png a 14_...png (calibración profundidad y Nutrition5k)
+│   ├── en/ (figuras 10 a 14 con textos en inglés)
 │   ├── README.md
-│   ├── resultado_pipeline_B.json
-│   ├── segmentos.csv
+│   ├── resultado_pipeline_B.json / segmentos.csv / profundidad_volumen_metricas.csv
 │   └── generar_*.py
 ├── nutrition_mapping/
 │   ├── README_mapeo nutricional.md
 │   ├── nutrition_wide_densidad.csv
 │   └── food_names_es.csv
 ├── docs/
-│   └── Seccion_V_Implementacion_Propuesta.md
+│   ├── Seccion_V_Implementacion_Propuesta.md
+│   └── CONTENIDO_PAPER_CALIBRACION_Y_NUTRITION5K.md
 └── tests/
     └── test_core.py
 ```
@@ -49,13 +52,14 @@ research/
 ## What is included
 
 - **Data preparation (00):** original dataset counts, v2.0 → v2.1 class mapping, train/validation/test splits, crop database for classifiers, and the SAM2/polygon decision (the final crop set uses polygon masks, not SAM2).
-- **Nine canonical experiments:** A1, A2, A4, B1, B2, B4, C1, C2 and C3. The earlier `B1_yolo26_clases v4.ipynb` duplicate is intentionally excluded; the canonical B1 is `B1_yolo26_clases_v4_final_m.ipynb`.
+- **Canonical experiments:** A1, A2, A4, B1, B2, B4, C1, C2 and C3. The earlier `B1_yolo26_clases v4.ipynb` duplicate is intentionally excluded; the canonical B1 is `B1_yolo26_clases_v4_final_m.ipynb`.
+- **Depth and volume calibration (D1):** quantitative close-up scale calibration of Depth Anything V2 (Small vs. Large), fiducial plate normalisation (Hough), and gravimetric parity evaluation on Google Research's Nutrition5k benchmark.
 - **Comparison notebook (99):** inventory, audit, segmentation and classification comparisons, light/robust profiles, and summary export.
-- **Comparison tables and figures:** the CSV/XLSX/JSON outputs and the PNG figures used in the analysis.
-- **Visual resources:** nine figures explaining the pipeline, depth map, 3D volume, plate result, weight comparison, class correction and the nutritional mapping. The HTML gallery is `visual_resources/index.html`.
+- **Comparison tables and figures:** the CSV/XLSX/JSON outputs and the PNG figures used in the analysis (with bilingual EN/ES figures for publication).
+- **Visual resources:** fourteen publication-grade figures explaining the pipeline, depth map, 3D volume, plate result, weight comparison, class correction, nutritional mapping, scale bias, and Nutrition5k parity. The HTML gallery is `visual_resources/index.html`.
 - **Nutritional mapping:** the 323-class table with nutrients, density and provenance, plus its documentation and Spanish names.
-- **Core tests:** volume and nutrition tests in `tests/test_core.py`.
-- **Section V draft:** the implementation/progress section, with V.A in English and V.B–V.L in Spanish.
+- **Core tests:** volume, geometry, and nutrition tests in `tests/test_core.py`.
+- **Paper documentation:** comprehensive Section V draft and the modular publication addendum (`CONTENIDO_PAPER_CALIBRACION_Y_NUTRITION5K.md`).
 
 ## Reproduction order
 

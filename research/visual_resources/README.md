@@ -24,6 +24,13 @@ Pesos reales anotados en el nombre: **34 g de plátano + 163 g de cerdo + 105 g 
 | `07_mapeo_flujo.png` | Cómo se construyó el mapeo nutricional: 323 clases → USDA → revisión → densidad → validación. |
 | `08_mapeo_cobertura.png` | Cobertura y calidad: match, origen USDA, fuentes de densidad, confianza y límites. |
 | `09_mapeo_ejemplo.png` | Tres clases reales (plátano, cerdo, patata) y el paso volumen × densidad → gramos. |
+| `10_sesgo_primer_plano_small_vs_large.png` | Sesgo de escala en primer plano (38.5 cm vs 110-175 cm) en Depth Anything V2 Small vs Large. |
+| `11_calibracion_escala_plato_hough.png` | Detección fiduciaria del plato por Hough circular y normalización métrica de profundidad. |
+| `12_perfiles_relieve_3d_small_vs_large.png` | Corte transversal y resolución de microtopografía superficial (Small vs Large). |
+| `13_paridad_gravimetrica_nutrition5k.png` | Dispersión gravimétrica sobre el benchmark Nutrition5k con banda clínica del ±15%. |
+| `14_panel_comparativo_multimodal_plato.png` | Panel completo multimodal: RGB original, máscaras de segmentación, mapa 3D y desglose nutricional. |
+| `en/` | Colección completa de las figuras 10 a 14 con textos, etiquetas y leyendas en inglés para publicación. |
+| `profundidad_volumen_metricas.csv` | Métricas cuantitativas detalladas de distancia, MAE y masas predichas en Nutrition5k. |
 | `resultado_pipeline_B.json` | Salida JSON completa del pipeline (la misma estructura que devuelve la app). |
 | `segmentos.csv` | Tabla por segmento: clase, confianza, volumen, densidad, peso, altura, plano, corrección y peso real. |
 | `datos_visuales.npz` | Arrays usados por las figuras (foto, profundidades, máscaras, mapas de altura). |

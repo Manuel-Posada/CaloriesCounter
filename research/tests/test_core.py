@@ -213,3 +213,58 @@ def test_centroid_is_normalized():
     mask[40:60, 90:110] = True  # media de índices (99.5, 49.5) -> centro del píxel (0.5, 0.5)
     assert mask_centroid(mask) == pytest.approx((0.5, 0.5), abs=1e-4)
 
+
+# ---------------- runner y selector de depth_model ----------------
+
+
+def test_food_pipeline_depth_model_selection():
+    from unittest.mock import MagicMock
+    from PIL import Image
+    from pipeline.runner import FoodPipeline
+    from pipeline.types import Segment
+
+    mock_depth_small = MagicMock()
+    mock_depth_small.predict.return_value = np.full((100, 100), 0.5, dtype=np.float32)
+
+    mock_depth_large = MagicMock()
+    mock_depth_large.predict.return_value = np.full((100, 100), 0.4, dtype=np.float32)
+
+    dummy_mask = np.zeros((100, 100), dtype=bool)
+    dummy_mask[30:70, 30:70] = True
+
+    mock_strategy = MagicMock()
+    mock_strategy.side_effect = lambda img: [
+        Segment(mask=dummy_mask, score=0.95, class_idx=0)
+    ]
+
+    mock_nutrition = MagicMock()
+    mock_nutrition.compute.return_value = {
+        "clase": "arroz",
+        "peso_g": 50.0,
+        "calorias_kcal": 65.0,
+        "proteinas_g": 1.5,
+        "carbohidratos_g": 14.0,
+        "grasas_g": 0.2,
+        "densidad_asumida": False,
+        "por_100g": {"calorias_kcal": 130, "proteinas_g": 2.7, "carbohidratos_g": 28, "grasas_g": 0.3},
+    }
+
+    pipe = FoodPipeline(
+        strategies={"A": mock_strategy},
+        depth={"small": mock_depth_small, "large": mock_depth_large},
+        nutrition=mock_nutrition,
+    )
+
+    img = Image.new("RGB", (100, 100), color="white")
+
+    # Ejecutar con depth_model="small"
+    res_small = pipe.run(img, mode="A", depth_model="small")
+    assert mock_depth_small.predict.called
+    assert not mock_depth_large.predict.called
+
+    # Ejecutar con depth_model="large"
+    res_large = pipe.run(img, mode="A", depth_model="large")
+    assert mock_depth_large.predict.called
+    assert "alimentos" in res_large
+
+
