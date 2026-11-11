@@ -47,7 +47,11 @@ export class FoodLogService {
 
   /** Paso 3: dispara la inferencia (Modal + Gemini) y registra el FoodLog. */
   create(idImagenR2: string, f35Mm: number | null = null): Observable<FoodLogCreated> {
-    const body: Record<string, unknown> = { id_imagen_r2: idImagenR2, pipeline: this.pipeline.pipeline() };
+    const body: Record<string, unknown> = {
+      id_imagen_r2: idImagenR2,
+      pipeline: this.pipeline.pipeline(),
+      depth_model: this.pipeline.depthModel(),
+    };
     // FOV elegido en Configuración; si es «Automático» no se envía y el pipeline usa el EXIF.
     const fovDeg = this.prefs.fovDeg();
     if (fovDeg !== null) body['fov_deg'] = fovDeg;

@@ -266,6 +266,15 @@ export const ES = {
   'settings.pipelineBDetail': 'Segmentación agnóstica y clasificador de 323 clases. Es el de producción.',
   'settings.pipelineReset': 'Restablecer el de producción (B)',
   'settings.pipelineSaved': 'Guardado en este dispositivo.',
+  'settings.depthModel': 'Modelo de profundidad',
+  'settings.depthModelHint':
+    'Variante de Depth Anything V2. Small es la predeterminada; Large ofrece mayor fidelidad en relieve superficial con calibración de escala.',
+  'settings.depthSmall': 'Depth Anything V2 Small (25M)',
+  'settings.depthSmallDetail': 'Variante métrica optimizada (~70 ms). Predeterminada de producción.',
+  'settings.depthLarge': 'Depth Anything V2 Large (335M)',
+  'settings.depthLargeDetail': 'Mayor fidelidad en micro-relieves y texturas complejas de alimentos (~320 ms).',
+  'settings.depthReset': 'Restablecer profundidad predeterminada (Small)',
+  'settings.depthSaved': 'Modelo de profundidad guardado en este dispositivo.',
   'settings.adminTitle': 'Administración',
   'settings.adminSubtitle': 'Ajustes de inferencia reservados a administradores.',
 
@@ -545,6 +554,15 @@ export const EN: Record<MessageKey, string> = {
   'settings.pipelineBDetail': 'Agnostic segmentation plus a 323-class classifier. The production one.',
   'settings.pipelineReset': 'Reset to production (B)',
   'settings.pipelineSaved': 'Saved on this device.',
+  'settings.depthModel': 'Depth model',
+  'settings.depthModelHint':
+    'Depth Anything V2 variant. Small is default; Large offers higher surface relief fidelity with scale calibration.',
+  'settings.depthSmall': 'Depth Anything V2 Small (25M)',
+  'settings.depthSmallDetail': 'Optimized metric variant (~70 ms). Production default.',
+  'settings.depthLarge': 'Depth Anything V2 Large (335M)',
+  'settings.depthLargeDetail': 'Higher fidelity on fine food textures and surface relief (~320 ms).',
+  'settings.depthReset': 'Reset to default depth (Small)',
+  'settings.depthSaved': 'Depth model saved on this device.',
   'settings.adminTitle': 'Administration',
   'settings.adminSubtitle': 'Inference settings reserved for administrators.',
 
