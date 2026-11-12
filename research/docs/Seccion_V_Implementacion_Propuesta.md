@@ -84,7 +84,7 @@ El desbalance de clases es fuerte. En validación, **215 clases** tienen menos d
 
 #### B.4 Base de recortes para los clasificadores
 
-Los clasificadores C1, C2 y C3 no se entrenan con la imagen completa, sino con recortes de cada instancia. El cuadernillo `00_datos_food_recognition_v4_sam2.ipynb` genera dos variantes:
+Los clasificadores C1, C2 y C3 no se entrenan con la imagen completa, sino con recortes de cada instancia. El cuadernillo `00_preparacion_datos.ipynb` genera dos variantes:
 
 - `crops/`: fondo negro, caja de la máscara con un **2 %** de margen, lado mayor máximo de **256 px** y erosión de **1 px**.
 - `crops_ctx/`: el mismo recorte con el fondo original y un **10 %** de margen.
@@ -347,7 +347,7 @@ En la evaluación preliminar sobre una única escena real (`34g_platano_163cerdo
 
 #### D.6 Validación cuantitativa multi-plato y calibración de Large en el benchmark Nutrition5k (Cuadernillo D1)
 
-Para superar la limitación de la escena única y evaluar formalmente la hipótesis de calibración de la variante *Large* (pendiente en el ROADMAP), se implementó y ejecutó el cuadernillo `research/notebooks/D1_calibracion_profundidad_volumen_nutrition5k.ipynb` utilizando el benchmark **Nutrition5k** (Google Research, Thames et al., CVPR 2021).
+Para superar la limitación de la escena única y evaluar formalmente la hipótesis de calibración de la variante *Large* (pendiente en el ROADMAP), se implementó y ejecutó el cuadernillo `research/notebooks/D1_calibracion_profundidad_nutrition5k.ipynb` utilizando el benchmark **Nutrition5k** (Google Research, Thames et al., CVPR 2021).
 
 Nutrition5k aporta tomas cenitales RGB, mapas de profundidad registrados con sensor de hardware **Intel RealSense** en milímetros y el peso exacto de cada ingrediente medido en báscula digital de precisión.
 
@@ -763,7 +763,7 @@ La experimentación se organiza en tres familias y dos cuadernillos de soporte:
 - **Cuadernillo 00:** preparación del dataset, mapeo v2.0 → v2.1, particiones y recortes para clasificadores.
 - **Cuadernillo 99:** comparación, auditoría y perfiles.
 
-Son **nueve experimentos canónicos**. El cuadernillo `B1_yolo26_clases v4.ipynb` se conserva como ensayo anterior; la versión canónica es `B1_yolo26_clases_v4_final_m.ipynb`. Los nueve resultados de test están presentes y se usan en la comparación.
+Son **nueve experimentos canónicos**: A1 (`A1_yolo26m_agnostico.ipynb`), A2 (`A2_yolo26n_agnostico.ipynb`), A4 (`A4_mask2former_agnostico.ipynb`), B1 (`B1_yolo26m_clases.ipynb`), B2 (`B2_yolo26n_clases.ipynb`), B4 (`B4_mask2former_clases.ipynb`), C1 (`C1_cnn_propia.ipynb`), C2 (`C2_mobilenetv3.ipynb`) y C3 (`C3_inception_v4.ipynb`), junto a la calibración D1 (`D1_calibracion_profundidad_nutrition5k.ipynb`). Los nueve resultados de test están presentes y se usan en la comparación.
 
 #### H.2 Cuaderno de comparación
 
@@ -1140,7 +1140,7 @@ La Tabla 24 resume la decisión por tipo de artefacto.
 
 La publicación mínima recomendada es:
 
-- `00_datos_food_recognition_v4_sam2.ipynb` y los nueve cuadernillos canónicos.
+- `00_preparacion_datos.ipynb` y los cuadernillos canónicos.
 - `99_comparacion_resultados.ipynb`.
 - Los CSV y figuras de `presentacion/calorie_counter/comparacion/`.
 - `presentacion/tests/Recursos_visuales/` completo, salvo la foto si no hay consentimiento.
@@ -1168,7 +1168,7 @@ En lugar de publicar `presentación/` tal cual, conviene una carpeta `research/`
 research/
 ├── README.md
 ├── notebooks/
-│   ├── 00_datos_food_recognition_v4_sam2.ipynb
+│   ├── 00_preparacion_datos.ipynb
 │   ├── A1_...ipynb
 │   ├── ...
 │   └── 99_comparacion_resultados.ipynb
@@ -1214,7 +1214,7 @@ El `README` del repositorio debe explicar:
 
 1. Dependencias de `ml`, `backend` y `frontend`.
 2. Dónde colocar los pesos (`MODELS_DIR` o Volume de Modal).
-3. El orden de ejecución: `00_datos` → cuadernillos A/B/C → `99_comparacion` → `generar_recursos.py`.
+3. El orden de ejecución: `00_preparacion_datos` → cuadernillos A/B/C/D → `99_comparacion` → `generar_recursos.py`.
 4. Cómo regenerar las figuras sin GPU.
 5. Qué resultados se esperan y dónde se guardan.
 6. Qué artefactos no se incluyen y por qué.

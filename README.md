@@ -127,11 +127,11 @@ CaloriesCounter/
 │
 ├── research/                 # Investigación experimental y cuadernillos de entrenamiento
 │   ├── notebooks/            # Cuadernillos reproducibles (00 a 99)
-│   │   ├── 00_datos_food_recognition_v4_sam2.ipynb
+│   │   ├── 00_preparacion_datos.ipynb
 │   │   ├── A1..A4 (Segmentadores agnósticos YOLO / Mask2Former)
 │   │   ├── B1..B4 (Segmentadores multiclase)
 │   │   ├── C1..C3 (Clasificadores de recortes CNN, MobileNetV3, Inception-V4)
-│   │   ├── D1_calibracion_profundidad_volumen_nutrition5k.ipynb (Profundidad y Nutrition5k)
+│   │   ├── D1_calibracion_profundidad_nutrition5k.ipynb (Profundidad y Nutrition5k)
 │   │   └── 99_comparacion_resultados.ipynb (Comparación global de métricas)
 │   ├── nutrition_mapping/    # Construcción y auditoría de la tabla nutricional USDA
 │   └── visual_resources/    # Scripts generadores de figuras y visualizaciones 3D
