@@ -42,3 +42,8 @@ research/**/runs/
 research/**/predicciones/
 research/**/predicciones_pilot/
 research/**/.ipynb_checkpoints/
+
+# Local presentation assets, test images, and browser automation artifacts
+presentación/
+.playwright-mcp/
+34g_platano_163cerdo_105papa.jpg
