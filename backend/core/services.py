@@ -1,6 +1,6 @@
 import json
 import logging
-import random
+import secrets
 
 import google.generativeai as genai
 import requests
@@ -50,7 +50,7 @@ def prompt_for(locale: str, name: str | None = None) -> str:
 def pick_name(first_name: str) -> str | None:
     """Nombre de pila para el saludo, solo a veces; None la mayoría de las veces."""
     name = (first_name or "").strip().split(" ")[0][:40]
-    if not name or random.random() >= NAME_CHANCE:
+    if not name or (secrets.randbelow(100) / 100.0) >= NAME_CHANCE:
         return None
     return name
 

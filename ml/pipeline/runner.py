@@ -1,5 +1,6 @@
 """Orquestador: segmentación (A o B) -> profundidad -> volumen -> masa -> nutrición."""
 import logging
+import math
 import time
 from collections.abc import Callable
 
@@ -109,7 +110,7 @@ class FoodPipeline:
                 fallback_trigger_cm=PLATE_FALLBACK_TRIGGER_CM,
                 fallback_distance_cm=PLATE_FALLBACK_DISTANCE_CM,
             )
-            if scale != 1.0:
+            if not math.isclose(scale, 1.0):
                 depth_m = (depth_m * scale).astype(np.float32)
             log.info("escala de profundidad x%.3f (%s)", scale, scale_source)
             if scale_source != "plate":

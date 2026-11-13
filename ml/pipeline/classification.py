@@ -25,7 +25,7 @@ class _BackboneWithHead(torch.nn.Module):
 
 
 def _load_state_dict(path: str, device: str) -> dict:
-    ckpt = torch.load(path, map_location=device)
+    ckpt = torch.load(path, map_location=device, weights_only=True)
     for key in ("state_dict", "model_state_dict", "model"):
         if isinstance(ckpt, dict) and key in ckpt and isinstance(ckpt[key], dict):
             ckpt = ckpt[key]

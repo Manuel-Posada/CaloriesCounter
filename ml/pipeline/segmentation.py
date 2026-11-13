@@ -72,7 +72,7 @@ def load_mask2former_weights(weights: str, model_id: str) -> Mask2FormerForUnive
 
     `model_id` sólo se usa como pista si no se puede deducir la arquitectura del checkpoint.
     """
-    state = _extract_state_dict(torch.load(weights, map_location="cpu"))
+    state = _extract_state_dict(torch.load(weights, map_location="cpu", weights_only=True))
 
     base_id = model_id
     embed = state.get(_EMBED_DIM_KEY)
