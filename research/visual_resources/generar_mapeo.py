@@ -83,7 +83,9 @@ def fig_flujo(df):
         y = top - (i - 1) * (h + gap)
         _step(ax, i, y, title, body, color)
         if i < len(steps):
-            ax.annotate("", xy=(5.0, y - h - 0.03), xytext=(5.0, y - h - 0.29),
+            # La punta se dibuja en `xy`, así que debe ser el punto inferior:
+            # el flujo va del recuadro de arriba al de abajo.
+            ax.annotate("", xy=(5.0, y - h - 0.29), xytext=(5.0, y - h - 0.03),
                         arrowprops=dict(arrowstyle="-|>", color="#94a3b8", lw=1.3))
 
     fig.suptitle("Cómo se construyó el mapeo nutricional de las 323 clases", fontsize=17, weight="bold", y=0.985)

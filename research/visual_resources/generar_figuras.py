@@ -114,7 +114,9 @@ def main():
         ax.text(1.12, y - 0.24, title, fontsize=11, weight="bold", color=COL["ink"], va="top")
         ax.text(1.12, y - 0.55, body, fontsize=8.8, color=COL["muted"], va="top")
         if i < len(steps) - 1:
-            ax.annotate("", xy=(5.0, y - h - 0.03), xytext=(5.0, y - h - 0.29),
+            # La punta se dibuja en `xy`, así que debe ser el punto inferior:
+            # el flujo va del recuadro de arriba al de abajo.
+            ax.annotate("", xy=(5.0, y - h - 0.29), xytext=(5.0, y - h - 0.03),
                         arrowprops=dict(arrowstyle="-|>", color="#94a3b8", lw=1.3))
     fig.suptitle("Cómo estima el peso el pipeline (Opción B)", fontsize=17, weight="bold", y=0.985)
     fig.text(0.02, 0.965, "Foto real de prueba · 1024×768 · CPU", fontsize=9, color=COL["muted"])
