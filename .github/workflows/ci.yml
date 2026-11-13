@@ -24,7 +24,7 @@ jobs:
           cache: pip
 
       - name: Install lightweight test dependencies
-        run: pip install pytest numpy opencv-python-headless
+        run: pip install pytest numpy opencv-python-headless pillow
 
       - name: Run ML unit tests
         working-directory: ml
