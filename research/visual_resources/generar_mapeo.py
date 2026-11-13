@@ -18,7 +18,8 @@ import pandas as pd
 from matplotlib.patches import Circle, FancyBboxPatch
 
 HERE = Path(__file__).resolve().parent
-CSV = HERE.parents[2] / "ml" / "data" / "nutrition_wide_densidad.csv"
+# `HERE` es `research/visual_resources`, así que la raíz del repo es parents[1].
+CSV = HERE.parents[1] / "ml" / "data" / "nutrition_wide_densidad.csv"
 
 COL = dict(ink="#0f172a", muted="#64748b", grid="#cbd5e1", blue="#2563eb",
            cyan="#0891b2", green="#16a34a", amber="#d97706", red="#dc2626",
@@ -39,8 +40,11 @@ def _save(fig, name, tight=True):
     print("  ·", path.name)
 
 
-def _box(ax, x, y, w, h, color, alpha=0.10, lw=1.2):
-    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.02,rounding_size=0.12",
+def _box(ax, x, y, w, h, color, alpha=0.10, lw=1.2, pad=0.02):
+    # El radio de la esquina debe quedar muy por debajo de la altura de la caja;
+    # si no, los arcos se solapan y dibujan aspas dentro del recuadro.
+    radius = min(0.12, h * 0.30)
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle=f"round,pad={pad},rounding_size={radius:.3f}",
                                 linewidth=lw, edgecolor=color, facecolor=color + f"{int(alpha*100):02x}"))
 
 
@@ -54,7 +58,8 @@ def _step(ax, i, y, title, body, color):
 
 
 def _stat_card(ax, x, y, w, h, number, label, color):
-    _box(ax, x, y, w, h, color, alpha=0.08)
+    # `pad=0` para que el relleno del parche no invada el hueco entre tarjetas.
+    _box(ax, x, y, w, h, color, alpha=0.08, pad=0.0)
     ax.text(x + 0.04, y + h * 0.56, number, fontsize=22, weight="bold", color=color, va="center")
     ax.text(x + 0.04, y + h * 0.20, label, fontsize=8.2, color=COL["muted"], va="center")
 
