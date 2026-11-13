@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-
 from pipeline.nutrition import NutritionTable
 from pipeline.overlay import mask_centroid, mask_to_polygon
 from pipeline.volume import camera_tilt_deg, estimate_volume_cm3, resolve_focal_px
@@ -184,7 +183,7 @@ def test_polygon_is_normalized_and_simplified():
 
     poly = mask_to_polygon(mask)
     assert 4 <= len(poly) <= 6  # un rectángulo simplificado
-    xs, ys = zip(*poly)
+    xs, ys = zip(*poly, strict=True)
     assert all(0.0 <= x <= 1.0 for x in xs) and all(0.0 <= y <= 1.0 for y in ys)
     # Centros de píxel: 50 -> 50.5/200 = 0.2525 y 149 -> 149.5/200 = 0.7475.
     assert min(xs) == pytest.approx(0.2525, abs=0.002)
@@ -219,6 +218,7 @@ def test_centroid_is_normalized():
 
 def test_food_pipeline_depth_model_selection():
     from unittest.mock import MagicMock
+
     from PIL import Image
     from pipeline.runner import FoodPipeline
     from pipeline.types import Segment
@@ -261,6 +261,7 @@ def test_food_pipeline_depth_model_selection():
     res_small = pipe.run(img, mode="A", depth_model="small")
     assert mock_depth_small.predict.called
     assert not mock_depth_large.predict.called
+    assert "alimentos" in res_small
 
     # Ejecutar con depth_model="large"
     res_large = pipe.run(img, mode="A", depth_model="large")

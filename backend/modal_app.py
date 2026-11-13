@@ -50,9 +50,8 @@ def db_check() -> None:
     import django
 
     django.setup()
-    from django.conf import settings
-
     from core.models import FoodLog, User
+    from django.conf import settings
 
     db = settings.DATABASES["default"]
     print(f"DB: {db['NAME']} @ {db['HOST']}")

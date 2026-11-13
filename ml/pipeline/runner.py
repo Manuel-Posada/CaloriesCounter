@@ -1,7 +1,7 @@
 """Orquestador: segmentación (A o B) -> profundidad -> volumen -> masa -> nutrición."""
 import logging
 import time
-from typing import Callable
+from collections.abc import Callable
 
 import numpy as np
 from PIL import Image

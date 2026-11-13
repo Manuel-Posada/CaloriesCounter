@@ -51,7 +51,7 @@ class YoloSegmenter:
         size = (image.width, image.height)
 
         out = []
-        for m, c, s in zip(masks, classes, scores):
+        for m, c, s in zip(masks, classes, scores, strict=True):
             if m.shape != (image.height, image.width):
                 m = cv2.resize(m.astype(np.uint8), size, interpolation=cv2.INTER_NEAREST).astype(bool)
             out.append(Segment(mask=m, score=float(s), class_idx=int(c), class_score=float(s)))
@@ -127,7 +127,7 @@ class Mask2FormerSegmenter:
         infos = result["segments_info"]
         # Con return_binary_maps=True: (N, H, W). Se contempla también el mapa de ids (H, W).
         if seg.ndim == 3:
-            pairs = zip(seg > 0, infos)
+            pairs = zip(seg > 0, infos, strict=True)
         else:
             pairs = ((seg == info["id"], info) for info in infos)
         # La etiqueta (label_id) se ignora a propósito: la segmentación es agnóstica.
