@@ -7,193 +7,191 @@
 [![Modal](https://img.shields.io/badge/Deployment-Modal_GPU_A10G-00FF66)](https://modal.com/)
 [![Gemini](https://img.shields.io/badge/LLM-Gemini_Flash_Lite-8E75B2?logo=google-gemini&logoColor=white)](https://ai.google.dev/)
 
-**Calorie Counter** is a decoupled intelligent system for 3D volumetric and nutritional food estimation from a single smartphone photograph taken in unconstrained real-world environments.
+**Calorie Counter** es un sistema inteligente desacoplado para la estimación nutricional y volumétrica de alimentos en 3D a partir de una única fotografía tomada con un smartphone en entornos reales no controlados.
 
-The project addresses the arithmetic hallucinations of end-to-end multimodal models and the hardware limitations of RGB-D/LiDAR systems through a **four-stage decoupled pipeline**:
-1. **Visual perception (instance-first segmentation and classification).**
-2. **Metric monocular depth and 3D volumetric estimation.**
-3. **Deterministic gravimetric and nutritional mapping (USDA FoodData Central).**
-4. **Grounded metabolic reasoning via LLM (Google Gemini Flash Lite).**
+El proyecto aborda las alucinaciones aritméticas de los modelos multimodales extremo a extremo (*end-to-end*) y las limitaciones de hardware de los sistemas RGB-D/LiDAR mediante un **pipeline desacoplado en cuatro etapas**:
+1. **Percepción visual (segmentación y clasificación por instancia).**
+2. **Profundidad monocular métrica y estimación volumétrica 3D.**
+3. **Mapeo gravimétrico y nutricional estandarizado (USDA FoodData Central).**
+4. **Razonamiento metabólico guiado por LLM (Google Gemini Flash Lite).**
 
 ---
 
-## 🏗️ System Architecture
+## 🏗️ Arquitectura del Sistema
 
 ```
-[ Smartphone Photograph ]
+[ Fotografía de Smartphone ]
              │
              ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│ 1. VISUAL PERCEPTION (Instance-First)                                  │
-│    • Pipeline B (Production / Decoupled):                              │
-│        Mask2Former Swin-Tiny (Agnostic) ──> Crops ──> Inception-V4     │
-│    • Pipeline A (Lightweight / Joint Alternative):                     │
-│        YOLO26-seg (Single-pass Segmentation + Classification)          │
+│ 1. PERCEPCIÓN VISUAL (Instancia primero)                               │
+│    • Pipeline B (Producción / Desacoplado):                            │
+│        Mask2Former Swin-Tiny (Agnóstico) ──> Recortes ──> Inception-V4 │
+│    • Pipeline A (Alternativa Ligera / Conjunto):                       │
+│        YOLO26-seg (Segmentación + Clasificación en una pasada)         │
 └────────────────────────────────────┬───────────────────────────────────┘
-                                     │ 2D Masks + Classes
+                                     │ Máscaras 2D + Clases
                                      ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│ 2. METRIC DEPTH & 3D VOLUME                                            │
-│    • Metric Depth: Depth Anything V2 (Metric Indoor Small / Large)     │
-│    • Scale Calibration: Plate detection (Circular Hough + f_px)        │
-│    • 3D Geometry: Table support plane fitting with RANSAC              │
-│    • Integration: Height h above plane x differential area (cm³)       │
+│ 2. PROFUNDIDAD MÉTRICA Y VOLUMEN 3D                                    │
+│    • Profundidad métrica: Depth Anything V2 (Metric Indoor Small / L)  │
+│    • Calibración de escala: Detección de plato (Hough circular + f_px) │
+│    • Geometría 3D: Ajuste de plano de mesa con RANSAC                  │
+│    • Integración: Altura h sobre el plano x diferencial de área (cm³)  │
 └────────────────────────────────────┬───────────────────────────────────┘
-                                     │ Apparent Volume V (cm³)
+                                     │ Volumen aparente V (cm³)
                                      ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│ 3. GRAVIMETRIC & NUTRITIONAL MAPPING (Deterministic)                   │
-│    • Apparent density ρ (g/cm³) calibrated across 323 classes          │
-│    • Computed mass: m = V · ρ (grams)                                  │
-│    • USDA FoodData Central catalog (323 classes x 219 nutrients)       │
-│    • Macros: kcal = (m / 100) · kcal_100g, protein, carbs, fat         │
+│ 3. MAPEO GRAVIMÉTRICO Y NUTRICIONAL (Determinista)                     │
+│    • Densidad aparente ρ (g/cm³) calibrada para 323 clases             │
+│    • Masa calculada: m = V · ρ (gramos)                                │
+│    • Catálogo USDA FoodData Central (323 clases x 219 nutrientes)      │
+│    • Macros: kcal = (m / 100) · kcal_100g, proteínas, carbos, grasas   │
 └────────────────────────────────────┬───────────────────────────────────┘
-                                     │ Structured JSON
+                                     │ JSON estructurado
                                      ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│ 4. METABOLIC REASONING (Google Gemini Flash Lite)                      │
-│    • Receives aggregated numerical data only (no numeric recalculation)│
-│    • Concise guidance (≤3 sentences): glycemic impact, satiety, macros │
+│ 4. RAZONAMIENTO METABÓLICO (Google Gemini Flash Lite)                  │
+│    • Recepción exclusiva de datos agregados (sin recálculo numérico)   │
+│    • Consejo conciso (≤3 frases): impacto glucémico, saciedad y macros │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📊 Experimental Results & Validation
+## 📊 Resultados Experimentales y Validación
 
-Comprehensive evaluation on the harmonized **323-class** *Food Recognition 2022* taxonomy (stratified hold-out test set, $N = 7,301$ annotations):
+Evaluación exhaustiva sobre la taxonomía armonizada de **323 clases** de *Food Recognition 2022* (hold-out test set estratificado, $N = 7.301$ anotaciones):
 
-### Instance Segmentation (Test Set)
+### Segmentación de Instancia (Test Set)
 
-| Model / Configuration | Evaluation Mode | AP50 | AP (0.5:0.95) | AR100 | Parameters | GPU Latency |
+| Modelo / Configuración | Modo de Evaluación | AP50 | AP (0.5:0.95) | AR100 | Parámetros | Latencia GPU |
 |---|---|:---:|:---:|:---:|:---:|:---:|
-| **A4 · Mask2Former Swin-T** (640px) | Agnostic | **0.752** | **0.548** | **0.726** | 47.4 M | 111.3 ms |
-| **A1 · YOLO26m-seg** (640px) | Agnostic | 0.682 | 0.475 | 0.551 | 26.9 M | 20.8 ms |
-| **A2 · YOLO26n-seg** (224px) | Agnostic | 0.651 | 0.445 | 0.535 | 3.1 M | 16.0 ms |
-| **B4 · Mask2Former Swin-T** (224px) | 323 Classes (Agnostic) | 0.352 (0.657) | 0.265 (0.454) | 0.605 (0.709) | 47.5 M | 74.2 ms |
-| **B1 · YOLO26m-seg** (640px) | 323 Classes (Agnostic) | 0.325 (0.670) | 0.232 (0.433) | 0.326 (0.567) | 27.5 M | 19.9 ms |
-| **B2 · YOLO26n-seg** (224px) | 323 Classes (Agnostic) | 0.207 (0.601) | 0.148 (0.387) | 0.236 (0.553) | 3.3 M | 15.8 ms |
+| **A4 · Mask2Former Swin-T** (640px) | Agnóstico | **0.752** | **0.548** | **0.726** | 47.4 M | 111.3 ms |
+| **A1 · YOLO26m-seg** (640px) | Agnóstico | 0.682 | 0.475 | 0.551 | 26.9 M | 20.8 ms |
+| **A2 · YOLO26n-seg** (224px) | Agnóstico | 0.651 | 0.445 | 0.535 | 3.1 M | 16.0 ms |
+| **B4 · Mask2Former Swin-T** (224px) | 323 Clases (Agnóstico) | 0.352 (0.657) | 0.265 (0.454) | 0.605 (0.709) | 47.5 M | 74.2 ms |
+| **B1 · YOLO26m-seg** (640px) | 323 Clases (Agnóstico) | 0.325 (0.670) | 0.232 (0.433) | 0.326 (0.567) | 27.5 M | 19.9 ms |
+| **B2 · YOLO26n-seg** (224px) | 323 Clases (Agnóstico) | 0.207 (0.601) | 0.148 (0.387) | 0.236 (0.553) | 3.3 M | 15.8 ms |
 
-### Crop Classifiers (Ground-Truth Crops, $N = 7,301$)
+### Clasificadores de Recortes (Ground-Truth Crops, $N = 7.301$)
 
-| Model | Top-1 Accuracy (95% CI) | Top-5 Accuracy | Macro-F1 | Parameters | Latency per Crop |
+| Modelo | Top-1 Accuracy (95% CI) | Top-5 Accuracy | Macro-F1 | Parámetros | Latencia por recorte |
 |---|:---:|:---:|:---:|:---:|:---:|
 | **C2 · MobileNetV3-Large** | **0.579** (0.567 – 0.590) | **0.840** | 0.423 | **4.62 M** | **10.7 ms** |
 | **C3 · Inception-V4** | 0.578 (0.566 – 0.590) | 0.835 | **0.427** | 41.64 M | 30.6 ms |
 | **C1 · Custom CNN Baseline** | 0.506 (0.493 – 0.517) | 0.776 | 0.308 | 11.44 M | 6.9 ms |
 
-### Real-World Volumetric & Gravimetric Validation
+### Validación Volumétrica y Gravimétrica en Escena Real
 
-Evaluated on a real multi-ingredient plate weighed on a digital scale ($302.0\text{ g}$ total):
+Evaluado sobre un plato real de tres ingredientes no homogéneos pesados en báscula digital ($302.0\text{ g}$ totales):
 
-| Food Item | Apparent Volume | Density $\rho$ | Estimated Weight | Ground-Truth Weight | Gravimetric Error |
+| Alimento | Volumen Aparente | Densidad $\rho$ | Peso Estimado | Peso Real (Báscula) | Error Gravimétrico |
 |---|:---:|:---:|:---:|:---:|:---:|
-| Banana (*Plátano*) | $97.9\text{ cm}^3$ | $0.793\text{ g/cm}^3$ | $77.6\text{ g}$ | $34.0\text{ g}$ | Overestimated (edge spill) |
-| Grilled Pork (*Cerdo*) | $234.7\text{ cm}^3$ | $0.812\text{ g/cm}^3$ | $190.6\text{ g}$ | $163.0\text{ g}$ | **+17.0%** |
-| Baked Potato (*Patata*) | $85.1\text{ cm}^3$ | $1.060\text{ g/cm}^3$ | $90.2\text{ g}$ | $105.0\text{ g}$ | **-14.1%** |
-| **Plate Total** | **$417.6\text{ cm}^3$** | — | **$358.4\text{ g}$** | **$302.0\text{ g}$** | **+18.7%** |
+| Plátano (*Banana*) | $97.9\text{ cm}^3$ | $0.793\text{ g/cm}^3$ | $77.6\text{ g}$ | $34.0\text{ g}$ | Sobreestimado (derrame en borde) |
+| Cerdo a la plancha (*Pork*) | $234.7\text{ cm}^3$ | $0.812\text{ g/cm}^3$ | $190.6\text{ g}$ | $163.0\text{ g}$ | **+17.0%** |
+| Patata cocida (*Baked Potato*) | $85.1\text{ cm}^3$ | $1.060\text{ g/cm}^3$ | $90.2\text{ g}$ | $105.0\text{ g}$ | **-14.1%** |
+| **Total Plato** | **$417.6\text{ cm}^3$** | — | **$358.4\text{ g}$** | **$302.0\text{ g}$** | **+18.7%** |
 
 ---
 
-## 📁 Repository Structure
+## 📁 Estructura del Repositorio
 
 ```
 CaloriesCounter/
-├── backend/                  # Django 6.1 REST API (Orchestration, R2, Auth, Gemini)
-│   ├── config/               # Core Django settings, URLs, WSGI
-│   ├── core/                 # Domain app (models, serializers, views, nutrition, tests)
-│   │   ├── data/             # nutrition_catalog.csv (fast backend lookup catalog)
-│   │   └── services.py       # Google Gemini Flash Lite integration
-│   └── requirements.txt      # Backend Python dependencies
+├── backend/                  # API REST en Django 6.1 (Orquestación, R2, Auth, Gemini)
+│   ├── config/               # Configuración central (settings, urls, wsgi)
+│   ├── core/                 # Aplicación de dominio (modelos, serializers, vistas, nutrition)
+│   │   ├── data/             # nutrition_catalog.csv (catálogo de consulta rápida para backend)
+│   │   └── services.py       # Integración con Google Gemini Flash Lite
+│   └── requirements.txt      # Dependencias del backend
 │
-├── frontend/                 # Angular 20 Progressive Web Application
+├── frontend/                 # Aplicación Web Progresiva en Angular 20
 │   ├── src/app/
-│   │   ├── core/             # Session, gyroscope (TiltService), and API services
-│   │   └── features/         # Zenith-guided capture, SVG overlay results, history
-│   └── package.json          # Frontend dependencies
+│   │   ├── core/             # Servicios de sesión, giroscopio (TiltService), API
+│   │   └── features/         # Vistas: captura con nivel cenital, resultado con SVG, historial
+│   └── package.json          # Dependencias de frontend
 │
-├── ml/                       # Inference pipeline & serverless GPU deployment
-│   ├── pipeline/             # Decoupled pipeline modules:
-│   │   ├── segmentation.py   # YOLO26-seg or Mask2Former inference
-│   │   ├── classification.py # Crop classification with Inception-V4 / MobileNet
-│   │   ├── depth.py          # Depth Anything V2 (Metric Small and Large)
-│   │   ├── plate.py          # Circular Hough plate detection & scale calibration
-│   │   ├── volume.py         # RANSAC table plane fitting & volumetric integration (cm³)
-│   │   └── nutrition.py      # Deterministic conversion to grams, kcal, and macros
-│   ├── data/                 # nutrition_wide_densidad.csv & food_names_es.csv
-│   ├── run_local.py          # CLI script to run the pipeline 100% locally
-│   ├── modal_app.py          # Modal serverless GPU container definition
-│   └── tests/test_core.py    # Unit tests for volume, geometry, and nutrition
+├── ml/                       # Módulos de inferencia y despliegue del pipeline
+│   ├── pipeline/             # Módulos modulares desacoplados:
+│   │   ├── segmentation.py   # Inferencia con YOLO26-seg o Mask2Former
+│   │   ├── classification.py # Clasificación de recortes con Inception-V4 / MobileNet
+│   │   ├── depth.py          # Depth Anything V2 (Small y Large métricos)
+│   │   ├── plate.py          # Detección de plato por Hough circular y escala
+│   │   ├── volume.py         # Ajuste RANSAC de mesa e integración volumétrica en cm³
+│   │   └── nutrition.py      # Conversión determinista a gramos, calorías y macros
+│   ├── data/                 # nutrition_wide_densidad.csv y food_names_es.csv
+│   ├── run_local.py          # Script CLI para ejecutar el pipeline 100% en local
+│   ├── modal_app.py          # Definición del contenedor serverless GPU en Modal
+│   └── tests/test_core.py    # Pruebas unitarias de volumen, geometría y nutrición
 │
-├── research/                 # Experimental research & training notebooks
-│   ├── notebooks/            # Reproducible notebooks (00 to 99 + D1)
-│   ├── comparison/           # Aggregated metric tables and EN/ES figures
-│   ├── nutrition_mapping/    # USDA nutritional table construction & audit
-│   └── visual_resources/     # Publication figure generators & web gallery
+├── research/                 # Investigación experimental y cuadernillos de entrenamiento
+│   ├── notebooks/            # Cuadernillos reproducibles (00 a 99)
+│   │   ├── 00_datos_food_recognition_v4_sam2.ipynb
+│   │   ├── A1..A4 (Segmentadores agnósticos YOLO / Mask2Former)
+│   │   ├── B1..B4 (Segmentadores multiclase)
+│   │   ├── C1..C3 (Clasificadores de recortes CNN, MobileNetV3, Inception-V4)
+│   │   ├── D1_calibracion_profundidad_volumen_nutrition5k.ipynb (Profundidad y Nutrition5k)
+│   │   └── 99_comparacion_resultados.ipynb (Comparación global de métricas)
+│   ├── nutrition_mapping/    # Construcción y auditoría de la tabla nutricional USDA
+│   └── visual_resources/    # Scripts generadores de figuras y visualizaciones 3D
 │
-├── docs/                     # Technical documentation & paper drafts
-│   ├── frontend/             # Frontend lifecycle audit & motion plan
-│   └── paper/                # Paper drafts (Section V, calibration & Nutrition5k)
+├── docs/                     # Auditorías técnicas, motion plans e investigación
+│   ├── frontend/             # Auditoría de ciclo de vida, DOM y plan de animaciones
+│   └── paper/                # Borradores de Sección V, calibración y Nutrition5k
 │
-├── .github/                  # CI workflow, PR/Issue templates
-├── .gitignore                # Strict exclusions (weights, temp files, runs)
-├── docker-compose.yml        # Local PostgreSQL development service
-├── pyproject.toml            # Ruff & pytest configuration
-└── ROADMAP.md                # Completed milestones & future work
+├── .gitignore                # Reglas estrictas de exclusión (pesos, temporales, runs)
+└── ROADMAP.md                # Registro de hitos completados y trabajo futuro
 ```
 
 > [!NOTE]
-> **Weights & Privacy Management:** Model weights (`*.pt`, `*.pth`) and local run directories (`/runs/`) are excluded from Git via `.gitignore` to keep the repository lightweight. In production, weights are stored in a private *Modal Volume* (`caloriescounter-models`).
+> **Gestión de pesos y privacidad:** Los archivos de pesos (`*.pt`, `*.pth`) y las carpetas de ejecuciones locales (`/runs/`) están excluidos de Git mediante `.gitignore` para no sobrecargar el repositorio ni violar políticas de tamaño. En producción, los pesos se alojan en un *Modal Volume* privado (`caloriescounter-models`).
 
 ---
 
-## 🚀 Local Setup & Testing
+## 🚀 Ejecución y Pruebas en Local
 
-### 1. Local ML Pipeline Inference
+### 1. Inferencia Local del Pipeline de Machine Learning
 
-You can run the full pipeline locally (on CPU or CUDA GPU) without depending on Modal:
+Puedes probar el pipeline completo localmente (en CPU o GPU CUDA) sin depender de la nube de Modal:
 
 ```powershell
 cd ml
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 
-# Install PyTorch and dependencies
+# Instalar PyTorch y dependencias
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install transformers timm pillow opencv-python-headless numpy pytest
 
-# Run on a sample image (Pipeline B: Mask2Former + Inception, default Depth Small)
+# Ejecutar sobre una imagen de prueba (usando Pipeline B: Mask2Former + Inception y Depth Small predeterminado)
 python run_local.py samples/pizza.jpg --pipeline B
 
-# Evaluate with calibrated Depth Anything V2 Large variant
+# Evaluar con variante Depth Anything V2 Large calibrada
 python run_local.py samples/pizza.jpg --pipeline B --depth-size large
 ```
 
-### 2. Geometry & Nutrition Unit Tests
+### 2. Pruebas Unitarias de Geometría y Nutrición
 
 ```powershell
 cd ml
 pytest tests/test_core.py -v
 ```
 
-### 3. Backend (Django)
+### 3. Ejecutar el Backend (Django)
 
 ```powershell
-# Optional: start local PostgreSQL
-docker compose up -d
-
 cd backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
-# Configure environment variables (copy backend/.env.example -> backend/.env)
+# Configurar variables de entorno (.env)
 python manage.py migrate
-python manage.py test
 python manage.py runserver
 ```
 
-### 4. Frontend (Angular)
+### 4. Ejecutar el Frontend (Angular)
 
 ```powershell
 cd frontend
@@ -201,24 +199,24 @@ npm install
 npm start
 ```
 
-The web app will be available at `http://localhost:4200` with interactive camera capture, zenithal leveling reticle, and macro visualization.
+La aplicación web estará disponible en `http://localhost:4200` con captura interactiva, retícula de nivelación cenital y visualización de macros.
 
 ---
 
-## 🌐 Cloud Deployment
+## 🌐 Despliegue en la Nube
 
-The production stack runs decoupled with zero fixed idle compute cost:
-* **Frontend:** Deployed on **Vercel** (Edge CDN).
-* **Orchestration API:** Deployed on **Render** (Django REST + Python 3.12).
-* **Database & Storage:** **Neon PostgreSQL** (30-day log retention) and **Cloudflare R2** (meal photos via presigned URLs with 72h lifecycle).
-* **GPU Inference:** Serverless container on **Modal** with NVIDIA A10G GPU (scales to zero after 5 minutes of inactivity).
-* **Reasoning Layer:** **Google Gemini Flash Lite** via Google Generative AI API (`< 2 s` response times).
+El stack productivo opera de manera desacoplada y sin costes fijos de computación en reposo:
+* **Frontend:** Desplegado en **Vercel** (Edge CDN).
+* **API de Orquestación:** Desplegado en **Render** (Django REST + Python 3.12).
+* **Base de Datos & Almacenamiento:** **Neon PostgreSQL** (almacenamiento de logs y usuarios con retención de 30 días) y **Cloudflare R2** (fotos de platos con presigned URLs y ciclo de vida de 72 h).
+* **Inferencia GPU:** Contenedor serverless en **Modal** con GPU NVIDIA A10G (auto-escalado a cero tras 5 minutos de inactividad).
+* **Capa de Razonamiento:** **Google Gemini Flash Lite** vía API de Google Generative AI con tiempos de respuesta `< 2 s`.
 
 ---
 
-## 📖 References & Datasets
+## 📖 Referencias y Dataset
 
-1. **Food Recognition Benchmark 2022:** MyFoodRepo / AIcrowd (323 classes in harmonized v2.1 taxonomy).
+1. **Food Recognition Benchmark 2022:** MyFoodRepo / AIcrowd (323 clases en taxonomía v2.1 armonizada).
 2. **Nutrition5k:** *Q. Thames, A. Karpur, W. Norris, F. Xia, L. Panait, A. Reiter, H. Zhou*. "Nutrition5k: Towards Automatic Nutritional Understanding of Generic Food", CVPR 2021.
-3. **USDA FoodData Central:** Standard Reference Legacy, FNDDS, and Foundation tables for gravimetry and macronutrient profiles.
+3. **USDA FoodData Central:** Tablas de referencia estándar SR Legacy, FNDDS y Foundation para gravimetría y perfiles de macronutrientes.
 4. **Depth Anything V2:** *L. Yang et al.* "Depth Anything V2: Metric Indoor Depth Estimation", 2024.
