@@ -64,10 +64,10 @@ class FoodLogEditSerializer(serializers.Serializer):
     def validate_items(self, value):
         for edit in value:
             if "index" not in edit:
-                raise serializers.ValidationError("Cada corrección necesita 'index'.")
+                raise serializers.ValidationError("Each item edit requires 'index'.")
             if "idx" not in edit and "peso_g" not in edit:
                 raise serializers.ValidationError(
-                    "Cada corrección necesita 'idx' (alimento) o 'peso_g' (gramos)."
+                    "Each item edit requires 'idx' (food) or 'peso_g' (grams)."
                 )
         return value
 
@@ -139,7 +139,7 @@ class FoodLogSerializer(serializers.ModelSerializer):
         if missing:
             raise serializers.ValidationError(f"Faltan claves: {sorted(missing)}")
         if not all(isinstance(value[k], (int, float)) and value[k] >= 0 for k in MACRO_KEYS):
-            raise serializers.ValidationError("Los macros deben ser números >= 0.")
+            raise serializers.ValidationError("Macros must be numbers >= 0.")
         return value
 
 

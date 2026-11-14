@@ -250,7 +250,7 @@ const ARC_FULL_DEG = 30;
           <p class="note slow" role="status">{{ i18n.t('capture.slowServer') }}</p>
         }
 
-        <!-- Skeleton del resultado que vendrá -->
+        <!-- Skeleton for incoming result -->
         <div class="card sk">
           <div class="skeleton" style="height: 18px; width: 40%"></div>
           <div class="skeleton" style="height: 14px; margin-top: 12px"></div>

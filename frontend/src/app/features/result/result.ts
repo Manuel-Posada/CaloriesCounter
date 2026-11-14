@@ -184,7 +184,7 @@ interface RenderedSegment {
                     />
                   }
 
-                  <!-- Zonas segmentadas: contorno + etiqueta con nombre y calorías -->
+                  <!-- Segmented zones: contour + label with name and calories -->
                   @if (slidePhoto(r) && segmentsFor(r).length) {
                     <svg class="overlay" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
                       @for (s of segmentsFor(r); track s.key) {
@@ -257,7 +257,7 @@ interface RenderedSegment {
                     </aside>
                   }
 
-                  <!-- Resumen calórico -->
+                  <!-- Calorie summary -->
                   <div class="card summary">
                     <div class="kcal">
                       <strong>

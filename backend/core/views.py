@@ -60,7 +60,7 @@ class GoogleLoginView(APIView):
                 settings.GOOGLE_OAUTH_CLIENT_ID,
             )
         except ValueError:
-            return Response({"detail": "Token de Google inválido."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": "Invalid Google token."}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not info.get("email_verified"):
             return Response({"detail": "Email de Google no verificado."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -253,7 +253,7 @@ class FoodLogDetailView(generics.RetrieveUpdateDestroyAPIView):
             if data.get("plate_diameter_cm") is not None:
                 if obj.escala_origen != "plate":
                     return Response(
-                        {"detail": "Este análisis no usó el plato como referencia de escala."},
+                        {"detail": "This analysis did not use the plate as a scale reference."},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
                 food_items.apply_plate_diameter(obj, data["plate_diameter_cm"])

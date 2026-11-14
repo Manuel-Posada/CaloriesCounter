@@ -51,12 +51,12 @@ def apply_edits(log, edits: list[dict]) -> None:
     """Apply [{index, idx?, peso_g?}] edits to items and recalculate totals."""
     items = list(log.items or [])
     if not items:
-        raise ValueError("Este análisis no tiene detalle editable.")
+        raise ValueError("This analysis has no editable breakdown.")
 
     for edit in edits:
         index = int(edit["index"])
         if not 0 <= index < len(items):
-            raise ValueError(f"Índice de alimento fuera de rango: {index}")
+            raise ValueError(f"Food item index out of range: {index}")
         item = items[index]
 
         if "idx" in edit and edit["idx"] is not None:
@@ -98,7 +98,7 @@ def apply_plate_diameter(log, diameter_cm: float) -> None:
     """Rescale volume according to the real plate diameter (volume ∝ diameter³)."""
     if not MIN_PLATE_DIAMETER_CM <= diameter_cm <= MAX_PLATE_DIAMETER_CM:
         raise ValueError(
-            f"Diámetro fuera de rango ({MIN_PLATE_DIAMETER_CM}-{MAX_PLATE_DIAMETER_CM} cm)."
+            f"Diameter out of range ({MIN_PLATE_DIAMETER_CM}-{MAX_PLATE_DIAMETER_CM} cm)."
         )
     current = float(log.plate_diameter_cm or 26.0)
     if abs(diameter_cm - current) < 1e-6:

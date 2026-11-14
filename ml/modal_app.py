@@ -151,7 +151,7 @@ class FoodInference:
 
         raw = file.file.read(config.MAX_UPLOAD_BYTES + 1)
         if len(raw) > config.MAX_UPLOAD_BYTES:
-            return _reply(request, {"detail": "Imagen demasiado grande (máx. 10 MB)"}, 413)
+            return _reply(request, {"detail": "Image too large (max 10 MB)"}, 413)
         try:
             img, f35 = load_image(raw)
         except Exception:
