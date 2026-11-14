@@ -1,101 +1,109 @@
-# Inference Pipeline (Modal)
+# Pipeline de inferencia (Modal)
 
 ```
 ml/
-├── modal_app.py            # Modal app: container image, FoodInference class, POST endpoint
-├── run_local.py            # Run the pipeline locally (without Modal)
-├── data/                   # Place nutrition_wide_densidad.csv here
-├── samples/                # Sample test images
+├── modal_app.py            # App Modal: imagen, clase FoodInference, endpoint POST
+├── run_local.py            # Prueba del pipeline en local (sin Modal)
+├── data/                   # <- colocar aquí nutrition_wide_densidad.csv
+├── samples/                # imágenes de prueba
 ├── pipeline/
-│   ├── config.py           # Paths, model IDs, thresholds
+│   ├── config.py           # rutas, IDs de modelos, umbrales
 │   ├── segmentation.py     # YoloSegmenter (A) · Mask2FormerSegmenter (B)
 │   ├── classification.py   # InceptionV4Classifier (B)
-│   ├── depth.py            # Depth Anything V2 (metric, meters)
-│   ├── volume.py           # Depth + mask -> cm³ (pure NumPy)
-│   ├── nutrition.py        # CSV -> grams -> kcal / macros (pure Python)
-│   └── runner.py           # A/B pipeline orchestrator
-└── tests/test_core.py      # Volume, overlay, and nutrition unit tests (no GPU)
+│   ├── depth.py            # Depth Anything V2 (métrico, metros)
+│   ├── volume.py           # profundidad + máscara -> cm³ (numpy puro)
+│   ├── nutrition.py        # CSV -> gramos -> kcal / macros (python puro)
+│   └── runner.py           # orquestador A/B
+└── tests/test_core.py      # volumen y nutrición (sin GPU)
 ```
 
-## Deploying to Modal
+## Despliegue en Modal
 
-Requirements: Modal account, `ml/data/nutrition_wide_densidad.csv`, and the three model weight files in the repository root (`*.pt` files are **not** tracked in Git; they go into a Modal Volume).
+Requisitos: cuenta de Modal, `ml/data/nutrition_wide_densidad.csv` y los tres pesos en la raíz del
+repo (`*.pt` **no** se versionan: van al Volume).
 
 ```bash
 cd ml
 pip install -r requirements.txt
-modal setup                       # or `modal token new`
+modal setup                       # o `modal token new`
 
-# 1. Create Volume with custom weights (mounted at /models/<filename>)
+# 1. Volume con los pesos propios (las rutas son /models/<fichero>)
 modal volume create caloriescounter-models
 modal volume put caloriescounter-models ../yolo26_seg_food323.pt /yolo26_seg_food323.pt
 modal volume put caloriescounter-models ../inception_v4_food323.pt /inception_v4_food323.pt
 modal volume put caloriescounter-models ../mask2former_agnostic.pt /mask2former_agnostic.pt
 
-# 2. Shared secret with Django (same value in backend/.env)
-modal secret create caloriescounter-modal MODAL_SHARED_SECRET=<long-random-string>
+# 2. Secreto compartido con Django (mismo valor en backend/.env)
+modal secret create caloriescounter-modal MODAL_SHARED_SECRET=<cadena-larga-aleatoria>
 
-# 3. Deploy
+# 3. Desplegar
 modal deploy modal_app.py
 ```
 
-`modal deploy` outputs the endpoint URL:
+`modal deploy` imprime la URL del endpoint:
 `https://<workspace>--calories-counter-inference-foodinference-predict.modal.run`.
-Add it to `backend/.env` along with the shared secret:
+Se pega en `backend/.env` junto al mismo secreto:
 
 ```dotenv
 MODAL_ENDPOINT_URL=https://<workspace>--calories-counter-inference-foodinference-predict.modal.run
-MODAL_SHARED_SECRET=<same-secret>
+MODAL_SHARED_SECRET=<la misma cadena>
 ```
 
-Django sends the secret in the `X-Modal-Secret` header; Modal returns `401` if missing or mismatched, so **the endpoint is not publicly callable**.
+Django manda el secreto en la cabecera `X-Modal-Secret`; Modal responde 401 si no coincide o si
+falta, así que **el endpoint no es usable desde fuera**.
 
-Notes:
+Notas:
 
-- The first `modal deploy` builds the image (PyTorch + Transformers) and takes several minutes.
-- `_download_hf_models()` bakes Depth Anything V2 and the Mask2Former config into the image so cold starts do not download weights.
-- Runs on an `A10G` GPU with `scaledown_window=300` (scales to zero after 5 minutes of inactivity).
-- For live-reload development: `modal serve modal_app.py` (temporary URL).
-- `CORS_ALLOWED_ORIGINS` only affects direct browser requests; Django calls Modal server-to-server.
-- When updating pipeline code, just re-run `modal deploy`; Volume weights remain untouched.
+- El primer `modal deploy` compila la imagen (torch + transformers): tarda varios minutos.
+- `_download_hf_models()` hornea Depth Anything V2 y la configuración de Mask2Former en la imagen,
+  así que los cold starts no descargan pesos.
+- GPU `A10G`; la clase tiene `scaledown_window=300`, se apaga a los 5 minutos sin uso.
+- Para desarrollo con recarga: `modal serve modal_app.py` (URL temporal).
+- `CORS_ALLOWED_ORIGINS` solo afecta a llamadas directas desde el navegador; Django llama desde el
+  servidor, así que no es necesario para la app.
+- Al cambiar código del pipeline basta con volver a `modal deploy`; los pesos del Volume no se tocan.
 
-## Local Execution (without Modal)
+## Prueba local (sin Modal)
 
 ```powershell
 cd ml
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu   # CPU-only
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu   # sin GPU
 pip install transformers timm pillow opencv-python-headless numpy pytest
 
 # Pipeline B: mask2former_agnostic.pt + inception_v4_food323.pt
-python run_local.py ..\my_plate.jpg --pipeline B
+python run_local.py ..\mi_plato.jpg --pipeline B
 
 # Pipeline A: yolo26_seg_food323.pt
 pip install "ultralytics>=8.4.0"
-python run_local.py ..\my_plate.jpg --pipeline A
+python run_local.py ..\mi_plato.jpg --pipeline A
 ```
 
-`run_local.py` loads weights from the repository root by default; override via `MODELS_DIR`, `MASK2FORMER_WEIGHTS`, `INCEPTION_WEIGHTS`, `YOLO_WEIGHTS`, `DEPTH_MODEL_ID`, and `NUTRITION_CSV`.
+`run_local.py` toma los pesos de la raíz del repo; se pueden sobreescribir con
+`MODELS_DIR`, `MASK2FORMER_WEIGHTS`, `INCEPTION_WEIGHTS`, `YOLO_WEIGHTS`, `DEPTH_MODEL_ID`
+y `NUTRITION_CSV`.
 
-> **Depth model:** The default is the *Small* variant (`DEPTH_MODEL_ID`), which is validated end-to-end. The *Large* variant overestimates close-up distance—on `samples/pizza.jpg` it predicts 1.8 m where the true distance is ~0.4 m, inflating volume (200 L instead of 0.17 L). You can test it with `--depth-size large`, though without calibration it is not production-ready and adds ~1.3 GB.
+> **Modelo de profundidad:** el valor por defecto es la variante *Small* (`DEPTH_MODEL_ID`), que es
+> la validada de extremo a extremo. La *Large* sobreestima la distancia en primeros planos —en la
+> foto de `samples/pizza.jpg` estima 1,8 m donde hay ~0,4 m— y el volumen se dispara (200 L en vez
+> de 0,17 L). Se puede probar con `--depth-model ...-Large-hf`, pero sin calibrar no es apta para
+> producción. Es más lenta y pesa ~1,3 GB más.
 
 ```powershell
-python run_local.py ..\my_plate.jpg --pipeline B `
+python run_local.py ..\mi_plato.jpg --pipeline B `
   --depth-model depth-anything/Depth-Anything-V2-Metric-Indoor-Small-hf
 ```
 
-## API Usage
+## Uso
 
 ```bash
 curl -X POST "https://<workspace>--calories-counter-inference-foodinference-predict.modal.run?pipeline=B" \
-     -F "file=@plate.jpg"
+     -F "file=@plato.jpg"
 ```
+Parámetros: `pipeline=A|B` (default `B`: Mask2Former + Inception; `A` es YOLO26-seg), `fov_deg` (FOV horizontal de la cámara; si no se envía se usa el EXIF `FocalLengthIn35mmFilm` y, si no existe, 65°) y `f35_mm` (focal equivalente en 35 mm leída del EXIF en el navegador, para cuando la subida viene recomprimida sin metadatos).
 
-Query parameters: `pipeline=A|B` (default `B`: Mask2Former + Inception; `A` is YOLO26-seg), `fov_deg` (horizontal camera FOV; falls back to EXIF `FocalLengthIn35mmFilm`, then 65°), and `f35_mm` (35 mm equivalent focal length extracted client-side before recompression).
-
-Response summary (JSON contract keys are preserved across `ml/`, `backend/`, and `frontend/`):
-
+Respuesta (resumen):
 ```json
 {
   "alimentos": [{
@@ -114,22 +122,27 @@ Response summary (JSON contract keys are preserved across `ml/`, `backend/`, and
   "advertencias": []
 }
 ```
-
-`totales` maps 1:1 to Django's `FoodLog` (`clases_detectadas`, `calorias_totales`, `volumen_estimado`, `macronutrientes`).
-`poligono` is the outer mask contour (up to 40 points, normalized 0..1 coordinates) and `centroide` is its center for frontend SVG rendering.
-`nutricion.por_100g` returns raw per-100 g values from the catalog.
-`angulo_camara_deg` is camera tilt from vertical estimated via the support plane normal (`0` = zenithal; `null` if no segment yielded a reliable plane). Exceeding `TILT_WARN_DEG` (default 15°) adds a warning without blocking inference.
+`totales` mapea 1:1 con `FoodLog` de Django (`clases_detectadas`, `calorias_totales`, `volumen_estimado`, `macronutrientes`).
+`poligono` es el contorno exterior de la máscara (máximo 40 puntos, coordenadas normalizadas 0..1 sobre la imagen)
+y `centroide` su centro: el frontend los usa para pintar la zona y su etiqueta sobre la foto.
+`nutricion.por_100g` son los valores de la tabla tal cual, para que el usuario pueda consultarlos.
+`angulo_camara_deg` es la inclinación de la cámara respecto a la vertical, estimada con la normal del plano de
+apoyo: `0` = cenital. Vale `null` cuando ningún segmento dio un plano fiable (nunca se inventa un `0`). Si supera
+`TILT_WARN_DEG` (15° por defecto) se añade una advertencia, pero la inferencia no se bloquea.
 
 ## Tests
-
 ```bash
-pip install numpy opencv-python-headless pillow pytest
+pip install numpy opencv-python-headless pytest
 pytest
 ```
 
-## Assumptions to Validate
+## Supuestos a validar
+- **CSV**: columnas nutricionales con los nombres exactos del enunciado; la columna de densidad se detecta
+  (`densidad`/`density`/cualquiera con "dens"); `idx` y nombre se detectan por alias (`idx`, `clase`, `nombre`…),
+  y si no hay `idx` se usa el orden de fila. Debe tener exactamente 323 filas o el contenedor falla al arrancar.
+- **Escala**: el volumen depende de la profundidad métrica y de la focal. Calibra con objetos de volumen conocido.
+- **Preprocesado de Inception-V4**: el de `timm` por defecto; debe coincidir con tu entrenamiento.
+- **Mask2Former**: `mask2former_agnostic.pt` se carga sobre la arquitectura deducida de su encoder Swin
+  (la clase de `class_predictor` se ignora porque la segmentación es agnóstica). Sin checkpoint se usa
+  `MASK2FORMER_ID` de Hugging Face.
 
-- **CSV:** Nutritional columns must match expected headers; density column is auto-detected (`densidad`/`density`/contains `dens`); `idx` and name use alias matching (`idx`, `clase`, `nombre`, etc.). Must contain exactly 323 rows or container startup fails.
-- **Scale:** Volume depends on metric depth and focal length. Calibrate against objects of known volume.
-- **Inception-V4 preprocessing:** Uses `timm` default transforms; must match training preprocessing.
-- **Mask2Former:** `mask2former_agnostic.pt` loads onto the architecture inferred from its Swin encoder (`class_predictor` labels are ignored for class-agnostic segmentation). Falls back to Hugging Face `MASK2FORMER_ID` if no checkpoint is provided.

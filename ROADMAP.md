@@ -1,87 +1,98 @@
 # Roadmap
 
-## Phase 2 — Non-Zenithal Photo Warning ✅
+## Fase 2 — Aviso de foto no cenital ✅
 
-*A posteriori* camera tilt estimation from the support plane already fitted by `ml/pipeline/volume.py`, warning users when a gallery photo was taken at an oblique angle (where no live gyroscope sensor is available).
+Detección *a posteriori* del ángulo de cámara a partir del plano de apoyo que ya ajusta
+`ml/pipeline/volume.py`, para avisar cuando la foto viene torcida (típico de la galería, donde
+no hay sensor de inclinación).
 
-- [x] `volume.py`: expose plane normal and compute `camera_tilt_deg()`
-- [x] `runner.py`: include per-image angle and warning if above threshold
-- [x] `FoodLog.angulo_camara_deg` + migration + serializer + view
-- [x] Frontend: warning card in result view when tilt angle is high
-- [x] 30-day retention for `FoodLog` records (`purge_food_logs` management command)
+- [x] `volume.py`: exponer la normal del plano y calcular `camera_tilt_deg()`
+- [x] `runner.py`: agregar el ángulo por imagen y aviso si supera el umbral
+- [x] `FoodLog.angulo_camara_deg` + migración + serializer + vista
+- [x] Frontend: tarjeta de aviso en el resultado cuando el ángulo es alto
+- [x] Retención de 30 días para los `FoodLog` (comando `purge_food_logs`)
 
-## Localization (Spanish / English) ✅
+## Idiomas (español / inglés) ✅
 
-- [x] Custom i18n service with Angular signals and typed dictionaries (zero external dependencies)
-- [x] Hot-swappable language & per-device preference (`cc.locale`), defaulting to `navigator.language`
-- [x] All screens migrated (login, capture, result, history, profile, settings, admin, drawer)
-- [x] Locale-aware date and number formatting; `<html lang>` kept in sync
-- [x] `Accept-Language` header in API and Gemini prompt localized to user language
-- [x] Pipeline warnings returned as codes (`tilt`, `low_volume`, `density_assumed`, `class_missing`)
-- [x] **323 food names translated** (`nombre_es` in nutritional CSV), manually reviewed
-- [x] Language, theme, and accent persisted in user profile (`User.locale/theme/accent` + `PATCH /me/`), cached in `localStorage` for instant first paint
-- [ ] Additional languages (architecture is ready: dictionary + prompt)
+- [x] Servicio de i18n propio con signals y diccionarios tipados (sin dependencias)
+- [x] Cambio en caliente y preferencia por dispositivo (`cc.locale`); por defecto, `navigator.language`
+- [x] Todas las pantallas migradas (login, captura, resultado, historial, perfil, ajustes, admin, menú)
+- [x] Fechas y números con el formato de cada idioma; `<html lang>` sincronizado
+- [x] `Accept-Language` en la API y prompt de Gemini en el idioma del usuario
+- [x] Avisos del pipeline como códigos (`tilt`, `low_volume`, `density_assumed`, `class_missing`)
+- [x] **323 nombres de comida traducidos** (`nombre_es` en el CSV nutricional), revisados por el usuario
+- [x] Idioma, tema y acento guardados en el perfil (`User.locale/theme/accent` + `PATCH /me/`),
+      sincronizados con `localStorage` como caché para el primer pintado
+- [ ] Más idiomas (la estructura ya lo permite: diccionario + prompt)
 
-## Segmented Result Zones & Nutritional Detail ✅
+## Resultado con zonas y detalle ✅
 
-- [x] `overlay.py`: mask contour (`poligono`, ≤ 40 normalized points) and `centroide`
-- [x] `runner.py`: `poligono`, `centroide`, `densidad_asumida`, and `nutricion.por_100g`
-- [x] Result photo: true aspect ratio + `<svg>` overlay for each zone contour
-- [x] Per-zone label with index, name, and kcal, with vertical overlap separation
-- [x] Food list opening a detail sheet: portion breakdown and values per 100 g
-- [x] Contours stored in `FoodLog.contornos` and rendered on history thumbnails (72 h)
-- [x] EXIF: browser reads `FocalLengthIn35mmFilm` before recompression and sends `f35_mm`
+- [x] `overlay.py`: contorno de la máscara (`poligono`, ≤ 40 puntos normalizados) y `centroide`
+- [x] `runner.py`: `poligono`, `centroide`, `densidad_asumida` y `nutricion.por_100g`
+- [x] Foto del resultado: proporción real + `<svg>` con el contorno de cada zona
+- [x] Etiqueta por zona con número, nombre y kcal, con separación si se solapan
+- [x] Lista de alimentos que abre una hoja de detalle: porción y valores por 100 g
+- [x] Contornos guardados en `FoodLog.contornos` y pintados en la miniatura del historial (72 h)
+- [x] EXIF: el navegador lee `FocalLengthIn35mmFilm` antes de recomprimir y lo envía como `f35_mm`
 
-## UI Improvements
+## Mejoras de interfaz
 
-- [x] Side account drawer with Profile, Settings, Administration, and Sign out
-- [x] `GET/PATCH /api/me/` (editable first and last name)
-- [x] A/B pipeline selector in Administration
-- [x] Light / dark / system themes with 5 accent colors
-- [x] Camera: horizontal FOV and level sensitivity settings
-- [x] History: flag tilted photos (> 15°) and render contours
-- [x] Hide scrollbars on mobile; keep visible on desktop
+- [x] Menú lateral de configuración con Perfil, Configuración, Administración y cerrar sesión
+- [x] `GET/PATCH /api/me/` (nombre y apellidos editables)
+- [x] Selector de pipeline A/B y tamaño del predictor de profundidad (Small vs Large) en Administración
+- [x] Temas claro/oscuro/sistema con 5 acentos
+- [x] Cámara: FOV horizontal y sensibilidad del nivel
+- [x] Historial: marcar fotos torcidas (> 15°) y pintar sus contornos
+- [x] En móvil se ocultan las barras de desplazamiento; en escritorio se mantienen
 
-## Ideas / Future Features
+## Ideas / posible feature
 
-- [ ] **Meal reminders** (requires notification permissions and a service worker)
-- [ ] Full-size photo with contours from history (currently thumbnail-only)
-- [ ] Calibrate depth scale with capture distance to enable *Large* model in production
-- [ ] Store localized `nombre_es` in history contours as well (currently stored in English)
-- [ ] **Topic-restricted AI nutrition chat.** Scoped conversation about the analyzed meal (macros, portions, substitutions, habits), not a general-purpose assistant:
-  - *Closed scope*: system prompt defines topic and polite refusal; pre-filter structured call (`{on_topic: bool, motivo}`) gates every question.
-  - *Explicit blocks*: medical diagnosis/treatment, medications, eating disorders, and off-topic queries. Never replaces a healthcare professional.
-  - *Limits*: context = meal summary only (never raw photo or personal data), session and daily user caps, short `max_output_tokens`, same timeout as advice.
-  - *Privacy*: first name used only with user consent; chat history expires after N days.
-  - *UI*: tab inside result screen with permanent advisory disclaimer.
-  - *Cost*: track tokens per conversation and cache frequent answers.
+- [ ] **Recordatorios de comidas** (necesitan permiso de notificaciones y un service worker)
+- [ ] Ver la foto con sus contornos a tamaño completo desde el historial (hoy solo en la miniatura)
+- [x] Calibrar la escala de profundidad con la distancia de captura para poder usar el modelo *Large* (evaluado y calibrado en `research/notebooks/D1_calibracion_profundidad_volumen_nutrition5k.ipynb` y validado frente a báscula en Nutrition5k)
+- [ ] Guardar el `nombre_es` también en los contornos del historial (hoy se guardan en inglés)
+- [ ] **Chat con el agente, con control estricto de tema.** Conversación sobre el plato analizado
+      (macros, porciones, sustituciones, hábitos), no un asistente general:
+      - *Alcance cerrado*: el system prompt define el tema y una respuesta de rechazo amable; una
+        llamada previa con salida estructurada (`{on_topic: bool, motivo}`) filtra la pregunta antes
+        de responder.
+      - *Bloqueos explícitos*: diagnóstico o tratamiento médico, medicamentos, trastornos de la
+        conducta alimentaria, y cualquier tema ajeno a nutrición. Nunca sustituye a un profesional.
+      - *Límites*: contexto = resumen del plato (nunca la foto ni datos personales), tope de
+        mensajes por sesión y por usuario/día, `max_output_tokens` corto y el mismo timeout que el
+        consejo.
+      - *Privacidad*: el nombre de pila solo si el usuario lo permite; el historial del chat caduca
+        a los N días.
+      - *UI*: pestaña dentro del resultado y aviso permanente de que es orientativo.
+      - *Coste*: medir tokens por conversación y cachear las respuestas frecuentes.
 
-## Corrections & Detailed Breakdown (2026-11)
+## Correcciones y detalle (2026-11)
 
-- [x] Real-world scale from plate rim (Hough + pinhole geometry) and warning if undetected
-- [x] `FoodLog.items`: editable per-food detail; totals are always their sum
-- [x] `PATCH /food-logs/<id>/`: edit food class, grams, and plate diameter (volume ∝ diameter³)
-- [x] `GET /foods/?q=`: 323-class catalog search, accent-insensitive with regional synonyms (`papa` → `patata`)
-- [x] History → `/result/:id` with full detail of any saved analysis
-- [x] Swipeable horizontal gallery (`scroll-snap`, thumbnails, synced URL, and prefetching)
-- [x] Shared pagination between history and gallery; active panel retry on failure
-- [x] Analysis deletion with two-step confirmation (`DELETE /food-logs/<id>/`, also deletes R2 photo)
-- [x] Date, time, and year visible in history and result (device timezone)
-- [x] Fullscreen camera with locked portrait orientation (Chrome Android)
-- [x] Swipe-to-dismiss detail sheet (down) and side drawer (right)
-- [x] 30-nutrient per-100 g table inside each food's detail sheet
-- [x] Gemini advice regenerated on plate edits; user's first name used ~1/3 of the time
-- [x] Confidence level (high/medium/low) with reason flags, recalculated on edits
-- [x] "?" indicator on foods with low classifier confidence
-- [x] Directional level ring: each arc opens toward the low side (pitch and roll axes)
-- [x] Shutter button acts as bubble level: shifts and scales up when centered
-- [x] Optional classic level guide inside shutter (crosshair and degrees), frameless
-- [x] Pipeline sanity caps (mean height and total weight) with `volume_clamped` warning
+- [x] Escala real con el borde del plato (Hough + geometría pinhole) y aviso si no se detecta
+- [x] `FoodLog.items`: detalle editable por alimento; los totales son su suma
+- [x] `PATCH /food-logs/<id>/`: corregir clase, gramos y diámetro del plato (volumen ∝ diámetro³)
+- [x] `GET /foods/?q=`: catálogo de 323 clases sin tildes y con sinónimos (`papa` → `patata`)
+- [x] Historial → `/result/:id` con el detalle de cualquier análisis guardado
+- [x] Galería deslizable entre análisis (scroll-snap, miniaturas, URL sincronizada y precarga)
+- [x] Paginación compartida entre historial y galería; detalle del panel activo con reintento
+- [x] Borrado de análisis con confirmación (`DELETE /food-logs/<id>/`, también borra la foto de R2)
+- [x] Fecha, hora y año visibles en historial y resultado (zona horaria del dispositivo)
+- [x] Cámara a pantalla completa con orientación bloqueada en vertical (Chrome Android)
+- [x] Hoja y menú se cierran deslizando (abajo / derecha)
+- [x] Tabla de 30 nutrientes por 100 g en la ficha de cada alimento
+- [x] El consejo de Gemini se regenera al corregir el plato; el nombre de pila aparece ~1 de cada 3 veces
+- [x] Nivel de confianza (alta/media/baja) con sus motivos, recalculado al corregir
+- [x] Aviso «?» en los alimentos que el clasificador no tenía claros
+- [x] Aro direccional: cada lado se abre por el lado bajo (ejes de inclinación y balanceo)
+- [x] El obturador es el nivel: burbuja que se desplaza y crece al centrarse
+- [x] Guía clásica opcional dentro del obturador (cruz y grados), sin recuadro
+- [x] Topes de cordura del pipeline (altura media y peso total) con el aviso `volume_clamped`
 
-## Session & Auth (2026-11)
+## Sesión (2026-11)
 
-- [x] Inactivity auto-logout (30 min, 1-minute warning with "Stay signed in")
-- [x] Fast re-entry: refresh on startup if access token expired; network drops do not log out
-- [x] Logout reason banner on login screen ("Signed out due to inactivity" / "Session expired")
-- [x] Cached profile with retries: never stuck on "My account" while signed in
-- [ ] Remember device beyond 14-day refresh lifetime (requires token rotation + blacklist)
+- [x] Cierre de sesión por inactividad (30 min, con aviso un minuto antes y «Seguir conectado»)
+- [x] Reentrada rápida: refresh al arrancar si el access caducó, y la red caída ya no cierra sesión
+- [x] Aviso del motivo en el login («Cerramos tu sesión por inactividad» / «Tu sesión caducó»)
+- [x] Perfil en caché y con reintentos: nunca se queda en «Mi cuenta» con la sesión abierta
+- [ ] Recordar el dispositivo más allá de los 14 días del refresh (requiere rotación + lista negra)
+
