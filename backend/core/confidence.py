@@ -1,14 +1,14 @@
-"""Nivel de confianza de un análisis, explicable y en un solo sitio.
+"""Explainable analysis confidence score, centralized in one place.
 
-Combina lo que sí sabemos con certeza sobre la medición (de dónde salió la escala, si la foto
-era cenital, si el volumen hubo que recortarlo) con la confianza del clasificador. Se recalcula
-al corregir el plato: los alimentos que el usuario ya ha revisado no penalizan.
+Combines known measurement signals (where scale came from, whether the photo was
+top-down, whether volume had to be clamped) with classifier confidence. Recomputed
+when editing the plate: food items already reviewed by the user are not penalized.
 """
 from __future__ import annotations
 
 ALTA = 75
 MEDIA = 45
-# Por debajo de esta confianza del clasificador (softmax sobre 323 clases) el nombre es dudoso.
+# Below this classifier confidence (softmax over 323 classes), the predicted label is uncertain.
 CLASES_DUDOSAS = 0.15
 CLASES_MUY_DUDOSAS = 0.10
 
@@ -21,7 +21,7 @@ def evaluate(log) -> dict:
         score -= 35
         motivos.append("escala_supuesta")
     elif log.escala_origen == "raw":
-        # Sin plato no hay referencia de tamaño: la distancia del modelo no está verificada.
+        # Without a plate there is no size reference: model distance is unverified.
         score -= 30
         motivos.append("escala_sin_referencia")
 
@@ -34,8 +34,8 @@ def evaluate(log) -> dict:
             score -= 10
             motivos.append("camara_algo_inclinada")
 
-    # Solo cuentan los alimentos que el usuario no ha revisado y cuya confianza conocemos:
-    # los reconstruidos desde un análisis antiguo no la traen y no deben penalizar.
+    # Only count items the user has not reviewed and whose confidence is known:
+    # items reconstructed from legacy analyses lack confidence and should not penalize.
     dudosos = [
         float(item["confianza"])
         for item in log.items or []
@@ -50,7 +50,7 @@ def evaluate(log) -> dict:
             score -= 15
             motivos.append("clasificacion_baja")
 
-    # Análisis reconstruidos desde un registro antiguo: la certeza del clasificador no se guardó.
+    # Analysis reconstructed from a legacy record: classifier confidence was not saved.
     if any(item.get("confianza") is None for item in log.items or []):
         score -= 30
         motivos.append("clasificacion_desconocida")

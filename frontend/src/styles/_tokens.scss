@@ -4,7 +4,7 @@
   --c-primary: #16a34a;
   --c-primary-dark: #15803d;
   --c-primary-soft: #dcfce7;
-  /* Texto legible sobre el color primario. */
+  /* Readable text on top of the primary color. */
   --c-primary-contrast: #ffffff;
   --c-accent: #f59e0b;
   --c-bg: #f6f7f9;
@@ -43,15 +43,15 @@
   --nav-h: 64px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* --- Curvas de aceleración y físicas de resorte (CSS linear()) --- */
-  /* Resorte con amortiguación crítica (ζ ≈ 0.86) para Drawer, Sheet y View Transitions */
+  /* --- Easing curves and spring physics (CSS linear()) --- */
+  /* Critically damped spring (ζ ≈ 0.86) for Drawer, Sheet, and View Transitions */
   --ease-spring-sheet: linear(
     0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%,
     1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%,
     1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991, 0.977 51%, 0.974 53.8%,
     0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1.004 83.8%, 1
   );
-  /* Resorte elástico (ζ ≈ 0.62) para píldoras .tag, badges y micro-interacciones */
+  /* Elastic spring (ζ ≈ 0.62) for .tag pills, badges, and micro-interactions */
   --ease-spring-pop: linear(
     0, 0.007, 0.029 2.2%, 0.118 4.7%, 0.625 14.4%, 0.826 19%, 0.902,
     0.962, 1.008 26.1%, 1.041 28.7%, 1.064 32.1%, 1.07 36%, 1.061 40.5%,
@@ -61,7 +61,7 @@
   --ease-in-accelerate: cubic-bezier(0.32, 0, 0.67, 0);
 }
 
-/* --- Tema oscuro --- */
+/* --- Dark theme --- */
 [data-theme='dark'] {
   color-scheme: dark;
 
@@ -86,7 +86,7 @@
   --shadow: 0 1px 2px rgb(0 0 0 / 45%), 0 4px 16px rgb(0 0 0 / 35%);
 }
 
-/* --- Acentos (claro) --- */
+/* --- Accents (light) --- */
 [data-accent='blue'] {
   --c-primary: #2563eb;
   --c-primary-dark: #1d4ed8;
@@ -111,7 +111,7 @@
   --c-primary-soft: #ede9fe;
 }
 
-/* --- Acentos (oscuro): versiones más luminosas y fondos apagados --- */
+/* --- Accents (dark): brighter versions and muted backgrounds --- */
 [data-theme='dark'][data-accent='blue'] {
   --c-primary: #60a5fa;
   --c-primary-dark: #3b82f6;

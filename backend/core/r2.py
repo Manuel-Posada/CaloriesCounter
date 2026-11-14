@@ -4,7 +4,7 @@ from django.conf import settings
 
 
 class R2NotConfigured(Exception):
-    """Faltan credenciales de Cloudflare R2 en la configuración."""
+    """Missing Cloudflare R2 credentials in configuration."""
 
 
 def r2_configured() -> bool:

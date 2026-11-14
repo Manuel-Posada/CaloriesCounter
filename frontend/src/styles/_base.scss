@@ -18,7 +18,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
-  /* Nada debe provocar desplazamiento horizontal (etiquetas largas, animaciones…). */
+  /* Nothing should cause horizontal scrolling (long labels, animations...). */
   overflow-x: clip;
 }
 
@@ -67,7 +67,7 @@ button {
   color: var(--c-muted);
 }
 
-/* Menú lateral, hoja de detalle o visor de cámara abierto: el fondo no debe hacer scroll ni rubber-banding. */
+/* Drawer, detail sheet, or camera viewfinder open: background must not scroll or rubber-band. */
 body.menu-open,
 body.sheet-open,
 body.camera-open {
@@ -75,7 +75,7 @@ body.camera-open {
   overscroll-behavior: none;
 }
 
-/* --- View Transitions API (navegación entre rutas y elemento compartido plate-hero) --- */
+/* --- View Transitions API (route navigation and shared plate-hero element) --- */
 ::view-transition-old(root) {
   animation: vt-fade-out 0.18s ease-in forwards;
 }
@@ -111,9 +111,9 @@ body.camera-open {
 }
 
 /*
- * Móvil: sin barras de desplazamiento. Se navega con el dedo y se gana espacio.
- * Escritorio: se mantienen, porque son la única pista de que un menú o una página
- * se puede desplazar en vertical.
+ * Mobile: no scrollbars. Touch navigation frees up screen space.
+ * Desktop: keep them, as they are the only visual cue that a menu or page
+ * can scroll vertically.
  */
 @media (max-width: 640px), (pointer: coarse) {
   * {
@@ -137,7 +137,7 @@ body.camera-open {
     scroll-behavior: auto !important;
   }
 
-  /* Las transiciones de vista no aportan información: se desactivan del todo. */
+  /* View transitions add no information: disable them completely. */
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*) {

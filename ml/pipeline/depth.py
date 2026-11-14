@@ -1,4 +1,4 @@
-"""Depth Anything V2 (variante métrica): devuelve profundidad en metros."""
+"""Depth Anything V2 (metric variant): returns depth in meters."""
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -17,7 +17,7 @@ class DepthEstimator:
 
     @torch.inference_mode()
     def predict(self, image: Image.Image) -> np.ndarray:
-        """HxW float32 en metros, al tamaño de `image`."""
+        """HxW float32 in meters, matching `image` dimensions."""
         inputs = self.processor(images=image, return_tensors="pt")
         pixel_values = inputs["pixel_values"].to(device=self.device, dtype=self.dtype)
         pred = self.model(pixel_values=pixel_values).predicted_depth  # (1, h, w)

@@ -1,8 +1,8 @@
 import { Component, computed, input, signal } from '@angular/core';
 
 /**
- * Avatar redondo. Usa la foto de Google y, si no hay o falla al cargar, las iniciales.
- * El tamaño y el radio los decide quien lo coloca (`class="avatar"` en el padre).
+ * Round avatar. Uses the Google photo and, if missing or failed to load, falls back to initials.
+ * Size and border-radius are decided by the parent (`class="avatar"` on the host).
  */
 @Component({
   selector: 'app-avatar',
@@ -34,9 +34,9 @@ import { Component, computed, input, signal } from '@angular/core';
   `,
 })
 export class Avatar {
-  /** URL del avatar; cadena vacía si no hay. */
+  /** Avatar URL; empty string if none. */
   readonly url = input<string>('');
-  /** Texto de respaldo (normalmente las iniciales del usuario). */
+  /** Fallback text (typically the user's initials). */
   readonly initials = input<string>('?');
 
   protected readonly failed = signal(false);

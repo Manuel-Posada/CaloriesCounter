@@ -1,7 +1,7 @@
 /**
- * Reduce la foto a JPEG (lado mayor ≤ maxSide). Las fotos de móvil pesan 3-12 MB y el
- * pipeline de inferencia rechaza > 10 MB; además acelera la subida a R2.
- * `imageOrientation: 'from-image'` aplica la rotación EXIF.
+ * Downscales the photo to JPEG (longest side ≤ maxSide). Mobile photos weigh 3-12 MB and the
+ * inference pipeline rejects > 10 MB; this also speeds up the R2 upload.
+ * `imageOrientation: 'from-image'` applies EXIF rotation.
  */
 export async function compressImage(file: Blob, maxSide = 1280, quality = 0.85): Promise<Blob> {
   const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });

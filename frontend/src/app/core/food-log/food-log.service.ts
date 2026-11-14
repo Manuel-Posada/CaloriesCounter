@@ -19,20 +19,20 @@ export class FoodLogService {
   private readonly prefs = inject(PreferencesService);
   private readonly api = environment.apiUrl;
 
-  /** Lista de registros en memoria para sincronizar la galería deslizable entre Historial y Resultado. */
+  /** In-memory log list to keep the swipeable gallery in sync between History and Result. */
   readonly cachedHistory = signal<FoodLog[]>([]);
-  /** Paginación compartida entre Historial y la galería del resultado. */
+  /** Pagination shared between History and the result gallery. */
   readonly historyHasMore = signal(false);
   readonly historyLoading = signal(false);
   private historyPage = 0;
   private readonly detailCache = new Map<number, FoodLogDetail>();
 
-  /** Paso 1: URL prefirmada de subida. */
+  /** Step 1: presigned upload URL. */
   presign(contentType: string): Observable<PresignResponse> {
     return this.http.post<PresignResponse>(`${this.api}/uploads/presign/`, { content_type: contentType });
   }
 
-  /** Paso 2: PUT directo a R2 (sin pasar por Django). Emite 0-100 y completa al terminar. */
+  /** Step 2: direct PUT to R2 (bypassing Django). Emits 0-100 and completes when done. */
   uploadToR2(p: PresignResponse, blob: Blob): Observable<number> {
     return this.http
       .put(p.upload_url, blob, { headers: p.headers, reportProgress: true, observe: 'events' })
@@ -45,26 +45,26 @@ export class FoodLogService {
       );
   }
 
-  /** Paso 3: dispara la inferencia (Modal + Gemini) y registra el FoodLog. */
+  /** Step 3: triggers inference (Modal + Gemini) and records the FoodLog. */
   create(idImagenR2: string, f35Mm: number | null = null): Observable<FoodLogCreated> {
     const body: Record<string, unknown> = {
       id_imagen_r2: idImagenR2,
       pipeline: this.pipeline.pipeline(),
       depth_model: this.pipeline.depthModel(),
     };
-    // FOV elegido en Configuración; si es «Automático» no se envía y el pipeline usa el EXIF.
+    // FOV selected in Settings; if "Auto", omit it so the pipeline uses EXIF.
     const fovDeg = this.prefs.fovDeg();
     if (fovDeg !== null) body['fov_deg'] = fovDeg;
-    // Focal del EXIF original, leída antes de recomprimir la imagen.
+    // Original EXIF focal length, read before recompressing the image.
     if (f35Mm !== null) body['f35_mm'] = f35Mm;
     return this.http.post<FoodLogCreated>(`${this.api}/food-logs/`, body);
   }
 
   /**
-   * Orquesta los 3 pasos en secuencia y emite el estado para la UI.
+   * Orchestrates the 3 steps in sequence and emits state for the UI.
    *
-   * El `timeout` evita que la pantalla de "analizando" se quede colgada para siempre si una
-   * petición nunca responde (red móvil que se corta, proxy que no cierra…).
+   * The `timeout` prevents the "analyzing" screen from hanging forever if a request
+   * never responds (dropping mobile network, unclosed proxy, etc.).
    */
   analyze(blob: Blob, f35Mm: number | null = null): Observable<AnalyzeEvent> {
     return this.presign(blob.type || 'image/jpeg').pipe(
@@ -104,21 +104,21 @@ export class FoodLogService {
       );
   }
 
-  /** Vuelve a pedir la primera página (refresco o reintento). */
+  /** Re-fetches the first page (refresh or retry). */
   refreshHistory(): Observable<Page<FoodLog>> {
     return this.list(1);
   }
 
   /**
-   * Carga la siguiente página del historial si queda alguna. Devuelve `null` si ya no hay
-   * más o si hay una petición en curso (Historial y galería comparten estado).
+   * Loads the next history page if any remain. Returns `null` if there are no more
+   * or if a request is already in flight (History and gallery share state).
    */
   loadMoreHistory(): Observable<Page<FoodLog>> | null {
     if (this.historyLoading() || !this.historyHasMore()) return null;
     return this.list(this.historyPage + 1);
   }
 
-  /** Detalle de un análisis guardado (con los alimentos y su tabla nutricional). */
+  /** Saved analysis detail (including food items and their nutrition table). */
   get(id: number): Observable<FoodLogDetail> {
     const cached = this.detailCache.get(id);
     if (cached) return of(cached);
@@ -127,7 +127,7 @@ export class FoodLogService {
       .pipe(tap((detail) => this.detailCache.set(id, detail)));
   }
 
-  /** Corrección del usuario: alimento y/o gramos de un item, o el diámetro del plato. */
+  /** User correction: food item and/or grams of an entry, or plate diameter. */
   update(
     id: number,
     body: { items?: { index: number; idx?: number; peso_g?: number }[]; plate_diameter_cm?: number },
@@ -140,7 +140,7 @@ export class FoodLogService {
     );
   }
 
-  /** Borra un análisis y su imagen. */
+  /** Deletes an analysis and its image. */
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/food-logs/${id}/`).pipe(
       tap(() => {
@@ -150,7 +150,7 @@ export class FoodLogService {
     );
   }
 
-  /** Busca en el catálogo de 323 clases para cambiar un alimento mal clasificado. */
+  /** Searches the 323-class catalog to replace a misclassified food item. */
   searchFoods(query: string): Observable<{ resultados: CatalogFood[] }> {
     return this.http.get<{ resultados: CatalogFood[] }>(`${this.api}/foods/`, {
       params: new HttpParams().set('q', query).set('limit', '12'),

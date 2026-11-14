@@ -1,4 +1,4 @@
-# Entorno y secretos
+# Environment and secrets
 .env
 .venv/
 .venv_test/
@@ -7,14 +7,14 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
-# Modelos y pesos locales (no subir a Git, van en Modal Volume o uso local)
+# Local model weights (do not push to Git; stored in Modal Volume or used locally)
 *.pt
 *.pth
 *.onnx
 *.safetensors
 /runs/
 
-# Documentos locales / paper (no versionar en git)
+# Local documents / paper (do not track in git)
 /calorie counter paper.pdf
 *.pdf
 
@@ -29,13 +29,13 @@ staticfiles/
 media/
 *.sqlite3
 
-# Sistema / editores
+# OS / editors
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
 
-# Artefactos de investigación generados localmente
+# Locally generated research artifacts
 research/data/
 research/visual_resources/datos_visuales.npz
 research/**/runs/

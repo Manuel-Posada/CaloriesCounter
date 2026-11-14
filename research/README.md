@@ -28,26 +28,23 @@ research/
 │   ├── perfiles_piezas.csv / perfiles_resumen.csv / perfiles_delta.csv
 │   ├── profundidad_volumen_metricas.csv / profundidad_paridad_nutrition5k.png
 │   ├── auditoria_runs.csv
-│   ├── *.png (figuras en español)
-│   └── en/ (figuras 10 a 14 en inglés)
+│   ├── *.png (Spanish figures)
+│   └── en/ (English figures 10 to 14)
 ├── visual_resources/
-│   ├── index.html (galería web navegable)
-│   ├── 01_...png a 09_...png (figuras pipeline y mapeo)
-│   ├── 10_...png a 14_...png (calibración profundidad y Nutrition5k)
-│   ├── en/ (figuras 10 a 14 con textos en inglés)
+│   ├── index.html (browsable web gallery)
+│   ├── 01_...png to 09_...png (pipeline and mapping figures)
+│   ├── 10_...png to 14_...png (depth calibration and Nutrition5k)
+│   ├── en/ (English versions of figures 10 to 14)
 │   ├── README.md
 │   ├── resultado_pipeline_B.json / segmentos.csv / profundidad_volumen_metricas.csv
 │   └── generar_*.py
-├── nutrition_mapping/
-│   ├── README_mapeo nutricional.md
-│   ├── nutrition_wide_densidad.csv
-│   └── food_names_es.csv
-├── docs/
-│   ├── Seccion_V_Implementacion_Propuesta.md
-│   └── CONTENIDO_PAPER_CALIBRACION_Y_NUTRITION5K.md
-└── tests/
-    └── test_core.py
+└── nutrition_mapping/
+    ├── README_mapeo nutricional.md
+    ├── nutrition_wide_densidad.csv
+    └── food_names_es.csv
 ```
+
+> Paper drafts live in [`../docs/paper/`](../docs/paper/) and core pipeline unit tests live in [`../ml/tests/test_core.py`](../ml/tests/test_core.py).
 
 ## What is included
 

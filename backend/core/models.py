@@ -8,12 +8,12 @@ class UserManager(BaseUserManager):
 
     def create_google_user(self, email, google_sub, **extra):
         user = self.model(email=self.normalize_email(email), google_sub=google_sub, **extra)
-        user.set_unusable_password()  # Login por contraseña imposible
+        user.set_unusable_password()  # Password login disabled
         user.save(using=self._db)
         return user
 
     def create_superuser(self, email, password=None, **extra):
-        # Solo para acceder al /admin; los usuarios finales entran únicamente con Google.
+        # Only for accessing /admin; end users sign in exclusively with Google.
         extra.setdefault("is_staff", True)
         extra.setdefault("is_superuser", True)
         user = self.model(email=self.normalize_email(email), **extra)
@@ -23,7 +23,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    """Usuario identificado por email; los usuarios finales se autentican solo con Google."""
+    """User identified by email; end users authenticate only with Google."""
 
     username = None
     email = models.EmailField(unique=True)
@@ -32,7 +32,7 @@ class User(AbstractUser):
     )
     picture_url = models.URLField(blank=True)
 
-    # Preferencias de interfaz, para que sigan al usuario entre dispositivos.
+    # UI preferences synced across user devices.
     locale = models.CharField(
         max_length=5, choices=[("es", "Español"), ("en", "English")], default="es"
     )
@@ -70,26 +70,26 @@ class FoodLog(models.Model):
     volumen_estimado = models.FloatField(help_text="cm³")
     calorias_totales = models.FloatField(help_text="kcal")
     macronutrientes = models.JSONField(default=dict)  # {"proteinas_g":..,"carbohidratos_g":..,"grasas_g":..}
-    # Detalle editable por alimento: lo que el usuario puede corregir (clase y gramos).
+    # Editable per-food breakdown: what the user can correct (class and grams).
     # [{idx, nombre, nombre_es, volumen_cm3, densidad_g_cm3, por_100g, peso_g, peso_manual,
-    #   poligono, centroide}]. Los totales de arriba siempre son la suma de esto.
+    #   poligono, centroide}]. The totals above are always the sum of this list.
     items = models.JSONField(default=list, blank=True)
-    # Diámetro del plato con el que se fijó la escala y de dónde salió (plate/prior/raw).
+    # Plate diameter used to set scale and its source (plate/prior/raw).
     plate_diameter_cm = models.FloatField(default=26.0)
     escala_origen = models.CharField(max_length=10, default="raw")
-    # Avisos del pipeline guardados con el análisis (antes solo vivían en la respuesta del POST):
-    # así el detalle del historial muestra los mismos avisos que el resultado recién hecho.
+    # Pipeline warnings saved with the analysis (previously only in the POST response),
+    # so the history detail view shows the same warnings as a fresh result.
     advertencias = models.JSONField(default=list, blank=True)
-    # Nivel de confianza calculado a partir de la escala, la inclinación y el clasificador.
+    # Confidence level computed from scale, camera tilt, and classifier score.
     confianza = models.JSONField(default=dict, blank=True)
     consejo_nutricional = models.TextField(blank=True)
-    # Inclinación estimada de la cámara respecto a la vertical, en grados, calculada por el
-    # pipeline a partir del plano de apoyo. NULL = no se pudo determinar (nunca 0 por defecto).
+    # Estimated camera tilt from vertical in degrees, computed by the pipeline
+    # from the support plane. NULL = could not be determined (never defaults to 0).
     angulo_camara_deg = models.FloatField(null=True, blank=True)
-    # Contornos de cada alimento sobre la foto: [{nombre, kcal, poligono, centroide}].
-    # Solo sirven mientras exista la imagen en R2 (72 h); se vacían al borrarla.
+    # Contours of each food item on the photo: [{nombre, kcal, poligono, centroide}].
+    # Only valid while the image exists in R2 (72 h); cleared when the image is deleted.
     contornos = models.JSONField(default=list, blank=True)
-    # Marca cuándo se borró la imagen de R2 (el registro se conserva).
+    # Timestamp when the image was deleted from R2 (the database record is kept).
     imagen_eliminada_en = models.DateTimeField(null=True, blank=True)
 
     class Meta:

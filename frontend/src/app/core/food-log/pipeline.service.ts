@@ -1,17 +1,17 @@
 import { Injectable, computed, signal } from '@angular/core';
 
 /**
- * Pipeline de inferencia que se envía al backend.
- * B = Mask2Former agnóstico + Inception-V4 (323 clases), el de producción.
- * A = YOLO26-seg, se mantiene disponible para comparar.
+ * Inference pipeline sent to the backend.
+ * B = class-agnostic Mask2Former + Inception-V4 (323 classes), used in production.
+ * A = YOLO26-seg, kept available for comparison.
  */
 export const PRODUCTION_PIPELINE: Pipeline = 'B';
 export type Pipeline = 'A' | 'B';
 
 /**
- * Variante del modelo de profundidad métrico (Depth Anything V2).
- * small = 24.8M parámetros, validado en producción y ligero.
- * large = 335.3M parámetros, mayor detalle de relieve con calibración.
+ * Metric depth model variant (Depth Anything V2).
+ * small = 24.8M parameters, validated in production and lightweight.
+ * large = 335.3M parameters, finer relief detail with calibration.
  */
 export const PRODUCTION_DEPTH_MODEL: DepthModel = 'small';
 export type DepthModel = 'small' | 'large';
@@ -20,18 +20,18 @@ const PIPELINE_STORAGE_KEY = 'cc.pipeline';
 const DEPTH_STORAGE_KEY = 'cc.depth_model';
 
 /**
- * Preferencias locales de inferencia (pipeline y modelo de profundidad).
- * Solo las cambia el panel de administración, y solo afectan a este dispositivo:
- * el backend y Modal aceptan estos parámetros por petición sin estado global.
+ * Local inference preferences (pipeline and depth model).
+ * Only changed via the admin panel, and only affect this device:
+ * the backend and Modal accept these parameters per request with no global state.
  */
 @Injectable({ providedIn: 'root' })
 export class PipelineService {
   readonly pipeline = signal<Pipeline>(readStoredPipeline());
   readonly depthModel = signal<DepthModel>(readStoredDepthModel());
 
-  /** `true` cuando se usa el pipeline de producción (B) sin override. */
+  /** `true` when using the production pipeline (B) with no override. */
   readonly isDefault = computed(() => this.pipeline() === PRODUCTION_PIPELINE);
-  /** `true` cuando se usa la variante de profundidad de producción (small) sin override. */
+  /** `true` when using the production depth variant (small) with no override. */
   readonly isDefaultDepth = computed(() => this.depthModel() === PRODUCTION_DEPTH_MODEL);
 
   set(pipeline: Pipeline): void {

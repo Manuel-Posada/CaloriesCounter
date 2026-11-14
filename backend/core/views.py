@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 
 
 class HealthView(APIView):
-    """Sonda de disponibilidad (sin autenticación)."""
+    """Availability probe (unauthenticated)."""
 
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -40,7 +40,7 @@ class HealthView(APIView):
 
 
 class GoogleLoginView(APIView):
-    """Intercambia un ID token de Google por un par JWT. Único método de login."""
+    """Exchange a Google ID token for a JWT pair. Only login method."""
 
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -79,9 +79,9 @@ class GoogleLoginView(APIView):
 
 
 class MeView(generics.RetrieveUpdateAPIView):
-    """Perfil del usuario autenticado: avatar, nombre, email y si es administrador.
+    """Authenticated user profile: avatar, name, email, and staff status.
 
-    `PATCH` permite cambiar solo el nombre y los apellidos.
+    `PATCH` allows updating only first and last name (plus UI preferences).
     """
 
     serializer_class = ProfileSerializer
@@ -91,7 +91,7 @@ class MeView(generics.RetrieveUpdateAPIView):
 
 
 class PresignedUploadView(APIView):
-    """Devuelve una URL PUT prefirmada para subir la imagen directo a R2."""
+    """Return a presigned PUT URL to upload the image directly to R2."""
 
     def post(self, request):
         ser = PresignRequestSerializer(data=request.data)
@@ -119,7 +119,7 @@ class PresignedUploadView(APIView):
 
 
 class FoodLogListCreateView(generics.ListCreateAPIView):
-    """GET: historial del usuario. POST: inferencia (Modal) + consejo (Gemini) + registro."""
+    """GET: user history. POST: inference (Modal) + advice (Gemini) + log creation."""
 
     serializer_class = FoodLogSerializer
 
@@ -145,7 +145,7 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
             )
             t2 = time.perf_counter()
         except services.ServiceError as exc:
-            log.warning("food-log: fallo en %.1fs: %s", time.perf_counter() - t0, exc)
+            log.warning("food-log: failed in %.1fs: %s", time.perf_counter() - t0, exc)
             return Response({"detail": str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
 
         if not inference.get("alimentos"):
@@ -155,7 +155,7 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
             )
 
         totales = inference["totales"]
-        # El consejo se genera en el idioma que pide el navegador (es por defecto).
+        # Advice is generated in the language requested by the browser (es by default).
         locale = (request.headers.get("Accept-Language") or "es")[:2].lower()
         consejo = services.get_nutrition_advice(
             inference, locale, user_name=services.pick_name(request.user.first_name)
@@ -169,8 +169,8 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
             t3 - t0,
         )
 
-        # Contornos de cada zona para poder pintarlas en el historial mientras exista la
-        # imagen en R2 (72 h). Se vacían al borrar la foto en `cleanup_r2_images`.
+        # Contours for each region so the history view can draw them while the image
+        # remains in R2 (72 h). Cleared when the photo is deleted in `cleanup_r2_images`.
         contornos = [
             {
                 "nombre": a["nombre"],
@@ -206,8 +206,8 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
         ser.is_valid(raise_exception=True)
         ser.save(usuario=request.user)
 
-        # Avisos y confianza se guardan con el análisis para que el detalle del historial los
-        # muestre igual que el resultado recién calculado.
+        # Warnings and confidence are stored with the analysis so the history detail
+        # view matches the freshly computed result.
         registro = ser.instance
         registro.advertencias = inference.get("advertencias", [])
         food_items.attach_confidence(registro)
@@ -224,7 +224,7 @@ class FoodLogListCreateView(generics.ListCreateAPIView):
 
 
 class FoodLogDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """GET: detalle de un análisis (con alimentos). PATCH: correcciones. DELETE: borrarlo."""
+    """GET: analysis detail (with food items). PATCH: corrections. DELETE: remove log."""
 
     serializer_class = FoodLogDetailSerializer
     http_method_names = ["get", "patch", "delete"]
@@ -233,7 +233,7 @@ class FoodLogDetailView(generics.RetrieveUpdateDestroyAPIView):
         return FoodLog.objects.filter(usuario=self.request.user)
 
     def perform_destroy(self, instance):
-        # El registro se borra igual aunque R2 falle: la foto caduca sola a las 72 h.
+        # Delete the DB record even if R2 fails: the photo expires after 72 h anyway.
         key = instance.id_imagen_r2
         instance.delete()
         if not key:
@@ -241,7 +241,7 @@ class FoodLogDetailView(generics.RetrieveUpdateDestroyAPIView):
         try:
             get_r2_client().delete_object(Bucket=settings.R2_BUCKET_NAME, Key=key)
         except (R2NotConfigured, ClientError) as exc:
-            log.warning("food-log: no se pudo borrar %s de R2: %s", key, exc)
+            log.warning("food-log: failed to delete %s from R2: %s", key, exc)
 
     def patch(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -266,8 +266,8 @@ class FoodLogDetailView(generics.RetrieveUpdateDestroyAPIView):
             "items", "volumen_estimado", "calorias_totales", "macronutrientes",
             "clases_detectadas", "contornos", "plate_diameter_cm", "confianza",
         ]
-        # El consejo habla del plato, así que al corregirlo se vuelve a pedir (si Gemini falla,
-        # se conserva el anterior en lugar de dejar la ficha sin texto).
+        # The advice describes the plate, so regenerate it after edits (if Gemini fails,
+        # keep the previous advice instead of leaving the card without text).
         locale = (request.headers.get("Accept-Language") or "es")[:2].lower()
         consejo = services.get_nutrition_advice(
             food_items.inference_like(obj),
@@ -283,7 +283,7 @@ class FoodLogDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Response(self.get_serializer(obj).data)
 
 class FoodCatalogView(APIView):
-    """GET: catálogo de alimentos para corregir una detección (búsqueda por nombre)."""
+    """GET: food catalog for correcting a detection (search by name)."""
 
     def get(self, request):
         query = request.query_params.get("q", "")

@@ -1,15 +1,15 @@
-"""Detección del plato: la referencia de escala de la escena.
+"""Plate detection: the scene's scale reference.
 
-El modelo de profundidad monocular es métrico "en teoría", pero en primeros planos
-(la foto de un plato a 30-50 cm) sobreestima la distancia varias veces y el volumen
-se dispara: 300 g de comida pueden salir como 57 litros.
+The monocular depth model is metric "in theory", but in close-ups
+(a plate photo at 30-50 cm) it overestimates distance several-fold and volume
+blows up: 300 g of food can come out as 57 liters.
 
-El plato es el único objeto de tamaño conocido de la escena. Si se detecta su borde,
-la distancia real sale de la geometría pinhole:
+The plate is the only object of known size in the scene. If its rim is detected,
+the true distance comes from pinhole geometry:
 
-    z_cm = f_px · D_plato_cm / D_plato_px
+    z_cm = f_px * D_plate_cm / D_plate_px
 
-y con ella se corrige la escala de todo el mapa de profundidad.
+and this rescales the entire depth map.
 """
 import math
 from dataclasses import dataclass
@@ -18,16 +18,16 @@ import cv2
 import numpy as np
 from PIL import Image
 
-# El plato tiene que ocupar una parte grande del encuadre para que su borde sea fiable
-# (y porque es el caso de uso: "foto de tu plato").
+# The plate must occupy a large portion of the frame for its rim to be reliable
+# (and because that is the use case: "photo of your plate").
 MIN_DIAMETER_FRAC = 0.30
 MAX_DIAMETER_FRAC = 0.95
-# Fracción mínima de píxeles de comida que deben caer dentro del círculo detectado.
+# Minimum fraction of food pixels that must fall inside the detected circle.
 MIN_FOOD_INSIDE = 0.98
-# Margen de recorte admitido: es habitual que el borde inferior del plato quede a pocos
-# píxeles del encuadre y Hough sigue ajustando bien el círculo completo.
+# Allowed clipping margin: the bottom rim of the plate often sits a few pixels
+# outside the frame and Hough still fits the full circle accurately.
 MAX_CLIPPED_FRAC = 0.05
-# Umbrales de Hough probados en orden: el más estricto primero.
+# Hough thresholds tried in order: strictest first.
 _HOUGH_PARAM2 = (70, 60, 50)
 
 
@@ -40,10 +40,10 @@ class PlateDetection:
 
 
 def detect_plate(image: Image.Image, food_union: np.ndarray | None = None) -> PlateDetection | None:
-    """Círculo del borde del plato, o None si no hay uno fiable.
+    """Plate rim circle, or None if no reliable candidate is found.
 
-    `food_union` (HxW bool) valida el candidato: toda la comida tiene que estar dentro
-    del plato, lo que descarta aros de la mesa, sombras y reflejos.
+    `food_union` (HxW bool) validates the candidate: all food must be inside
+    the plate, which filters out table rings, shadows, and reflections.
     """
     gray = cv2.cvtColor(np.asarray(image.convert("RGB")), cv2.COLOR_RGB2GRAY)
     gray = cv2.medianBlur(gray, 5)
@@ -68,9 +68,9 @@ def detect_plate(image: Image.Image, food_union: np.ndarray | None = None) -> Pl
         for cx, cy, r in circles[0]:
             if not MIN_DIAMETER_FRAC <= 2 * r / w <= MAX_DIAMETER_FRAC:
                 continue
-            # El plato completo dentro del encuadre (con un margen): un círculo cortado por
-            # el borde no permite medir su diámetro. Hough lo ajusta igual si sólo asoma un
-            # poco, y es habitual que el borde inferior quede pegado al encuadre.
+            # Full plate inside the frame (with a margin): a circle clipped by the edge
+            # cannot measure diameter. Hough still fits it if it only peeks out slightly,
+            # and the bottom rim often touches the frame edge.
             margin = MAX_CLIPPED_FRAC * min_side
             if cx - r < -margin or cy - r < -margin or cx + r > w + margin or cy + r > h + margin:
                 continue
@@ -81,8 +81,8 @@ def detect_plate(image: Image.Image, food_union: np.ndarray | None = None) -> Pl
             else:
                 inside = 1.0
             cand = PlateDetection(float(cx), float(cy), float(r), inside)
-            # Varios candidatos válidos: el plato es el mayor (los pequeños son dibujos
-            # del patrón o el fondo de una taza).
+            # Multiple valid candidates: the plate is the largest (smaller ones are
+            # pattern rings or the bottom of a cup).
             if best is None or cand.radius_px > best.radius_px:
                 best = cand
         if best is not None:
@@ -98,7 +98,7 @@ def _food_inside(mask: np.ndarray, cx: float, cy: float, r: float) -> float:
 
 
 def plate_distance_cm(plate: PlateDetection, focal_px: float, diameter_cm: float) -> float:
-    """Distancia a la que está el plato según su diámetro aparente."""
+    """Distance to the plate based on its apparent diameter."""
     return focal_px * diameter_cm / (2.0 * plate.radius_px)
 
 
@@ -117,12 +117,12 @@ def resolve_depth_scale(
     fallback_trigger_cm: float,
     fallback_distance_cm: float,
 ) -> tuple[float, str]:
-    """Factor por el que hay que multiplicar la profundidad y de dónde sale.
+    """Factor to multiply depth by and its source.
 
-    "plate"  -> corregido con el diámetro del plato (el caso bueno).
-    "prior"  -> sin plato y el modelo dice que la mesa está lejísimos: se acota a una
-                distancia típica de foto de plato.
-    "raw"    -> se deja como está (dentro de un rango razonable).
+    "plate"  -> corrected using the plate diameter (the good case).
+    "prior"  -> no plate and the model says the table is very far: clamped to a
+                typical plate-photo distance.
+    "raw"    -> left as-is (within a reasonable range).
     """
     z_model_cm = float(np.median(depth_m)) * 100.0
 

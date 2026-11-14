@@ -13,7 +13,7 @@ MACRO_KEYS = {"proteinas_g", "carbohidratos_g", "grasas_g"}
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    """Perfil del usuario autenticado: lo que pinta el menú de cuenta y la página de perfil."""
+    """Authenticated user profile: rendered in the account menu and profile page."""
 
     class Meta:
         model = User
@@ -27,7 +27,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "theme",
             "accent",
         ]
-        # El nombre y las preferencias se pueden editar; el email y el avatar los manda Google.
+        # Name and preferences are editable; email and avatar are managed by Google.
         read_only_fields = ["email", "picture_url", "is_staff"]
 
 
@@ -40,13 +40,13 @@ class PresignRequestSerializer(serializers.Serializer):
 
 
 class FoodLogCreateSerializer(serializers.Serializer):
-    """Entrada del POST: la imagen ya subida a R2 y opciones de inferencia."""
+    """POST payload: image already uploaded to R2 and inference options."""
 
     id_imagen_r2 = serializers.CharField(max_length=512)
     pipeline = serializers.ChoiceField(choices=["A", "B"], default="B")
     depth_model = serializers.ChoiceField(choices=["small", "large"], default="small")
     fov_deg = serializers.FloatField(required=False, min_value=10, max_value=170)
-    # Focal equivalente en 35 mm del EXIF original (p. ej. 26 en la cámara principal de un móvil).
+    # 35 mm equivalent focal length from original EXIF (e.g. 26 mm on a phone main camera).
     f35_mm = serializers.FloatField(required=False, min_value=5, max_value=300)
 
     def validate_id_imagen_r2(self, value):
@@ -56,7 +56,7 @@ class FoodLogCreateSerializer(serializers.Serializer):
 
 
 class FoodLogEditSerializer(serializers.Serializer):
-    """Body del PATCH: correcciones del usuario sobre un análisis ya guardado."""
+    """PATCH payload: user corrections to an already saved analysis."""
 
     items = serializers.ListField(child=serializers.DictField(), required=False)
     plate_diameter_cm = serializers.FloatField(required=False, min_value=15, max_value=40)
@@ -79,7 +79,7 @@ class FoodLogSerializer(serializers.ModelSerializer):
     calorias_totales = serializers.FloatField(min_value=0)
     peso_total = serializers.SerializerMethodField()
     editable = serializers.SerializerMethodField()
-    # Entrada del POST (detalle calculado por el pipeline); no se devuelve en las respuestas.
+    # POST input (breakdown computed by the pipeline); omitted from responses.
     items = serializers.JSONField(write_only=True, required=False)
     advertencias = serializers.ListField(child=serializers.JSONField(), required=False)
     confianza = serializers.JSONField(required=False)
@@ -116,7 +116,7 @@ class FoodLogSerializer(serializers.ModelSerializer):
         return bool(obj.items)
 
     def get_imagen_url(self, obj):
-        """URL prefirmada de lectura (1 h) mientras la imagen siga en R2; None si ya expiró."""
+        """Presigned read URL (1 h) while the image remains in R2; None once expired."""
         expired = obj.fecha_hora < timezone.now() - timedelta(hours=settings.R2_RETENTION_HOURS)
         if obj.imagen_eliminada_en or expired or not r2_configured():
             return None
@@ -144,7 +144,7 @@ class FoodLogSerializer(serializers.ModelSerializer):
 
 
 class FoodLogDetailSerializer(FoodLogSerializer):
-    """Detalle de un análisis: añade la lista de alimentos (con su tabla nutricional)."""
+    """Analysis detail: adds the food item list (with its nutrition table)."""
 
     alimentos = serializers.SerializerMethodField()
 

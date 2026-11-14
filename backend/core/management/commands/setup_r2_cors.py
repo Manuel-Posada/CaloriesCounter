@@ -3,8 +3,8 @@ from django.core.management.base import BaseCommand, CommandError
 
 from core.r2 import R2NotConfigured, get_r2_client
 
-# El navegador sube la foto directamente a R2 con una URL prefirmada, así que el bucket
-# necesita permitir PUT/GET desde los orígenes de la app.
+# The browser uploads the photo directly to R2 with a presigned URL, so the bucket
+# must allow PUT/GET from the app origins.
 CORS_RULES = {
     "CORSRules": [
         {
@@ -25,10 +25,10 @@ CORS_RULES = {
 
 
 class Command(BaseCommand):
-    help = "Aplica (o muestra) la política CORS del bucket R2, necesaria para subir fotos desde el navegador."
+    help = "Apply (or show) the R2 bucket CORS policy, required for browser photo uploads."
 
     def add_arguments(self, parser):
-        parser.add_argument("--show", action="store_true", help="Solo muestra la política actual.")
+        parser.add_argument("--show", action="store_true", help="Only show the current policy.")
 
     def handle(self, *args, **opts):
         try:
@@ -42,6 +42,6 @@ class Command(BaseCommand):
 
         client.put_bucket_cors(Bucket=settings.R2_BUCKET_NAME, CORSConfiguration=CORS_RULES)
         self.stdout.write(
-            self.style.SUCCESS(f"CORS aplicado al bucket {settings.R2_BUCKET_NAME} "
-                               f"({len(CORS_RULES['CORSRules'][0]['AllowedOrigins'])} orígenes)")
+            self.style.SUCCESS(f"CORS applied to bucket {settings.R2_BUCKET_NAME} "
+                               f"({len(CORS_RULES['CORSRules'][0]['AllowedOrigins'])} origins)")
         )

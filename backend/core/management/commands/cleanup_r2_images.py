@@ -10,11 +10,11 @@ from core.r2 import get_r2_client
 
 
 class Command(BaseCommand):
-    help = "Elimina de Cloudflare R2 las imágenes de FoodLog con más de N horas (72 por defecto). El registro en BD se conserva."
+    help = "Delete FoodLog images from Cloudflare R2 older than N hours (72 by default). The DB record is kept."
 
     def add_arguments(self, parser):
         parser.add_argument("--hours", type=int, default=settings.R2_RETENTION_HOURS)
-        parser.add_argument("--dry-run", action="store_true", help="Solo lista, no borra.")
+        parser.add_argument("--dry-run", action="store_true", help="List only, do not delete.")
 
     def handle(self, *args, **opts):
         cutoff = timezone.now() - timedelta(hours=opts["hours"])
@@ -30,16 +30,16 @@ class Command(BaseCommand):
                 self.stdout.write(f"[dry-run] {log.id_imagen_r2}")
                 continue
             try:
-                # delete_object es idempotente: no falla si la clave ya no existe.
+                # delete_object is idempotent: it does not fail if the key no longer exists.
                 client.delete_object(Bucket=settings.R2_BUCKET_NAME, Key=log.id_imagen_r2)
             except (ClientError, BotoCoreError) as exc:
                 failed += 1
-                self.stderr.write(f"Error borrando {log.id_imagen_r2}: {exc}")
+                self.stderr.write(f"Error deleting {log.id_imagen_r2}: {exc}")
                 continue
             FoodLog.objects.filter(pk=log.pk).update(
                 imagen_eliminada_en=timezone.now(), contornos=[]
             )
             deleted += 1
 
-        self.stdout.write(self.style.SUCCESS(f"Eliminadas: {deleted} | Fallidas: {failed}"))
+        self.stdout.write(self.style.SUCCESS(f"Deleted: {deleted} | Failed: {failed}"))
 

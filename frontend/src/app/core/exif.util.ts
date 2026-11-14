@@ -1,18 +1,18 @@
 import { parse } from 'exifr';
 
-/** El EXIF vive en el primer bloque del fichero; no hace falta leer 10 MB. */
+/** EXIF lives in the first chunk of the file; no need to read 10 MB. */
 const MAX_EXIF_BYTES = 256 * 1024;
 
 /**
- * Focal equivalente en 35 mm (tag EXIF `0xA405`) de la foto original.
+ * 35mm-equivalent focal length (EXIF tag `0xA405`) of the original photo.
  *
- * Hay que leerla **antes** de comprimir: el re-encode a JPEG con canvas borra el EXIF, y sin
- * este dato el pipeline tiene que asumir un FOV de 65° (fuente de error en el volumen).
+ * Must be read **before** compressing: re-encoding to JPEG via canvas strips EXIF, and without
+ * this value the pipeline falls back to assuming a 65° FOV (a source of volume error).
  *
- * Ojo con el nombre: `exifr` traduce el tag a `FocalLengthIn35mmFormat` (no `…Film`).
+ * Watch out for the name: `exifr` maps the tag to `FocalLengthIn35mmFormat` (not `...Film`).
  *
- * Devuelve `null` si el formato no la expone (PNG, HEIC sin EXIF, capturas de pantalla) o si
- * la cámara no la escribe; en ese caso se usa el FOV de Configuración o el valor por defecto.
+ * Returns `null` if the format does not expose it (PNG, HEIC without EXIF, screenshots) or if
+ * the camera does not write it; in that case the Settings FOV or default value is used.
  */
 export async function readFocal35mm(file: Blob): Promise<number | null> {
   try {
@@ -21,7 +21,7 @@ export async function readFocal35mm(file: Blob): Promise<number | null> {
     const value = exif?.FocalLengthIn35mmFormat;
     return typeof value === 'number' && value > 0 ? value : null;
   } catch {
-    // Formato no soportado o EXIF corrupto: no es un error de la app.
+    // Unsupported format or corrupt EXIF: not an app error.
     return null;
   }
 }

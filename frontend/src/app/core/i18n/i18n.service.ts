@@ -6,27 +6,27 @@ export type Locale = 'es' | 'en';
 const STORAGE_KEY = 'cc.locale';
 
 /**
- * Idioma de la interfaz, con cambio en caliente.
+ * UI language with live hot-switching.
  *
- * `t()` lee la señal `locale`, así que cualquier plantilla que lo llame se reevalúa sola al
- * cambiar de idioma. El valor por defecto sale de `navigator.language` (la señal estándar:
- * instantánea, sin red y sin fallar detrás de VPN) y luego se recuerda en el dispositivo.
+ * `t()` reads the `locale` signal, so any template calling it re-evaluates automatically on
+ * language change. The default comes from `navigator.language` (standard signal: instant,
+ * offline, and reliable behind a VPN) and is then remembered on the device.
  */
 @Injectable({ providedIn: 'root' })
 export class I18nService {
   readonly locale = signal<Locale>(initialLocale());
 
-  /** Locale que esperan `DatePipe` / `DecimalPipe` (es | en-US). */
+  /** Locale expected by `DatePipe` / `DecimalPipe` (es | en-US). */
   readonly dateLocale = computed(() => (this.locale() === 'es' ? 'es' : 'en-US'));
 
-  /** Formatos de fecha con el orden natural de cada idioma. */
+  /** Date formats in each language's natural order. */
   readonly shortDate = computed(() => (this.locale() === 'es' ? 'd MMM y, HH:mm' : 'MMM d, y, HH:mm'));
   readonly longDate = computed(() =>
     this.locale() === 'es' ? 'EEEE d MMM y, HH:mm' : 'EEEE, MMM d, y, HH:mm',
   );
 
   constructor() {
-    // Mantiene <html lang> sincronizado: lectores de pantalla, guiones y corrector.
+    // Keeps <html lang> synchronized: screen readers, hyphenation, and spellcheck.
     effect(() => {
       document.documentElement.lang = this.locale();
     });
@@ -46,7 +46,7 @@ export class I18nService {
     try {
       localStorage.setItem(STORAGE_KEY, locale);
     } catch {
-      /* modo privado: vale para esta sesión */
+      /* private mode: applies for this session only */
     }
     this.locale.set(locale);
   }
@@ -57,7 +57,7 @@ function initialLocale(): Locale {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'es' || stored === 'en') return stored;
   } catch {
-    /* sin acceso a localStorage */
+    /* no localStorage access */
   }
   return (navigator.language || 'es').toLowerCase().startsWith('es') ? 'es' : 'en';
 }

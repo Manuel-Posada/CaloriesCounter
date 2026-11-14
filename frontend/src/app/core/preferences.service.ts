@@ -7,7 +7,7 @@ export type LevelSensitivity = 'strict' | 'normal' | 'relaxed';
 export const ACCENTS: readonly Accent[] = ['green', 'blue', 'orange', 'pink', 'violet'];
 export const FOV_OPTIONS: readonly (number | null)[] = [null, 60, 65, 70, 75, 80];
 
-/** Umbrales del nivel de burbuja (verde / se pierde) por sensibilidad. */
+/** Bubble level thresholds (green / lost) per sensitivity. */
 const LEVEL_THRESHOLDS: Record<LevelSensitivity, { enter: number; exit: number }> = {
   strict: { enter: 5, exit: 8 },
   normal: { enter: 8, exit: 12 },
@@ -24,32 +24,32 @@ const KEYS = {
 } as const;
 
 /**
- * Preferencias del usuario que se aplican en el cliente: tema, acento y ajustes de cámara.
- * Se guardan en `localStorage` (por dispositivo) y no pasan por el servidor.
+ * Client-side user preferences: theme, accent, and camera settings.
+ * Stored in `localStorage` (per device) and not sent to the server.
  */
 @Injectable({ providedIn: 'root' })
 export class PreferencesService {
   readonly theme = signal<ThemeMode>(oneOf(KEYS.theme, ['system', 'light', 'dark'], 'system'));
   readonly accent = signal<Accent>(oneOf(KEYS.accent, ACCENTS, 'green'));
   readonly level = signal<LevelSensitivity>(oneOf(KEYS.level, ['strict', 'normal', 'relaxed'], 'normal'));
-  /** FOV horizontal de la cámara en grados; `null` = que decida el pipeline (EXIF o 65°). */
+  /** Horizontal camera FOV in degrees; `null` = let the pipeline decide (EXIF or 65°). */
   readonly fovDeg = signal<number | null>(readFov());
 
-  /** Disparo automático al mantenerse nivelado (por defecto, manual). */
+  /** Auto-capture when held level (manual by default). */
   readonly autoShoot = signal<boolean>(readBool(KEYS.autoShoot, false));
 
-  /** Muestra la guía clásica (cruz, círculo y grados) además del aro direccional. */
+  /** Shows the classic guide (crosshair, circle, and degrees) in addition to the directional ring. */
   readonly bubbleLevel = signal<boolean>(readBool(KEYS.bubbleLevel, false));
 
-  /** Ángulo a partir del cual el aro se pone verde. */
+  /** Angle below which the ring turns green. */
   readonly levelEnter = computed(() => LEVEL_THRESHOLDS[this.level()].enter);
-  /** Histéresis: una vez verde no se pierde hasta superar este ángulo. */
+  /** Hysteresis: once green, it is not lost until exceeding this angle. */
   readonly levelExit = computed(() => LEVEL_THRESHOLDS[this.level()].exit);
 
   private readonly darkMedia = window.matchMedia('(prefers-color-scheme: dark)');
 
   constructor() {
-    // El tema se aplica solo (el efecto lee `theme` y `accent`).
+    // Theme applies automatically (the effect reads `theme` and `accent`).
     effect(() => this.applyTheme());
     this.darkMedia.addEventListener('change', () => this.applyTheme());
   }
@@ -128,7 +128,7 @@ function save(key: string, value: string): void {
   try {
     localStorage.setItem(key, value);
   } catch {
-    /* modo privado: el cambio vale para esta sesión */
+    /* private mode: change applies for this session only */
   }
 }
 
@@ -136,6 +136,6 @@ function remove(key: string): void {
   try {
     localStorage.removeItem(key);
   } catch {
-    /* nada que hacer */
+    /* nothing to do */
   }
 }

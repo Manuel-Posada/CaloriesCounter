@@ -48,7 +48,7 @@ img.thumb {
   }
 }
 
-/* Contorno guardado con el registro: mismo encuadre que `object-fit: cover`. */
+/* Contour saved with the log: same framing as `object-fit: cover`. */
 .thumb-overlay {
   position: absolute;
   inset: 0;
@@ -89,7 +89,7 @@ img.thumb {
   gap: var(--space-2);
 }
 
-/* Foto que salió torcida: mismo umbral que la tarjeta del resultado. */
+/* Photo taken at a tilt: same threshold as the result card. */
 .chip--warn {
   background: var(--c-warn-soft);
   color: var(--c-warn);
@@ -181,7 +181,7 @@ img.thumb {
   text-decoration: underline;
 }
 
-/* Toda la tarjeta del historial abre el detalle del análisis. */
+/* The entire history card opens the analysis detail. */
 .card.row,
 .card.text-only {
   color: inherit;

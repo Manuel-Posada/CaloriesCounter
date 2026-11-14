@@ -92,7 +92,7 @@
   flex-direction: column;
 
   strong {
-    /* Dos líneas para el nombre; el email se queda en una. */
+    /* Two lines for the name; email stays on one. */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;

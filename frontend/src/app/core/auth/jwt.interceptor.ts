@@ -7,9 +7,9 @@ import { AuthService } from './auth.service';
 const PUBLIC_PATHS = ['/auth/google/', '/auth/refresh/'];
 
 /**
- * Adjunta `Authorization: Bearer` SOLO a peticiones hacia nuestra API (nunca a R2:
- * la URL prefirmada ya lleva su firma y un header extra la invalidaría).
- * Ante un 401 intenta renovar el token una vez y reintenta; si falla, cierra sesión.
+ * Attaches `Authorization: Bearer` ONLY to requests to our API (never to R2:
+ * the presigned URL already carries its signature and an extra header would invalidate it).
+ * On a 401, attempts to refresh the token once and retries; if that fails, logs out.
  */
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
@@ -31,8 +31,8 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       }
       return auth.refresh().pipe(
         switchMap((newToken) => next(withToken(req, newToken))),
-        // El servicio ya cierra la sesión si el refresh token caducó. Un fallo de red NO debe
-        // sacar al usuario: se propaga el error y se reintentará en la siguiente petición.
+        // The service already logs out if the refresh token expired. A network error MUST NOT
+        // sign the user out: propagate the error and retry on the next request.
       );
     }),
   );

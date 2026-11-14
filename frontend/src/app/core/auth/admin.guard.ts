@@ -4,8 +4,8 @@ import { map } from 'rxjs';
 import { AuthService } from './auth.service';
 
 /**
- * Reserva `/admin` a `is_staff`. `ensureProfile()` resuelve al instante si el perfil ya está
- * cargado y, si no (recarga directa de la URL), espera la petición antes de decidir.
+ * Restricts `/admin` to `is_staff`. `ensureProfile()` resolves immediately if the profile is
+ * already loaded and, if not (direct URL reload), awaits the request before deciding.
  */
 export const adminGuard: CanActivateFn = () => {
   const auth = inject(AuthService);

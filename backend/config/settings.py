@@ -54,10 +54,10 @@ TEMPLATES = [
     }
 ]
 
-# Se usa el prefijo POSTGRES_* en lugar de DB_* porque python-decouple da
-# prioridad a las variables de entorno del sistema sobre el .env, y nombres
-# genéricos como DB_PASSWORD suelen estar definidos por otros proyectos.
-# En producción (Neon) basta con definir DATABASE_URL.
+# Use the POSTGRES_* prefix instead of DB_* because python-decouple gives
+# priority to system environment variables over .env, and generic names
+# like DB_PASSWORD are often already set by other projects.
+# In production (Neon), setting DATABASE_URL is sufficient.
 DATABASE_URL = config("DATABASE_URL", default="")
 if DATABASE_URL:
     DATABASES = {
@@ -76,7 +76,7 @@ else:
     }
 
 AUTH_USER_MODEL = "core.User"
-# Solo Google OAuth: ningún backend por contraseña salvo el admin (superusuarios).
+# Google OAuth only: no password-based backend except for admin (superusers).
 AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = "es"
@@ -89,7 +89,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="", cast=Csv())
-# Previews y alias de Vercel del propio proyecto (p. ej. caloriescounter-hazel.vercel.app).
+# Vercel previews and aliases for this project (e.g. caloriescounter-hazel.vercel.app).
 CORS_ALLOWED_ORIGIN_REGEXES = config(
     "CORS_ALLOWED_ORIGIN_REGEXES",
     default=r"^https://caloriescounter-[a-z0-9-]+\.vercel\.app$",
@@ -97,8 +97,8 @@ CORS_ALLOWED_ORIGIN_REGEXES = config(
 )
 CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
 
-# Detrás del proxy de Modal/Vercel: sin esto Django cree que la petición es HTTP y
-# rechaza el admin por CSRF cuando el origen es https.
+# Behind Modal/Vercel proxy: without this, Django thinks the request is HTTP and
+# rejects admin requests due to CSRF when the origin is https.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 REST_FRAMEWORK = {
@@ -118,7 +118,7 @@ SIMPLE_JWT = {
 # --- Google OAuth ---
 GOOGLE_OAUTH_CLIENT_ID = config("GOOGLE_OAUTH_CLIENT_ID", default="")
 
-# --- Cloudflare R2 (API compatible con S3) ---
+# --- Cloudflare R2 (S3-compatible API) ---
 R2_ACCOUNT_ID = config("R2_ACCOUNT_ID", default="")
 R2_ACCESS_KEY_ID = config("R2_ACCESS_KEY_ID", default="")
 R2_SECRET_ACCESS_KEY = config("R2_SECRET_ACCESS_KEY", default="")
@@ -126,8 +126,8 @@ R2_BUCKET_NAME = config("R2_BUCKET_NAME", default="")
 R2_PRESIGN_EXPIRES = config("R2_PRESIGN_EXPIRES", default=300, cast=int)
 R2_RETENTION_HOURS = config("R2_RETENTION_HOURS", default=72, cast=int)
 
-# --- Historial ---
-# Los FoodLog se borran pasado este tiempo (las imágenes de R2 ya se van antes, a las 72 h).
+# --- History ---
+# FoodLog records are deleted after this period (R2 images are already removed earlier, at 72 h).
 FOOD_LOG_RETENTION_DAYS = config("FOOD_LOG_RETENTION_DAYS", default=30, cast=int)
 
 STORAGES = {
@@ -147,7 +147,7 @@ AWS_QUERYSTRING_AUTH = True
 AWS_S3_FILE_OVERWRITE = False
 
 
-# --- Modal (inferencia) y Gemini ---
+# --- Modal (inference) and Gemini ---
 MODAL_ENDPOINT_URL = config('MODAL_ENDPOINT_URL', default='')
 MODAL_SHARED_SECRET = config('MODAL_SHARED_SECRET', default='')
 MODAL_TIMEOUT = config('MODAL_TIMEOUT', default=90, cast=int)

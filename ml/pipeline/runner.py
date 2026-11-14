@@ -1,4 +1,4 @@
-"""Orquestador: segmentación (A o B) -> profundidad -> volumen -> masa -> nutrición."""
+"""Orchestrator: segmentation (A or B) -> depth -> volume -> mass -> nutrition."""
 import logging
 import math
 import time
@@ -26,17 +26,17 @@ from .volume import camera_tilt_deg, estimate_volume_cm3, resolve_focal_px
 
 log = logging.getLogger(__name__)
 
-# Una "estrategia" recibe la imagen y devuelve segmentos YA clasificados.
+# A "strategy" takes an image and returns ALREADY classified segments.
 Strategy = Callable[[Image.Image], list[Segment]]
 
 
 def build_strategy_a(segmenter) -> Strategy:
-    """Opción A: YOLO26-seg segmenta y clasifica a la vez."""
+    """Option A: YOLO26-seg segments and classifies in one step."""
     return segmenter.segment
 
 
 def build_strategy_b(segmenter, classifier) -> Strategy:
-    """Opción B: Mask2Former (agnóstico) + Inception-V4 sobre los recortes."""
+    """Option B: Mask2Former (class-agnostic) + Inception-V4 on crops."""
 
     def run(image: Image.Image) -> list[Segment]:
         segments = segmenter.segment(image)
@@ -48,7 +48,7 @@ def build_strategy_b(segmenter, classifier) -> Strategy:
 
 
 def _scale_food(food: dict, factor: float) -> None:
-    """Reescala volumen, peso y nutrientes de un alimento (los macros son proporcionales)."""
+    """Rescale volume, weight, and nutrients of a food item (macros scale linearly)."""
     food["volumen_cm3"] = round(food["volumen_cm3"] * factor, 2)
     food["peso_g"] = round(food["peso_g"] * factor, 2)
     for key in ("calorias_kcal", "proteinas_g", "carbohidratos_g", "grasas_g"):
@@ -73,7 +73,7 @@ class FoodPipeline:
         depth_model: str = "small",
     ) -> dict:
         if mode not in self.strategies:
-            raise ValueError(f"pipeline desconocido: {mode!r} (opciones: {sorted(self.strategies)})")
+            raise ValueError(f"unknown pipeline: {mode!r} (options: {sorted(self.strategies)})")
 
         t0 = time.perf_counter()
         segments = self.strategies[mode](image)
@@ -87,7 +87,7 @@ class FoodPipeline:
         scale, scale_source = 1.0, "raw"
         t_depth = t_seg
         if segments:
-            # Soporta tanto un único DepthEstimator como un diccionario {"small": ..., "large": ...}
+            # Supports both a single DepthEstimator and a dict {"small": ..., "large": ...}
             if isinstance(self.depth, dict):
                 estimator = self.depth.get(depth_model.lower(), self.depth.get("small", next(iter(self.depth.values()))))
             else:
@@ -97,8 +97,8 @@ class FoodPipeline:
             focal_px = resolve_focal_px(image.width, image.height, fov_deg, f35_mm)
             food_union = np.logical_or.reduce([s.mask for s in segments])
 
-            # La profundidad monocular se queda corta en primeros planos: se reescala con el
-            # diámetro del plato antes de medir nada.
+            # Monocular depth underestimates/overestimates close-ups: rescale using the
+            # plate diameter before measuring anything.
             plate = detect_plate(image, food_union)
             scale, scale_source = resolve_depth_scale(
                 depth_m,
@@ -112,7 +112,7 @@ class FoodPipeline:
             )
             if not math.isclose(scale, 1.0):
                 depth_m = (depth_m * scale).astype(np.float32)
-            log.info("escala de profundidad x%.3f (%s)", scale, scale_source)
+            log.info("depth scale x%.3f (%s)", scale, scale_source)
             if scale_source != "plate":
                 warnings.append({"code": "no_plate_reference"})
 
@@ -136,7 +136,7 @@ class FoodPipeline:
                         "peso_g": round(n["peso_g"], 2),
                         "densidad_g_cm3": n["densidad_g_cm3"],
                         "densidad_asumida": n["densidad_asumida"],
-                        # Contorno normalizado para pintar la zona sobre la foto.
+                        # Normalized contour for drawing the region over the photo.
                         "poligono": mask_to_polygon(s.mask),
                         "centroide": list(centroid) if (centroid := mask_centroid(s.mask)) else None,
                         "nutricion": {
@@ -160,9 +160,9 @@ class FoodPipeline:
                 if n["densidad_asumida"]:
                     warnings.append({"code": "density_assumed", "params": {"idx": s.class_idx}})
 
-        # --- topes de cordura -------------------------------------------------
-        # Si la geometría sale imposible (plano mal ajustado, comida que ocupa media foto), se
-        # recorta a lo físicamente posible y se avisa en vez de devolver kilos de comida.
+        # --- sanity caps ------------------------------------------------------
+        # If geometry is physically impossible (badly fitted plane, food covering half the
+        # frame), clamp to plausible limits and warn instead of returning kilograms of food.
         clamped = False
         for food in foods:
             dbg = food["debug_volumen"]
@@ -187,8 +187,8 @@ class FoodPipeline:
         totals = {k: round(v, 2) for k, v in totals.items()}
         totals["clases_detectadas"] = [f["idx"] for f in foods]
 
-        # Un solo ángulo por imagen: la mediana de los planos fiables de cada alimento.
-        # None cuando ningún segmento dio un plano del anillo (no se inventa un 0°).
+        # Single angle per image: median across reliable food planes.
+        # None when no segment yielded a ring plane (never fabricate 0°).
         angulo = round(float(np.median(angles)), 1) if angles else None
         if angulo is not None and angulo > TILT_WARN_DEG:
             warnings.append({"code": "tilt", "params": {"deg": angulo}})

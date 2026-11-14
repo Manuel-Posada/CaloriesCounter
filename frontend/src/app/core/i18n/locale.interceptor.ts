@@ -4,8 +4,8 @@ import { environment } from '../../../environments/environment';
 import { I18nService } from './i18n.service';
 
 /**
- * Manda el idioma de la interfaz a la API para que los textos que genera el servidor
- * (consejo de Gemini, avisos) salgan en el idioma del usuario.
+ * Sends the UI language to the API so server-generated texts
+ * (Gemini advice, warnings) are returned in the user's language.
  */
 export const localeInterceptor: HttpInterceptorFn = (req, next) => {
   if (!req.url.startsWith(environment.apiUrl)) return next(req);

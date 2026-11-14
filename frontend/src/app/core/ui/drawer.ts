@@ -4,15 +4,15 @@ import { AuthService } from '../auth/auth.service';
 import { I18nService } from '../i18n/i18n.service';
 import { Avatar } from './avatar';
 
-/** Duración de la animación de salida del menú lateral (sincronizada con `drawer.scss`). */
+/** Exit animation duration of the side drawer (synced with `drawer.scss`). */
 const DRAWER_CLOSE_MS = 240;
-/** Umbral en píxeles (o velocidad en px/ms) para cerrar el panel al arrastrar a la derecha. */
+/** Pixel threshold (or velocity in px/ms) to close the drawer when swiping right. */
 const DRAWER_SWIPE_PX = 95;
 const DRAWER_SWIPE_VELOCITY = 0.45;
 
 /**
- * Menú lateral de cuenta. Se abre desde el avatar de la barra inferior y sustituye al
- * antiguo botón "Salir": aquí viven el perfil, la configuración y la administración.
+ * Account side drawer. Opens from the bottom-bar avatar and replaces the
+ * old "Logout" button: profile, settings, and admin live here.
  */
 @Component({
   selector: 'app-drawer',
@@ -107,7 +107,7 @@ export class Drawer implements OnDestroy {
   private gestureAxis: 'x' | 'y' | null = null;
 
   constructor() {
-    // Bloquea el scroll y empuja el fondo en 3D mientras el menú está activo (y no cerrándose).
+    // Locks scroll and pushes the background in 3D while the drawer is active (and not closing).
     effect((onCleanup) => {
       const active = this.open() && !this.isClosing();
       document.body.classList.toggle('menu-open', active);
@@ -122,7 +122,7 @@ export class Drawer implements OnDestroy {
     this.isRebounding.set(false);
     this.dragOffset.set(0);
     this.open.set(true);
-    // El perfil puede faltar tras un login lento o un fallo de red: se reintenta al abrir.
+    // Profile may be missing after a slow login or network error: retry on open.
     this.auth.loadProfile();
     setTimeout(() => this.closeBtn()?.nativeElement.focus());
   }
@@ -166,7 +166,7 @@ export class Drawer implements OnDestroy {
     if (ev.cancelable) ev.preventDefault();
     this.isRebounding.set(false);
     this.isDragging.set(true);
-    // Solo arrastra hacia la derecha (dx >= 0) para mantener el borde derecho pegado a la pantalla.
+    // Only drag right (dx >= 0) to keep the right edge flush against the screen.
     this.dragOffset.set(Math.max(0, dx));
   }
 

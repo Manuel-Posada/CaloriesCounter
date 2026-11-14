@@ -9,14 +9,14 @@ import { TokenPair, UserProfile } from '../models';
 
 const ACCESS_KEY = 'cc.access';
 const REFRESH_KEY = 'cc.refresh';
-/** Copia del perfil para pintar el nombre y el avatar al instante (y si /me/ falla). */
+/** Cached copy of the profile to render name and avatar immediately (and if /me/ fails). */
 const PROFILE_KEY = 'cc.profile';
 const GIS_SRC = 'https://accounts.google.com/gsi/client';
 
-/** Por qué se cerró la sesión; la pantalla de login lo explica. */
+/** Why the session ended; explained on the login screen. */
 export type LogoutReason = 'manual' | 'idle' | 'expired';
 
-// Google Identity Services se carga dinámicamente; se tipa mínimamente.
+// Google Identity Services is loaded dynamically; minimally typed.
 declare const google: any;
 
 @Injectable({ providedIn: 'root' })
@@ -32,20 +32,20 @@ export class AuthService {
   private refreshInFlight$?: Observable<string>;
   private profileRequest$?: Observable<UserProfile | null>;
 
-  /** Motivo del último cierre de sesión, para avisar en la pantalla de login. */
+  /** Reason for the last logout, to show a notice on the login screen. */
   readonly logoutReason = signal<LogoutReason | null>(null);
 
   readonly isAuthenticated = computed(() => !!this.access() && !!this.refreshToken());
 
-  /** Perfil de la cuenta (GET /me/). `null` mientras no se haya cargado. */
+  /** Account profile (GET /me/). `null` while not yet loaded. */
   readonly profile = signal<UserProfile | null>(readCachedProfile());
-  /** `true` cuando el perfil viene del servidor y no solo de la caché local. */
+  /** `true` when the profile comes from the server rather than only from local cache. */
   private readonly profileLoaded = signal(false);
   private profileRetryTimer?: ReturnType<typeof setTimeout>;
   private profileRetries = 0;
   readonly isAdmin = computed(() => this.profile()?.is_staff === true);
 
-  /** Nombre a mostrar: el de Google y, si no hay, la parte local del email. */
+  /** Display name: Google's name, or the email local part if unavailable. */
   readonly displayName = computed(() => {
     const p = this.profile();
     if (!p) return '';
@@ -53,7 +53,7 @@ export class AuthService {
     return full || p.email.split('@')[0];
   });
 
-  /** Iniciales para el avatar cuando no hay foto (o falla al cargar). */
+  /** Initials for the avatar when there is no photo (or it fails to load). */
   readonly initials = computed(() => {
     const name = this.displayName();
     if (!name) return '?';
@@ -66,9 +66,9 @@ export class AuthService {
   });
 
   constructor() {
-    // Ojo: aquí NO se puede pedir el perfil. El interceptor JWT inyecta AuthService y, si la
-    // petición sale durante su propia construcción, la inyección es circular y falla en silencio.
-    // La carga inicial la dispara `App` (ya con el servicio construido).
+    // Note: do NOT fetch the profile here. The JWT interceptor injects AuthService, and if
+    // the request fires during its own construction, injection is circular and fails silently.
+    // Initial loading is triggered by `App` (once the service is constructed).
   }
 
   accessToken(): string | null {
@@ -79,7 +79,7 @@ export class AuthService {
     return !!this.refreshToken();
   }
 
-  /** Envía el ID token de Google a Django y guarda el par JWT recibido. */
+  /** Sends the Google ID token to Django and stores the returned JWT pair. */
   loginWithGoogle(idToken: string): Observable<void> {
     return this.http
       .post<TokenPair>(`${environment.apiUrl}/auth/google/`, { id_token: idToken })
@@ -90,10 +90,10 @@ export class AuthService {
   }
 
   /**
-   * Renueva el access token. Las llamadas concurrentes comparten una sola petición.
+   * Refreshes the access token. Concurrent callers share a single request.
    *
-   * Un fallo de red **no** cierra la sesión: el refresh token sigue siendo válido y se
-   * reintentará en la siguiente petición. Solo un 401/403 significa que caducó.
+   * A network failure does **not** log out: the refresh token is still valid and will
+   * retry on the next request. Only a 401/403 means it expired.
    */
   refresh(): Observable<string> {
     if (!this.refreshInFlight$) {
@@ -117,24 +117,24 @@ export class AuthService {
   }
 
   /**
-   * Arranque: si el access token ya caducó (o está a punto), lo renueva antes de que la
-   * primera petición tenga que hacerlo. Silencioso: si falla por red, no pasa nada.
-   * Devuelve `true` si lanzó el refresco (que ya pedirá el perfil al guardar el token).
+   * Startup: if the access token is already expired (or about to), refresh it before the
+   * first request has to. Silent: if it fails due to network, nothing breaks.
+   * Returns `true` if a refresh was started (which will fetch the profile on token save).
    */
   ensureFreshToken(): boolean {
     if (!this.isAuthenticated()) return false;
     const exp = tokenExpiry(this.access());
     if (exp !== null && exp - Date.now() > 60_000) return false;
     this.refresh().subscribe({
-      // Si el refresco no llega (red, backend despertando), el perfil se pide igual: con el
-      // access anterior si aún vale, o con el refresh del interceptor si devuelve 401.
+      // If refresh fails (network, backend waking up), fetch the profile anyway: with the
+      // previous access token if still valid, or via the interceptor refresh if it returns 401.
       error: () => this.loadProfile(),
     });
     return true;
   }
 
   logout(reason: LogoutReason = 'manual'): void {
-    // Solo se anota el motivo si había sesión: cerrar dos veces no debe reescribirlo.
+    // Only record the reason if there was an active session: calling logout twice should not overwrite it.
     if (this.isAuthenticated()) this.logoutReason.set(reason);
     localStorage.removeItem(ACCESS_KEY);
     localStorage.removeItem(REFRESH_KEY);
@@ -144,22 +144,22 @@ export class AuthService {
     this.profileRetryTimer = undefined;
     this.profileRetries = 0;
     this.storeProfile(null);
-    // La preferencia de pipeline es del dispositivo, pero no debe heredarla el siguiente usuario.
+    // Pipeline preference is device-local, but should not be inherited by the next user.
     this.pipelines.reset();
-    // Cierre manual o por inactividad: no se vuelve a entrar solo. Solo una caducidad por
-    // tiempo permite el auto-acceso, que es lo que hace rápida la reentrada normal.
+    // Manual or idle logout: do not auto-sign-in again. Only time-based expiration
+    // allows auto-select, which keeps normal re-entry fast.
     if (reason !== 'expired' && typeof google !== 'undefined') google.accounts.id.disableAutoSelect();
     void this.router.navigate(['/login']);
   }
 
   /**
-   * Perfil de la cuenta, cargado una sola vez. Las llamadas concurrentes comparten petición.
-   * Reintenta si el fallo es de red o del servidor (backend despertando) y devuelve `null`
-   * como último recurso: el menú funciona igual con la copia en caché.
+   * Account profile, loaded once. Concurrent callers share the request.
+   * Retries on network or server errors (backend waking up) and falls back to `null`:
+   * the menu still works using the cached copy.
    */
   ensureProfile(force = false): Observable<UserProfile | null> {
     const cached = this.profile();
-    // La caché pinta al instante, pero no evita pedir el perfil al servidor una vez.
+    // The cache renders immediately, but does not skip fetching the profile from the server once.
     if (!force && cached && this.profileLoaded()) return of(cached);
     if (!this.isAuthenticated()) return of(null);
 
@@ -169,7 +169,7 @@ export class AuthService {
           count: 2,
           delay: (error: unknown, attempt: number) => {
             const status = (error as HttpErrorResponse)?.status;
-            // 401/403 los gestiona el interceptor (refresh o cierre); reintentar no aporta.
+            // 401/403 are handled by the interceptor (refresh or logout); retrying does not help.
             return status === 0 || status >= 500 ? timer(attempt * 1500) : throwError(() => error);
           },
         }),
@@ -182,14 +182,14 @@ export class AuthService {
     return this.profileRequest$;
   }
 
-  /** Dispara la carga sin esperar al resultado (para el arranque y tras el login). */
+  /** Triggers profile loading without waiting for the result (for startup and post-login). */
   loadProfile(force = false): void {
     this.ensureProfile(force).subscribe((profile) => {
       if (profile) {
         this.profileRetries = 0;
         return;
       }
-      // Backend dormido o microcorte: reintentos espaciados; la app sigue usable mientras.
+      // Sleeping backend or brief outage: spaced retries; the app stays usable meanwhile.
       if (!this.isAuthenticated() || this.profileLoaded() || this.profileRetryTimer !== undefined) return;
       if (this.profileRetries >= 3) return;
       this.profileRetries++;
@@ -200,14 +200,14 @@ export class AuthService {
     });
   }
 
-  /** Guarda nombre y apellidos. El email y la foto vienen de Google y no se editan aquí. */
+  /** Saves first and last name. Email and photo come from Google and are not edited here. */
   updateProfile(payload: { first_name: string; last_name: string }): Observable<UserProfile> {
     return this.http
       .patch<UserProfile>(`${environment.apiUrl}/me/`, payload)
       .pipe(tap((profile) => this.storeProfile(profile)));
   }
 
-  /** Guarda las preferencias de interfaz para que sigan al usuario entre dispositivos. */
+  /** Saves UI preferences so they follow the user across devices. */
   savePreferences(prefs: {
     locale?: UserProfile['locale'];
     theme?: UserProfile['theme'];
@@ -218,13 +218,13 @@ export class AuthService {
       .pipe(tap((profile) => this.storeProfile(profile)));
   }
 
-  /** Indica si hay un OAuth Client ID real configurado (no el placeholder). */
+  /** Indicates whether a real OAuth Client ID is configured (not the placeholder). */
   isGoogleConfigured(): boolean {
     const id = environment.googleClientId?.trim() ?? '';
     return id.endsWith('.apps.googleusercontent.com') && !id.startsWith('REEMPLAZAR');
   }
 
-  /** Renderiza el botón oficial "Sign in with Google" dentro de `host`. */
+  /** Renders the official "Sign in with Google" button inside `host`. */
   async renderGoogleButton(host: HTMLElement, onCredential: (idToken: string) => void): Promise<void> {
     if (!this.isGoogleConfigured()) {
       throw new Error('GOOGLE_CLIENT_ID_NOT_CONFIGURED');
@@ -232,10 +232,10 @@ export class AuthService {
     await this.loadGis();
     google.accounts.id.initialize({
       client_id: environment.googleClientId,
-      // Si la cuenta de Google sigue activa en este navegador, entra sin tocar nada (la
-      // velocidad de reentrada que se nota). Tras un cierre manual se desactiva.
+      // If the Google account is still active in this browser, sign in without tapping anything
+      // (noticeably fast re-entry). Disabled after a manual logout.
       auto_select: true,
-      // El callback llega fuera de la zona de Angular.
+      // Callback arrives outside Angular's zone.
       callback: (r: { credential: string }) => this.zone.run(() => onCredential(r.credential)),
     });
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -255,13 +255,13 @@ export class AuthService {
     localStorage.setItem(REFRESH_KEY, refresh);
     this.access.set(access);
     this.refreshToken.set(refresh);
-    // Al entrar (o renovar) ya no hay motivo que explicar en el login.
+    // On sign-in (or refresh) there is no longer a logout reason to explain on login.
     this.logoutReason.set(null);
-    // Tras un login (o un refresh) el perfil puede faltar todavía.
+    // After a login (or refresh) the profile may still be missing.
     this.loadProfile();
   }
 
-  /** Guarda el perfil en memoria y en `localStorage` (para pintarlo al instante al abrir). */
+  /** Stores the profile in memory and `localStorage` (to render immediately on open). */
   private storeProfile(profile: UserProfile | null): void {
     this.profile.set(profile);
     this.profileLoaded.set(profile !== null);
@@ -270,7 +270,7 @@ export class AuthService {
       if (profile) localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
       else localStorage.removeItem(PROFILE_KEY);
     } catch {
-      // Almacenamiento lleno o bloqueado: la app funciona igual, solo pierde la caché.
+      // Storage full or blocked: the app still works, just loses the cache.
     }
   }
 
@@ -278,7 +278,7 @@ export class AuthService {
     if (typeof google !== 'undefined' && google.accounts?.id) return Promise.resolve();
     return new Promise((resolve, reject) => {
       const s = document.createElement('script');
-      // `hl` fija el idioma del botón oficial de Google.
+      // `hl` sets the language of the official Google button.
       s.src = `${GIS_SRC}?hl=${this.i18n.locale()}`;
       s.async = true;
       s.onload = () => resolve();
@@ -288,7 +288,7 @@ export class AuthService {
   }
 }
 
-/** `exp` del JWT en milisegundos, o `null` si el token no se puede leer. */
+/** JWT `exp` in milliseconds, or `null` if the token cannot be parsed. */
 function tokenExpiry(token: string | null): number | null {
   if (!token) return null;
   try {
@@ -300,7 +300,7 @@ function tokenExpiry(token: string | null): number | null {
   }
 }
 
-/** Perfil guardado de la última sesión, para no mostrar «Mi cuenta» mientras llega /me/. */
+/** Profile saved from the last session, to avoid showing "My account" while /me/ loads. */
 function readCachedProfile(): UserProfile | null {
   try {
     const raw = localStorage.getItem(PROFILE_KEY);

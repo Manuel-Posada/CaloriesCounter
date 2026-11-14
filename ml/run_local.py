@@ -1,16 +1,16 @@
-"""Prueba local del pipeline completo, sin Modal.
+"""Local test of the full pipeline, without Modal.
 
-Uso (desde ml/, con el venv activado):
+Usage (from ml/, with venv activated):
 
     python run_local.py plato.jpg --pipeline B
     python run_local.py plato.jpg --pipeline B --depth-model \\
         depth-anything/Depth-Anything-V2-Metric-Indoor-Small-hf
 
-`--pipeline B` usa mask2former_agnostic.pt + inception_v4_food323.pt.
-`--pipeline A` usa yolo26_seg_food323.pt.
+`--pipeline B` uses mask2former_agnostic.pt + inception_v4_food323.pt.
+`--pipeline A` uses yolo26_seg_food323.pt.
 
-Los pesos se buscan en la raíz del repo (o donde diga MODELS_DIR).
-En CPU puede tardar; en GPU es cuestión de segundos.
+Weights are searched in the repo root (or wherever MODELS_DIR points).
+On CPU it may take a while; on GPU it takes seconds.
 """
 import argparse
 import json
@@ -24,26 +24,26 @@ ROOT = HERE.parent
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Pipeline de inferencia en local")
-    ap.add_argument("image", type=Path, help="ruta de la foto del plato")
+    ap = argparse.ArgumentParser(description="Local inference pipeline")
+    ap.add_argument("image", type=Path, help="path to the plate photo")
     ap.add_argument("--pipeline", default="B", choices=["A", "B"], help="A=YOLO26-seg, B=Mask2Former+Inception")
     ap.add_argument("--device", default="cpu", help="cpu | cuda | mps")
-    ap.add_argument("--fov-deg", type=float, default=None, help="FOV horizontal de la cámara en grados")
-    ap.add_argument("--depth-model", default=None, help="repo HF de profundidad (por defecto el de config.py)")
+    ap.add_argument("--fov-deg", type=float, default=None, help="camera horizontal FOV in degrees")
+    ap.add_argument("--depth-model", default=None, help="HF depth repo (defaults to config.py)")
     ap.add_argument(
         "--depth-size",
         default="small",
         choices=["small", "large"],
-        help="variante de Depth Anything V2 (small | large)",
+        help="Depth Anything V2 variant (small | large)",
     )
-    ap.add_argument("--threshold", type=float, default=None, help="umbral de Mask2Former")
-    ap.add_argument("--out", type=Path, default=None, help="guarda el JSON de salida en esta ruta")
+    ap.add_argument("--threshold", type=float, default=None, help="Mask2Former threshold")
+    ap.add_argument("--out", type=Path, default=None, help="save output JSON to this path")
     args = ap.parse_args()
 
     if not args.image.exists():
-        ap.error(f"no existe la imagen: {args.image}")
+        ap.error(f"image not found: {args.image}")
 
-    # Rutas locales por defecto; los valores del entorno tienen prioridad.
+    # Default local paths; environment variables take precedence.
     os.environ.setdefault("MODELS_DIR", str(ROOT))
     os.environ.setdefault("NUTRITION_CSV", str(HERE / "data" / "nutrition_wide_densidad.csv"))
     if args.depth_model:
@@ -69,14 +69,14 @@ def main() -> int:
         weights = [config.YOLO_WEIGHTS]
     for w in weights:
         if not Path(w).exists():
-            print(f"AVISO: no existe el checkpoint {w}", file=sys.stderr)
+            print(f"WARNING: checkpoint not found: {w}", file=sys.stderr)
 
-    print(f"→ dispositivo: {args.device} | pipeline: {args.pipeline}", file=sys.stderr)
+    print(f"→ device: {args.device} | pipeline: {args.pipeline}", file=sys.stderr)
     nutrition = NutritionTable.load(config.NUTRITION_CSV)
-    print(f"→ tabla nutricional: {len(nutrition)} clases", file=sys.stderr)
+    print(f"→ nutrition table: {len(nutrition)} classes", file=sys.stderr)
 
     depth = DepthEstimator(config.DEPTH_MODEL_ID, args.device)
-    print(f"→ profundidad: {config.DEPTH_MODEL_ID}", file=sys.stderr)
+    print(f"→ depth: {config.DEPTH_MODEL_ID}", file=sys.stderr)
 
     strategies = {}
     if args.pipeline == "A":
@@ -84,14 +84,14 @@ def main() -> int:
         strategies["A"] = build_strategy_a(yolo)
     else:
         m2f = Mask2FormerSegmenter(config.MASK2FORMER_ID, args.device, threshold, config.MASK2FORMER_WEIGHTS)
-        print(f"→ Mask2Former: {m2f.source} (umbral {threshold})", file=sys.stderr)
+        print(f"→ Mask2Former: {m2f.source} (threshold {threshold})", file=sys.stderr)
         inception = InceptionV4Classifier(config.INCEPTION_WEIGHTS, config.NUM_CLASSES, args.device)
         print(f"→ Inception-V4: {Path(config.INCEPTION_WEIGHTS).name}", file=sys.stderr)
         strategies["B"] = build_strategy_b(m2f, inception)
 
     pipeline = FoodPipeline(strategies=strategies, depth=depth, nutrition=nutrition)
     image, f35 = load_image(args.image.read_bytes())
-    print(f"→ imagen: {image.width}x{image.height}px | f35={f35} | carga {time.perf_counter() - t0:.1f}s", file=sys.stderr)
+    print(f"→ image: {image.width}x{image.height}px | f35={f35} | load {time.perf_counter() - t0:.1f}s", file=sys.stderr)
 
     result = pipeline.run(
         image, args.pipeline, fov_deg=args.fov_deg, f35_mm=f35, depth_model=args.depth_size
@@ -100,7 +100,7 @@ def main() -> int:
 
     if args.out:
         args.out.write_text(payload, encoding="utf-8")
-        print(f"→ JSON guardado en {args.out}", file=sys.stderr)
+        print(f"→ JSON saved to {args.out}", file=sys.stderr)
     print(payload)
     return 0
 

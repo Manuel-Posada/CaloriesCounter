@@ -4,7 +4,7 @@ export interface Macros {
   grasas_g: number;
 }
 
-/** Valores de la tabla nutricional, por 100 g (el "mapeo" del CSV). */
+/** Nutrition table values per 100 g (from the CSV mapping). */
 export interface NutritionPer100g {
   calorias_kcal: number;
   proteinas_g: number;
@@ -12,48 +12,48 @@ export interface NutritionPer100g {
   grasas_g: number;
 }
 
-/** Elemento de `alimentos` devuelto por el POST (pipeline de Modal). */
+/** Item in `alimentos` returned by the POST endpoint (Modal pipeline). */
 export interface DetectedFood {
   idx: number;
   nombre: string;
-  /** Nombre traducido del CSV nutricional; puede faltar en un Modal antiguo. */
+  /** Translated name from the nutrition CSV; may be missing from an older Modal response. */
   nombre_es?: string;
   confianza: number | null;
   volumen_cm3: number;
   peso_g: number;
   densidad_g_cm3: number;
-  /** `true` si el CSV no traía densidad y se asumió 1 g/cm³. */
+  /** `true` if the CSV had no density and 1 g/cm³ was assumed. */
   densidad_asumida?: boolean;
-  /** `true` si el usuario fijó los gramos a mano. */
+  /** `true` if the user manually set the grams. */
   peso_manual?: boolean;
-  /** `true` si el usuario cambió la clase: ya no cuenta como duda del clasificador. */
+  /** `true` if the user changed the class: no longer counts as classifier uncertainty. */
   clase_editada?: boolean;
-  /** Valores extendidos por 100 g (minerales, vitaminas, grasas). */
+  /** Extended values per 100 g (minerals, vitamins, fats). */
   detalle?: Record<string, number>;
-  /** Contorno de la zona segmentada, normalizado a 0..1 sobre la imagen. */
+  /** Segmented region contour, normalized to 0..1 over the image. */
   poligono?: number[][];
-  /** Centro de la zona segmentada, normalizado. */
+  /** Segmented region center, normalized. */
   centroide?: [number, number] | null;
   nutricion: {
     calorias_kcal: number;
     proteinas_g: number;
     carbohidratos_g: number;
     grasas_g: number;
-    /** Puede faltar con un Modal antiguo que aún no lo envía. */
+    /** May be missing from an older Modal response that does not send it yet. */
     por_100g?: NutritionPer100g;
   };
 }
 
-/** Contorno guardado con el registro, para pintar las zonas en el historial. */
+/** Contour saved with the log, used to draw regions in history. */
 export interface FoodContour {
   nombre: string;
   kcal: number;
-  /** Puntos [x, y] normalizados a 0..1 sobre la imagen. */
+  /** [x, y] points normalized to 0..1 over the image. */
   poligono: number[][];
   centroide: [number, number] | null;
 }
 
-/** Entrada del catálogo de clases, para corregir un alimento mal clasificado. */
+/** Class catalog entry, used to correct a misclassified food item. */
 export interface CatalogFood {
   idx: number;
   nombre: string;
@@ -62,18 +62,18 @@ export interface CatalogFood {
   densidad_g_cm3: number;
 }
 
-/** Nivel de confianza del análisis (lo calcula el servidor con escala, inclinación y clasificador). */
+/** Analysis confidence level (computed server-side from scale, tilt, and classifier). */
 export interface Confidence {
   score: number;
   nivel: 'alta' | 'media' | 'baja';
-  /** Códigos de los motivos que bajan la confianza (`escala_supuesta`, `clasificacion_baja`…). */
+  /** Reason codes that lower confidence (`escala_supuesta`, `clasificacion_baja`…). */
   motivos: string[];
 }
 
 export interface FoodLog {
   id: number;
   id_imagen_r2: string;
-  /** URL prefirmada de lectura; null cuando la imagen ya fue eliminada de R2 (>72 h). */
+  /** Presigned read URL; null when the image has already been deleted from R2 (>72 h). */
   imagen_url: string | null;
   fecha_hora: string;
   clases_detectadas: number[];
@@ -81,36 +81,36 @@ export interface FoodLog {
   calorias_totales: number;
   macronutrientes: Macros;
   consejo_nutricional: string;
-  /** Inclinación de cámara estimada por el pipeline (grados respecto a la vertical). */
+  /** Camera tilt estimated by the pipeline (degrees from vertical). */
   angulo_camara_deg: number | null;
-  /** Contornos por alimento; vacío cuando la imagen ya no existe. */
+  /** Contours per food item; empty when the image no longer exists. */
   contornos: FoodContour[];
-  /** Peso total en gramos (suma del detalle por alimento). */
+  /** Total weight in grams (sum of per-food breakdown). */
   peso_total: number;
-  /** Diámetro del plato con el que se fijó la escala y su origen (plate/prior/raw). */
+  /** Plate diameter used to set the scale and its source (plate/prior/raw). */
   plate_diameter_cm: number;
   escala_origen: 'plate' | 'prior' | 'raw';
-  /** false en análisis antiguos, guardados antes de que existiera el detalle editable. */
+  /** false in older analyses saved before the editable breakdown existed. */
   editable: boolean;
-  /** Avisos del pipeline; los strings sueltos vienen de un Modal antiguo. */
+  /** Pipeline warnings; bare strings come from an older Modal response. */
   advertencias: (string | PipelineWarning)[];
-  /** Puede faltar en análisis guardados antes de existir este cálculo. */
+  /** May be missing in analyses saved before this calculation existed. */
   confianza?: Confidence;
   imagen_eliminada_en: string | null;
 }
 
-/** Aviso del pipeline: código + parámetros, para traducirlo en el cliente. */
+/** Pipeline warning: code + parameters, for client-side translation. */
 export interface PipelineWarning {
   code: string;
   params?: Record<string, string | number>;
 }
 
-/** Respuesta del POST /food-logs/: el registro + el detalle por alimento (no se persiste). */
+/** Response from POST /food-logs/: the log + per-food breakdown (not persisted). */
 export interface FoodLogCreated extends FoodLog {
   alimentos: DetectedFood[];
 }
 
-/** Detalle de un análisis guardado (GET /food-logs/:id/). */
+/** Saved analysis detail (GET /food-logs/:id/). */
 export interface FoodLogDetail extends FoodLog {
   alimentos: DetectedFood[];
 }
@@ -135,16 +135,16 @@ export interface TokenPair {
   refresh: string;
 }
 
-/** GET /me/: perfil mínimo para el menú de cuenta. */
+/** GET /me/: minimal profile for the account menu. */
 export interface UserProfile {
   email: string;
   first_name: string;
   last_name: string;
-  /** Avatar de la cuenta de Google; cadena vacía si no hay. */
+  /** Google account avatar; empty string if none. */
   picture_url: string;
-  /** Habilita la sección de administración. */
+  /** Enables the admin section. */
   is_staff: boolean;
-  /** Preferencias de interfaz guardadas en el perfil. */
+  /** UI preferences saved in the profile. */
   locale: 'es' | 'en';
   theme: 'system' | 'light' | 'dark';
   accent: 'green' | 'blue' | 'orange' | 'pink' | 'violet';

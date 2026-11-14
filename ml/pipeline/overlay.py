@@ -1,22 +1,22 @@
-"""Contornos de las máscaras para pintarlas sobre la foto en el cliente.
+"""Mask contours for rendering overlays on the photo in the client.
 
-Las coordenadas salen normalizadas a [0, 1] (x / ancho, y / alto) para que el frontend
-las dibuje con un `viewBox="0 0 1 1"` sin conocer el tamaño real de la imagen.
+Coordinates are normalized to [0, 1] (x / width, y / height) so the frontend
+can draw them with `viewBox="0 0 1 1"` without knowing the actual image size.
 """
 import cv2
 import numpy as np
 
-# Suficiente para que el contorno parezca suave sin inflar el JSON (≈40 puntos × 2 floats).
+# Enough for the contour to look smooth without bloating JSON (~40 points x 2 floats).
 MAX_POINTS = 40
-# Tolerancia de simplificación: 0,5 % del perímetro (más fiel que 1 % sin inflar el JSON).
+# Simplification tolerance: 0.5% of the perimeter (more faithful than 1% without bloating JSON).
 EPSILON_FRAC = 0.005
 
 
 def mask_to_polygon(mask: np.ndarray, max_points: int = MAX_POINTS) -> list[list[float]]:
-    """Contorno exterior principal de la máscara, simplificado y normalizado.
+    """Main outer contour of the mask, simplified and normalized.
 
-    Devuelve `[]` si la máscara está vacía o no tiene área: el cliente simplemente no
-    dibuja nada para ese alimento.
+    Returns `[]` if the mask is empty or has zero area: the client simply draws
+    nothing for that food item.
     """
     h, w = mask.shape
     if h == 0 or w == 0:
@@ -39,15 +39,15 @@ def mask_to_polygon(mask: np.ndarray, max_points: int = MAX_POINTS) -> list[list
         step = int(np.ceil(len(approx) / max_points))
         approx = approx[::step]
 
-    # +0.5 para usar el centro del píxel, no su esquina.
+    # +0.5 to use the pixel center rather than its corner.
     return [[round(float(x + 0.5) / w, 4), round(float(y + 0.5) / h, 4)] for x, y in approx]
 
 
 def mask_centroid(mask: np.ndarray) -> tuple[float, float] | None:
-    """Centroide de la máscara, normalizado. `None` si está vacía.
+    """Normalized mask centroid. `None` if empty.
 
-    Se calcula sobre la máscara y no sobre el polígono: en formas cóncavas el centroide
-    del contorno puede caer fuera de la figura.
+    Computed over the mask rather than the polygon: for concave shapes the contour
+    centroid can fall outside the figure.
     """
     h, w = mask.shape
     if h == 0 or w == 0:

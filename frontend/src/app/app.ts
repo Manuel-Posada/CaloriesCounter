@@ -78,20 +78,20 @@ export class App {
   private readonly drawer = viewChild(Drawer);
 
   constructor() {
-    // Instanciar las preferencias al arrancar aplica el tema guardado (y escucha al sistema).
+    // Instantiating preferences on startup applies the saved theme (and listens to system changes).
     inject(PreferencesService);
-    // Sincroniza idioma/tema/acento con el perfil del usuario.
+    // Syncs language/theme/accent with the user's profile.
     inject(PreferencesSync);
-    // Despierta el backend (Render duerme a los 15 min) mientras el usuario aún navega.
+    // Wakes up the backend (Render sleeps after 15 min) while the user is still navigating.
     warmUpApi();
-    // Tras recargar, los tokens vienen de localStorage y nadie ha pedido aún el perfil.
-    // Aquí AuthService ya está construido: pedirlo desde su constructor sería circular.
+    // After reload, tokens come from localStorage and no one has requested the profile yet.
+    // AuthService is already constructed here: requesting it from its constructor would be circular.
     if (this.auth.isAuthenticated()) {
-      // Si el access token ya caducó, se renueva antes de que falle la primera petición
-      // (el refresco ya pide el perfil al guardar el token nuevo).
+      // If the access token is already expired, refresh it before the first request fails
+      // (refreshing already fetches the profile when saving the new token).
       if (!this.auth.ensureFreshToken()) this.auth.loadProfile();
     }
-    // Cierra la sesión tras 30 min sin actividad (con aviso un minuto antes).
+    // Logs out after 30 min of inactivity (with a warning one minute prior).
     effect(() => {
       if (this.auth.isAuthenticated()) this.idle.start();
       else this.idle.stop();
@@ -102,7 +102,7 @@ export class App {
     this.drawer()?.openMenu();
   }
 
-  /** Volver a la pestaña o recuperar la red: si el perfil no llegó, se reintenta. */
+  /** Returning to the tab or recovering network: retry if the profile hasn't arrived. */
   @HostListener('document:visibilitychange')
   @HostListener('window:online')
   protected onMaybeBack(): void {
