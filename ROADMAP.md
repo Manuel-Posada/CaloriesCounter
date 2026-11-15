@@ -49,7 +49,7 @@ no hay sensor de inclinación).
 
 - [ ] **Recordatorios de comidas** (necesitan permiso de notificaciones y un service worker)
 - [ ] Ver la foto con sus contornos a tamaño completo desde el historial (hoy solo en la miniatura)
-- [x] Calibrar la escala de profundidad con la distancia de captura para poder usar el modelo *Large* (evaluado y calibrado en `research/notebooks/D1_calibracion_profundidad_nutrition5k.ipynb` y validado frente a báscula en Nutrition5k)
+- [x] Calibrar la escala de profundidad con la distancia de captura para poder usar el modelo *Large* (evaluado y calibrado en `research/notebooks/D1_depth_calibration_nutrition5k.ipynb` y validado frente a báscula en Nutrition5k)
 - [ ] Guardar el `nombre_es` también en los contornos del historial (hoy se guardan en inglés)
 - [ ] **Chat con el agente, con control estricto de tema.** Conversación sobre el plato analizado
       (macros, porciones, sustituciones, hábitos), no un asistente general:

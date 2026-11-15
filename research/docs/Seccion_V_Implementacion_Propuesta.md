@@ -50,7 +50,7 @@ Overall, the implementation preserves the modular philosophy of the proposal whi
 
 Esta sección describe el dataset original, el proceso de armonización de clases, las particiones utilizadas y la base de recortes que alimenta a los clasificadores. El objetivo es doble: fijar el protocolo experimental y explicar las decisiones que condicionan las métricas presentadas en las secciones C–E.
 
-{imagen: flujo_preparacion_datos.png}
+{imagen: flujo_preparacion_datos.png}  
 
 #### B.1 Dataset original
 
@@ -84,7 +84,7 @@ El desbalance de clases es fuerte. En validación, **215 clases** tienen menos d
 
 #### B.4 Base de recortes para los clasificadores
 
-Los clasificadores C1, C2 y C3 no se entrenan con la imagen completa, sino con recortes de cada instancia. El cuadernillo `00_preparacion_datos.ipynb` genera dos variantes:
+Los clasificadores C1, C2 y C3 no se entrenan con la imagen completa, sino con recortes de cada instancia. El cuadernillo `00_data_preparation.ipynb` genera dos variantes:
 
 - `crops/`: fondo negro, caja de la máscara con un **2 %** de margen, lado mayor máximo de **256 px** y erosión de **1 px**.
 - `crops_ctx/`: el mismo recorte con el fondo original y un **10 %** de margen.
@@ -347,7 +347,7 @@ En la evaluación preliminar sobre una única escena real (`34g_platano_163cerdo
 
 #### D.6 Validación cuantitativa multi-plato y calibración de Large en el benchmark Nutrition5k (Cuadernillo D1)
 
-Para superar la limitación de la escena única y evaluar formalmente la hipótesis de calibración de la variante *Large* (pendiente en el ROADMAP), se implementó y ejecutó el cuadernillo `research/notebooks/D1_calibracion_profundidad_nutrition5k.ipynb` utilizando el benchmark **Nutrition5k** (Google Research, Thames et al., CVPR 2021).
+Para superar la limitación de la escena única y evaluar formalmente la hipótesis de calibración de la variante *Large* (pendiente en el ROADMAP), se implementó y ejecutó el cuadernillo `research/notebooks/D1_depth_calibration_nutrition5k.ipynb` utilizando el benchmark **Nutrition5k** (Google Research, Thames et al., CVPR 2021).
 
 Nutrition5k aporta tomas cenitales RGB, mapas de profundidad registrados con sensor de hardware **Intel RealSense** en milímetros y el peso exacto de cada ingrediente medido en báscula digital de precisión.
 
@@ -763,11 +763,11 @@ La experimentación se organiza en tres familias y dos cuadernillos de soporte:
 - **Cuadernillo 00:** preparación del dataset, mapeo v2.0 → v2.1, particiones y recortes para clasificadores.
 - **Cuadernillo 99:** comparación, auditoría y perfiles.
 
-Son **nueve experimentos canónicos**: A1 (`A1_yolo26m_agnostico.ipynb`), A2 (`A2_yolo26n_agnostico.ipynb`), A4 (`A4_mask2former_agnostico.ipynb`), B1 (`B1_yolo26m_clases.ipynb`), B2 (`B2_yolo26n_clases.ipynb`), B4 (`B4_mask2former_clases.ipynb`), C1 (`C1_cnn_propia.ipynb`), C2 (`C2_mobilenetv3.ipynb`) y C3 (`C3_inception_v4.ipynb`), junto a la calibración D1 (`D1_calibracion_profundidad_nutrition5k.ipynb`). Los nueve resultados de test están presentes y se usan en la comparación.
+Son **nueve experimentos canónicos**: A1 (`A1_yolo26m_agnostic.ipynb`), A2 (`A2_yolo26n_agnostic.ipynb`), A4 (`A4_mask2former_agnostic.ipynb`), B1 (`B1_yolo26m_classes.ipynb`), B2 (`B2_yolo26n_classes.ipynb`), B4 (`B4_mask2former_classes.ipynb`), C1 (`C1_custom_cnn.ipynb`), C2 (`C2_mobilenetv3.ipynb`) y C3 (`C3_inception_v4.ipynb`), junto a la calibración D1 (`D1_depth_calibration_nutrition5k.ipynb`). Los nueve resultados de test están presentes y se usan en la comparación.
 
 #### H.2 Cuaderno de comparación
 
-El cuaderno `99_comparacion_resultados.ipynb` es el eje de la evidencia comparativa. Contiene:
+El cuaderno `99_results_comparison.ipynb` es el eje de la evidencia comparativa. Contiene:
 
 1. **Inventario y cobertura** de los resultados disponibles.
 2. **Auditoría 1.1** de runs, cuadernillos y JSON de test.
@@ -832,7 +832,7 @@ La Tabla 19 enumera los artefactos principales.
 | Artefacto | Ubicación |
 |---|---|
 | Cuadernillos de experimentos | `presentación/cuadernillos/` |
-| Cuaderno de comparación | `presentación/99_comparacion_resultados.ipynb` |
+| Cuaderno de comparación | `presentación/99_results_comparison.ipynb` |
 | Resultados de test | `presentación/calorie_counter/resultados/*.json` |
 | Tablas y figuras comparativas | `presentación/calorie_counter/comparacion/` |
 | Recursos visuales | `presentación/tests/Recursos_visuales/` |
@@ -1140,8 +1140,8 @@ La Tabla 24 resume la decisión por tipo de artefacto.
 
 La publicación mínima recomendada es:
 
-- `00_preparacion_datos.ipynb` y los cuadernillos canónicos.
-- `99_comparacion_resultados.ipynb`.
+- `00_data_preparation.ipynb` y los cuadernillos canónicos.
+- `99_results_comparison.ipynb`.
 - Los CSV y figuras de `presentacion/calorie_counter/comparacion/`.
 - `presentacion/tests/Recursos_visuales/` completo, salvo la foto si no hay consentimiento.
 - `presentacion/README_mapeo nutricional.md`.
@@ -1168,10 +1168,10 @@ En lugar de publicar `presentación/` tal cual, conviene una carpeta `research/`
 research/
 ├── README.md
 ├── notebooks/
-│   ├── 00_preparacion_datos.ipynb
+│   ├── 00_data_preparation.ipynb
 │   ├── A1_...ipynb
 │   ├── ...
-│   └── 99_comparacion_resultados.ipynb
+│   └── 99_results_comparison.ipynb
 ├── comparison/
 │   ├── resumen.csv
 │   ├── perfiles_resumen.csv

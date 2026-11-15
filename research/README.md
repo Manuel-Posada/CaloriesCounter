@@ -9,18 +9,18 @@ The trained weights, the original Food Recognition 2022 images, the full `presen
 ```text
 research/
 ├── notebooks/
-│   ├── 00_preparacion_datos.ipynb
-│   ├── A1_yolo26m_agnostico.ipynb
-│   ├── A2_yolo26n_agnostico.ipynb
-│   ├── A4_mask2former_agnostico.ipynb
-│   ├── B1_yolo26m_clases.ipynb
-│   ├── B2_yolo26n_clases.ipynb
-│   ├── B4_mask2former_clases.ipynb
-│   ├── C1_cnn_propia.ipynb
+│   ├── 00_data_preparation.ipynb
+│   ├── A1_yolo26m_agnostic.ipynb
+│   ├── A2_yolo26n_agnostic.ipynb
+│   ├── A4_mask2former_agnostic.ipynb
+│   ├── B1_yolo26m_classes.ipynb
+│   ├── B2_yolo26n_classes.ipynb
+│   ├── B4_mask2former_classes.ipynb
+│   ├── C1_custom_cnn.ipynb
 │   ├── C2_mobilenetv3.ipynb
 │   ├── C3_inception_v4.ipynb
-│   ├── D1_calibracion_profundidad_nutrition5k.ipynb
-│   └── 99_comparacion_resultados.ipynb
+│   ├── D1_depth_calibration_nutrition5k.ipynb
+│   └── 99_results_comparison.ipynb
 ├── comparison/
 │   ├── resumen.csv / resumen.json / resumen.xlsx
 │   ├── segmentadores_agnostico.csv / segmentadores_clases.csv
@@ -52,9 +52,9 @@ research/
 ## What is included
 
 - **Data preparation (00):** original dataset counts, v2.0 → v2.1 class mapping, train/validation/test splits, crop database for classifiers, and the SAM2/polygon decision (the final crop set uses polygon masks, not SAM2).
-- **Canonical experiments:** A1 (`A1_yolo26m_agnostico.ipynb`), A2 (`A2_yolo26n_agnostico.ipynb`), A4 (`A4_mask2former_agnostico.ipynb`), B1 (`B1_yolo26m_clases.ipynb`), B2 (`B2_yolo26n_clases.ipynb`), B4 (`B4_mask2former_clases.ipynb`), C1 (`C1_cnn_propia.ipynb`), C2 (`C2_mobilenetv3.ipynb`) and C3 (`C3_inception_v4.ipynb`).
-- **Depth and volume calibration (D1):** quantitative close-up scale calibration of Depth Anything V2 (Small vs. Large), fiducial plate normalisation (Hough), and gravimetric parity evaluation on Google Research's Nutrition5k benchmark (`D1_calibracion_profundidad_nutrition5k.ipynb`).
-- **Comparison notebook (99):** inventory, audit, segmentation and classification comparisons, light/robust profiles, and summary export (`99_comparacion_resultados.ipynb`).
+- **Canonical experiments:** A1 (`A1_yolo26m_agnostic.ipynb`), A2 (`A2_yolo26n_agnostic.ipynb`), A4 (`A4_mask2former_agnostic.ipynb`), B1 (`B1_yolo26m_classes.ipynb`), B2 (`B2_yolo26n_classes.ipynb`), B4 (`B4_mask2former_classes.ipynb`), C1 (`C1_custom_cnn.ipynb`), C2 (`C2_mobilenetv3.ipynb`) and C3 (`C3_inception_v4.ipynb`).
+- **Depth and volume calibration (D1):** quantitative close-up scale calibration of Depth Anything V2 (Small vs. Large), fiducial plate normalisation (Hough), and gravimetric parity evaluation on Google Research's Nutrition5k benchmark (`D1_depth_calibration_nutrition5k.ipynb`).
+- **Comparison notebook (99):** inventory, audit, segmentation and classification comparisons, light/robust profiles, and summary export (`99_results_comparison.ipynb`).
 - **Comparison tables and figures:** the CSV/XLSX/JSON outputs and the PNG figures used in the analysis (with bilingual EN/ES figures for publication).
 - **Visual resources:** fourteen publication-grade figures explaining the pipeline, depth map, 3D volume, plate result, weight comparison, class correction, nutritional mapping, scale bias, and Nutrition5k parity. The HTML gallery is `visual_resources/index.html`.
 - **Nutritional mapping:** the 323-class table with nutrients, density and provenance, plus its documentation and Spanish names.
@@ -63,9 +63,9 @@ research/
 
 ## Reproduction order
 
-1. Open `notebooks/00_preparacion_datos.ipynb` and prepare the dataset. The original dataset is **not** included; download Food Recognition 2022 (MyFoodRepo) from Kaggle and set the paths in the notebook.
+1. Open `notebooks/00_data_preparation.ipynb` and prepare the dataset. The original dataset is **not** included; download Food Recognition 2022 (MyFoodRepo) from Kaggle and set the paths in the notebook.
 2. Run the A/B/C notebooks. They expect the weights in `MODELS_DIR` or the paths configured in each notebook. The weights are **not** included.
-3. Run `notebooks/99_comparacion_resultados.ipynb`. It only reads `resultados/*.json`, so it does not need a GPU or the dataset images.
+3. Run `notebooks/99_results_comparison.ipynb`. It only reads `resultados/*.json`, so it does not need a GPU or the dataset images.
 4. Optionally, regenerate the visual resources with `visual_resources/generar_recursos.py`. The script needs the model weights and the test image; the original test photo is not included.
 
 The notebooks keep their outputs where useful; if you re-run them, the results should match the tables in `comparison/`.
