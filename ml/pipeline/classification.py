@@ -25,7 +25,7 @@ class _BackboneWithHead(torch.nn.Module):
 
 
 def _load_state_dict(path: str, device: str) -> dict:
-    ckpt = torch.load(path, map_location=device)
+    ckpt = torch.load(path, map_location=device, weights_only=True)
     for key in ("state_dict", "model_state_dict", "model"):
         if isinstance(ckpt, dict) and key in ckpt and isinstance(ckpt[key], dict):
             ckpt = ckpt[key]
@@ -70,5 +70,5 @@ class InceptionV4Classifier:
             batch = torch.stack([self.transform(self._crop(image, s)) for s in chunk]).to(self.device)
             probs = self.model(batch).softmax(dim=1)
             conf, idx = probs.max(dim=1)
-            for s, c, p in zip(chunk, idx.tolist(), conf.tolist()):
+            for s, c, p in zip(chunk, idx.tolist(), conf.tolist(), strict=True):
                 s.class_idx, s.class_score = int(c), float(p)

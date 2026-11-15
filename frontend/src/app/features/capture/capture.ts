@@ -622,16 +622,12 @@ export class Capture implements OnDestroy {
    */
   private enterImmersiveCamera(): void {
     const lock = (): void => {
-      try {
-        const request = (screen.orientation as ScreenOrientation & {
-          lock?: (orientation: string) => Promise<void>;
-        })?.lock?.('portrait');
-        // `lock()` puede rechazar (sin soporte o sin activación): no debe quedar sin capturar.
-        if (request && typeof request.catch === 'function') {
-          void request.catch(() => undefined);
-        }
-      } catch {
-        // Navegador sin bloqueo de orientación.
+      const orientation = screen.orientation as ScreenOrientation & {
+        lock?: (orientation: string) => Promise<void>;
+      };
+      // `lock()` puede rechazar (sin soporte o sin activación): no debe quedar sin capturar.
+      if (typeof orientation?.lock === 'function') {
+        void Promise.resolve(orientation.lock('portrait')).catch(() => undefined);
       }
     };
     const root = document.documentElement as HTMLElement & {

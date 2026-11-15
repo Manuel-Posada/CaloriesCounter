@@ -53,7 +53,8 @@ export class Login implements AfterViewInit {
 
   @ViewChild('gbtn', { static: true }) gbtn!: ElementRef<HTMLElement>;
 
-  private readonly phraseIndex = Math.floor(Math.random() * LOGIN_PHRASE_KEYS.length);
+  private readonly phraseIndex =
+    crypto.getRandomValues(new Uint32Array(1))[0] % LOGIN_PHRASE_KEYS.length;
   protected readonly dynamicTagline = computed(() => this.i18n.t(LOGIN_PHRASE_KEYS[this.phraseIndex]));
   protected readonly loading = signal(false);
   protected readonly error = signal<MessageKey | null>(null);

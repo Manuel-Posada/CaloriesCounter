@@ -149,7 +149,7 @@ export class AuthService {
     // Cierre manual o por inactividad: no se vuelve a entrar solo. Solo una caducidad por
     // tiempo permite el auto-acceso, que es lo que hace rápida la reentrada normal.
     if (reason !== 'expired' && typeof google !== 'undefined') google.accounts.id.disableAutoSelect();
-    this.router.navigate(['/login']);
+    void this.router.navigate(['/login']);
   }
 
   /**
