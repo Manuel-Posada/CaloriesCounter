@@ -1,12 +1,12 @@
-"""Segmentadores. Ambos exponen `segment(image) -> list[Segment]`.
+"""Segmenters. Both expose `segment(image) -> list[Segment]`.
 
-- YoloSegmenter (Opción A): segmenta Y clasifica (class_idx ya viene resuelto).
-- Mask2FormerSegmenter (Opción B): segmentación agnóstica a la clase (class_idx = None);
-  la clasificación la hace después `InceptionV4Classifier`.
+- YoloSegmenter (Option A): segments AND classifies (class_idx is already resolved).
+- Mask2FormerSegmenter (Option B): class-agnostic segmentation (class_idx = None);
+  classification is performed afterward by `InceptionV4Classifier`.
 
-Mask2FormerSegmenter acepta un checkpoint propio (p. ej. `mask2former_agnostic.pt`).
-En ese caso sólo se descarga de Hugging Face la *arquitectura* (`config.json`), que se
-elige automáticamente a partir del tamaño del encoder Swin del checkpoint.
+Mask2FormerSegmenter accepts a custom checkpoint (e.g. `mask2former_agnostic.pt`).
+In that case, only the *architecture* (`config.json`) is downloaded from Hugging Face,
+automatically chosen from the checkpoint's Swin encoder size.
 """
 import logging
 from pathlib import Path
@@ -21,7 +21,7 @@ from .types import Segment
 
 log = logging.getLogger(__name__)
 
-# embed_dim del patch embedding -> repo de HF con la misma arquitectura.
+# Patch embedding embed_dim -> HF repo with the same architecture.
 _SWIN_BY_EMBED_DIM = {
     96: "facebook/mask2former-swin-tiny-coco-instance",
     128: "facebook/mask2former-swin-small-coco-instance",
@@ -39,7 +39,7 @@ class YoloSegmenter:
         self.device, self.conf, self.imgsz = device, conf, imgsz
 
     def segment(self, image: Image.Image) -> list[Segment]:
-        # Se pasa el PIL (RGB) directamente; con un ndarray ultralytics asume BGR.
+        # Pass PIL (RGB) directly; with an ndarray ultralytics assumes BGR.
         res = self.model.predict(
             image, conf=self.conf, imgsz=self.imgsz, retina_masks=True, device=self.device, verbose=False
         )[0]
@@ -59,7 +59,7 @@ class YoloSegmenter:
 
 
 def _extract_state_dict(ckpt) -> dict:
-    """Acepta checkpoints {state_dict: ...}, de Lightning o un state_dict plano."""
+    """Accept {state_dict: ...}, Lightning, or flat state_dict checkpoints."""
     for key in ("state_dict", "model_state_dict", "model"):
         if isinstance(ckpt, dict) and key in ckpt and isinstance(ckpt[key], dict):
             ckpt = ckpt[key]
@@ -68,9 +68,9 @@ def _extract_state_dict(ckpt) -> dict:
 
 
 def load_mask2former_weights(weights: str, model_id: str) -> Mask2FormerForUniversalSegmentation:
-    """Construye Mask2Former a partir de un checkpoint propio.
+    """Build Mask2Former from a custom checkpoint.
 
-    `model_id` sólo se usa como pista si no se puede deducir la arquitectura del checkpoint.
+    `model_id` is only used as a fallback hint if the architecture cannot be inferred.
     """
     state = _extract_state_dict(torch.load(weights, map_location="cpu", weights_only=True))
 
@@ -81,19 +81,19 @@ def load_mask2former_weights(weights: str, model_id: str) -> Mask2FormerForUnive
 
     config = Mask2FormerConfig.from_pretrained(base_id)
     if "class_predictor.weight" in state:
-        # HF añade una clase "no-object" al final.
+        # HF appends a "no-object" class at the end.
         config.num_labels = int(state["class_predictor.weight"].shape[0]) - 1
 
     model = Mask2FormerForUniversalSegmentation(config)
     missing, unexpected = model.load_state_dict(state, strict=False)
-    # Los buffers del criterion (`empty_weight`) son de entrenamiento y no afectan a la inferencia.
+    # Criterion buffers (`empty_weight`) are training-only and do not affect inference.
     blocking = [k for k in unexpected if not k.startswith("criterion.")]
     if missing or blocking:
         raise RuntimeError(
-            f"El checkpoint {Path(weights).name} no encaja con {base_id}: "
-            f"faltan {missing[:5]} y sobran {blocking[:5]}"
+            f"Checkpoint {Path(weights).name} does not match {base_id}: "
+            f"missing {missing[:5]} and unexpected {blocking[:5]}"
         )
-    log.info("Mask2Former cargado desde %s (arquitectura %s, num_labels=%d)", weights, base_id, config.num_labels)
+    log.info("Loaded Mask2Former from %s (architecture %s, num_labels=%d)", weights, base_id, config.num_labels)
     return model
 
 
@@ -107,7 +107,7 @@ class Mask2FormerSegmenter:
             self.source = str(Path(weights).name)
         else:
             if weights:
-                log.warning("No existe el checkpoint %s; se usa %s de Hugging Face", weights, model_id)
+                log.warning("Checkpoint %s not found; using %s from Hugging Face", weights, model_id)
             self.model = Mask2FormerForUniversalSegmentation.from_pretrained(model_id)
             self.source = model_id
         self.model.to(device).eval()
@@ -125,10 +125,10 @@ class Mask2FormerSegmenter:
 
         seg = result["segmentation"].cpu().numpy()
         infos = result["segments_info"]
-        # Con return_binary_maps=True: (N, H, W). Se contempla también el mapa de ids (H, W).
+        # With return_binary_maps=True: (N, H, W). Also handle ID map (H, W).
         if seg.ndim == 3:
             pairs = zip(seg > 0, infos, strict=True)
         else:
             pairs = ((seg == info["id"], info) for info in infos)
-        # La etiqueta (label_id) se ignora a propósito: la segmentación es agnóstica.
+        # label_id is intentionally ignored: segmentation is class-agnostic.
         return [Segment(mask=m.astype(bool), score=float(info["score"])) for m, info in pairs if m.any()]

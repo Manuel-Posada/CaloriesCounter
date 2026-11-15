@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { FoodLogCreated } from '../models';
 
-/** Pasa el resultado de Captura a Resultados y conserva la foto local para mostrarla al instante. */
+/** Passes the result from Capture to Result and keeps the local photo to display it immediately. */
 @Injectable({ providedIn: 'root' })
 export class ResultStore {
   readonly result = signal<FoodLogCreated | null>(null);

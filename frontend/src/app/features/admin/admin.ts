@@ -3,7 +3,7 @@ import { DepthModel, Pipeline, PipelineService } from '../../core/food-log/pipel
 import { I18nService } from '../../core/i18n/i18n.service';
 import { MessageKey } from '../../core/i18n/messages';
 
-/** Ajustes de inferencia reservados a administradores (`is_staff`). */
+/** Inference settings restricted to administrators (`is_staff`). */
 @Component({
   selector: 'app-admin',
   template: `
@@ -11,7 +11,7 @@ import { MessageKey } from '../../core/i18n/messages';
       <h1>{{ i18n.t('settings.adminTitle') }}</h1>
       <p class="muted">{{ i18n.t('settings.adminSubtitle') }}</p>
 
-      <!-- Selector de Pipeline (A / B) -->
+      <!-- Pipeline selector (A / B) -->
       <div class="card">
         <h2>{{ i18n.t('settings.pipeline') }}</h2>
         <p class="muted small">{{ i18n.t('settings.pipelineHint') }}</p>

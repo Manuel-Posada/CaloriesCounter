@@ -27,17 +27,17 @@ const HOME_TITLE_KEYS: readonly MessageKey[] = [
   'capture.title4',
 ];
 
-/** Duración de cada paso de la cuenta regresiva (1 segundo × 3 pasos = 3 segundos). */
+/** Duration of each countdown step (1 second × 3 steps = 3 seconds). */
 const COUNTDOWN_STEP_MS = 1000;
-/** Tiempo que hay que mantener el nivel antes de disparar solo (si el auto-disparo está activo). */
+/** Time the level must be held before auto-capturing (if auto-shoot is enabled). */
 const HOLD_MS = 500;
-/** Tiempo que permanece visible un aviso superpuesto en cámara antes de ocultarse. */
+/** Time a camera overlay notice stays visible before hiding. */
 const NOTICE_TIMEOUT_MS = 3500;
-/** Tras este tiempo analizando se avisa de que el backend puede estar despertando. */
+/** After this time analyzing, warn that the backend may be waking up. */
 const SLOW_HINT_MS = 8000;
-/** Separación máxima de los arcos cuando un eje está muy desviado. */
+/** Maximum arc separation when an axis is heavily tilted. */
 const ARC_SPREAD_PX = 28;
-/** Grados de desviación en un eje que abren del todo su lado del aro. */
+/** Tilt degrees on an axis that fully open its side of the ring. */
 const ARC_FULL_DEG = 30;
 
 @Component({
@@ -250,7 +250,7 @@ const ARC_FULL_DEG = 30;
           <p class="note slow" role="status">{{ i18n.t('capture.slowServer') }}</p>
         }
 
-        <!-- Skeleton del resultado que vendrá -->
+        <!-- Skeleton for incoming result -->
         <div class="card sk">
           <div class="skeleton" style="height: 18px; width: 40%"></div>
           <div class="skeleton" style="height: 14px; margin-top: 12px"></div>
@@ -296,9 +296,9 @@ export class Capture implements OnDestroy {
   protected readonly isLevel = signal(false);
   protected readonly isCounting = signal(false);
   protected readonly countdown = signal(0);
-  /** Ángulo de orientación física de la pantalla (0, 90, -90) para contrarrotar los iconos. */
+  /** Physical screen orientation angle (0, 90, -90) to counter-rotate icons. */
   protected readonly deviceOrientation = signal<number>(0);
-  /** El análisis tarda más de lo normal (backend despertando de un arranque en frío). */
+  /** Analysis is taking longer than usual (backend waking up from a cold start). */
   protected readonly slowServer = signal(false);
   protected readonly cameraNotice = signal<{ key: MessageKey; deg?: number } | null>(null);
   protected readonly activeIndex = computed(() => STEPS.findIndex((s) => s.key === this.step()));
@@ -307,9 +307,9 @@ export class Capture implements OnDestroy {
   );
 
   /**
-   * Separación de cada lado del aro (0..28 px) según el eje que esté desviado: el arco se
-   * abre por el lado bajo, que es el que hay que levantar. `bubble` ya viene rotado con la
-   * pantalla, y la rampa arranca en `levelEnter()` para evitar saltos bruscos al nivelar.
+   * Separation of each ring side (0..28 px) according to the tilted axis: the arc opens
+   * on the low side, which is the side to raise. `bubble` is already rotated with the
+   * screen, and the ramp starts at `levelEnter()` to avoid sudden jumps when leveling.
    */
   protected readonly gaps = computed(() => {
     const closed = { up: '0px', down: '0px', left: '0px', right: '0px' };
@@ -324,13 +324,13 @@ export class Capture implements OnDestroy {
       return `${(ARC_SPREAD_PX * axisRatio * ramp).toFixed(1)}px`;
     };
 
-    // bubble.y < 0: el borde superior está alto (el bajo es el de abajo), y viceversa.
+    // bubble.y < 0: top edge is high (low edge is bottom), and vice versa.
     return { up: open(y), down: open(-y), left: open(x), right: open(-x) };
   });
 
   /**
-   * Burbuja del obturador: se desplaza hacia el lado alto y crece al centrarse, así que el
-   * propio botón hace de nivel sin ocupar más pantalla.
+   * Shutter bubble: shifts toward the high side and grows when centered, so the
+   * button itself acts as a level without taking up extra screen space.
    */
   protected readonly bubbleStyle = computed(() => {
     const tilt = this.tilt.tilt();
@@ -340,14 +340,14 @@ export class Capture implements OnDestroy {
     const angle = magnitude > 0 ? Math.atan2(y, x) : 0;
     const px = Math.cos(angle) * k * 9;
     const py = Math.sin(angle) * k * 9;
-    // 1.2 cuando está centrada; 0.7 cuando va muy torcida (o sin lectura).
+    // 1.2 when centered; 0.7 when heavily tilted (or no reading).
     const scale = tilt === null ? 0.85 : 1.2 - 0.5 * Math.min(1, tilt / 20);
     return `translate(-50%, -50%) translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) scale(${scale.toFixed(2)})`;
   });
 
   protected readonly levelDegrees = computed(() => Math.round(this.tilt.tilt() ?? 0));
 
-  /** Instrucción de la guía clásica en coordenadas de pantalla: se corrige primero el eje más desviado. */
+  /** Classic guide instruction in screen coordinates: fix the most tilted axis first. */
   protected readonly levelHint = computed<MessageKey | null>(() => {
     if (this.tilt.tilt() === null) return null;
     if (this.isLevel()) return 'gauge.perfect';
@@ -365,12 +365,12 @@ export class Capture implements OnDestroy {
   constructor() {
     this.deviceOrientation.set(this.readDeviceOrientation());
     window.addEventListener('orientationchange', this.onOrientationChange);
-    // `orientationchange` llega antes de que el viewport cambie de tamaño: `resize` confirma
-    // si la página terminó en horizontal (y por tanto ya está girada).
+    // `orientationchange` fires before the viewport resizes: `resize` confirms
+    // whether the page ended up in landscape (and is therefore already rotated).
     window.addEventListener('resize', this.onOrientationChange);
     screen.orientation?.addEventListener?.('change', this.onOrientationChange);
 
-    // El <video> sólo existe cuando `mode` pasa a 'camera': enganchamos el stream reactivamente.
+    // <video> only exists when `mode` becomes 'camera': attach the stream reactively.
     effect(() => {
       const el = this.videoRef()?.nativeElement;
       const stream = this.stream();
@@ -379,7 +379,7 @@ export class Capture implements OnDestroy {
       void el.play().catch(() => this.failCamera('capture.cameraPreviewError'));
     });
 
-    // Bloquea el scroll y el rubber-banding (overscroll) del body en iOS Safari mientras la cámara está activa.
+    // Lock body scroll and rubber-banding (overscroll) on iOS Safari while the camera is active.
     effect((onCleanup) => {
       const active = this.mode() === 'camera';
       document.body.classList.toggle('camera-open', active);
@@ -392,7 +392,7 @@ export class Capture implements OnDestroy {
       });
     });
 
-    // Deriva reactivamente el estado de nivel con histéresis a partir de las señales de TiltService (sin setInterval).
+    // Reactively derive level state with hysteresis from TiltService signals (no setInterval).
     effect(() => {
       if (this.mode() !== 'camera') {
         this.clearHoldTimer();
@@ -425,13 +425,13 @@ export class Capture implements OnDestroy {
       if (!level) {
         this.clearHoldTimer();
         if (isCounting) {
-          // Si se mueve y supera la histéresis durante los 3 s, se aborta de inmediato.
+          // If it moves beyond the hysteresis threshold during the 3 s, abort immediately.
           this.cancelCountdown(true);
         }
         return;
       }
 
-      // Disparo automático (opcional): nivelado y estable durante HOLD_MS.
+      // Auto-capture (optional): level and steady for HOLD_MS.
       if (autoShoot && !isCounting && !this.capturing) {
         this.holdTimer ??= setTimeout(() => {
           this.holdTimer = undefined;
@@ -447,13 +447,13 @@ export class Capture implements OnDestroy {
     if (this.isOpeningCamera() || this.mode() !== 'idle') return;
 
     this.isOpeningCamera.set(true);
-    // Debe hacerse dentro del gesto del usuario: después de los `await` se pierde la activación
-    // transitoria y el navegador rechazaría la pantalla completa (necesaria para bloquear el giro).
+    // Must happen within the user gesture: after `await`, transient activation is lost
+    // and the browser would reject fullscreen (needed to lock orientation).
     this.enterImmersiveCamera();
     this.error.set(null);
     this.cameraFailed.set(false);
 
-    // En iOS Safari el AudioContext debe crearse/reanudarse de forma síncrona en el click.
+    // On iOS Safari, AudioContext must be created/resumed synchronously on click.
     this.unlockAudio();
 
     if (!navigator.mediaDevices?.getUserMedia) {
@@ -463,7 +463,7 @@ export class Capture implements OnDestroy {
     }
 
     try {
-      // En iOS el permiso del sensor sólo se concede dentro del gesto del usuario.
+      // On iOS, sensor permission is only granted inside a user gesture.
       await this.tilt.enable();
       if (this.destroyed || this.mode() !== 'idle') {
         this.tilt.disable();
@@ -515,9 +515,9 @@ export class Capture implements OnDestroy {
   }
 
   /**
-   * Acción manual del obturador:
-   * - Si el dispositivo no está nivelado (> umbral cenital, 8° por defecto), muestra aviso y no inicia cuenta.
-   * - Si está nivelado (o el dispositivo no tiene sensor), inicia la cuenta regresiva de 3 segundos.
+   * Manual shutter action:
+   * - If the device is not level (> top-down threshold, 8° by default), show a notice and do not start countdown.
+   * - If level (or the device has no sensor), start the 3-second countdown.
    */
   triggerCapture(): void {
     if (this.mode() !== 'camera' || this.isCounting() || this.capturing) return;
@@ -555,7 +555,7 @@ export class Capture implements OnDestroy {
     }
     ctx.drawImage(video, 0, 0);
 
-    // Pasamos a 'working' y liberamos la cámara antes de codificar el JPEG.
+    // Switch to 'working' and release the camera before encoding the JPEG.
     this.closeCamera(false);
     this.step.set('presign');
     this.progress.set(0);
@@ -577,7 +577,7 @@ export class Capture implements OnDestroy {
   onFile(ev: Event): void {
     const input = ev.target as HTMLInputElement;
     const file = input.files?.[0];
-    input.value = ''; // permite volver a elegir la misma foto
+    input.value = ''; // allows re-selecting the same photo
     if (file && !this.isOpeningCamera()) {
       if (this.mode() === 'camera') this.closeCamera(false);
       void this.analyze(file);
@@ -598,9 +598,9 @@ export class Capture implements OnDestroy {
   }
 
   /**
-   * Ángulo para contrarrotar los iconos. Solo se aplica cuando la página **no** ha girado con
-   * el móvil (p. ej. si algún día se bloquea la orientación): si el navegador ya puso la
-   * interfaz en horizontal, los iconos deben quedarse como están.
+   * Angle to counter-rotate icons. Only applied when the page has **not** rotated with
+   * the phone (e.g. if orientation is locked): if the browser already switched the UI to
+   * landscape, icons should stay as they are.
    */
   private readDeviceOrientation(): number {
     const raw =
@@ -616,16 +616,16 @@ export class Capture implements OnDestroy {
   }
 
   /**
-   * Pantalla completa + bloqueo vertical al abrir la cámara. Chrome solo permite
-   * `screen.orientation.lock` en pantalla completa, así que se pide primero sobre la raíz
-   * (dentro del gesto del usuario). En iOS Safari no existe ninguno de los dos: se ignora.
+   * Fullscreen + portrait lock when opening the camera. Chrome only allows
+   * `screen.orientation.lock` in fullscreen, so it is requested first on the root
+   * element (within the user gesture). On iOS Safari neither exists: ignored.
    */
   private enterImmersiveCamera(): void {
     const lock = (): void => {
       const orientation = screen.orientation as ScreenOrientation & {
         lock?: (orientation: string) => Promise<void>;
       };
-      // `lock()` puede rechazar (sin soporte o sin activación): no debe quedar sin capturar.
+      // `lock()` may reject (unsupported or no activation): must not block capture.
       if (typeof orientation?.lock === 'function') {
         void Promise.resolve(orientation.lock('portrait')).catch(() => undefined);
       }
@@ -644,7 +644,7 @@ export class Capture implements OnDestroy {
     try {
       (screen.orientation as ScreenOrientation & { unlock?: () => void })?.unlock?.();
     } catch {
-      // Navegador sin bloqueo de orientación.
+      // Browser without orientation lock.
     }
     if (document.fullscreenElement) {
       void document.exitFullscreen().catch(() => undefined);
@@ -771,7 +771,7 @@ export class Capture implements OnDestroy {
     let blob: Blob;
     let focal35: number | null = null;
     try {
-      // El EXIF se lee del fichero original: `compressImage` re-encodea y lo borra.
+      // EXIF is read from the original file: `compressImage` re-encodes and strips it.
       [blob, focal35] = await Promise.all([
         compressImage(source),
         source instanceof File ? readFocal35mm(source) : Promise.resolve(null),
@@ -795,7 +795,7 @@ export class Capture implements OnDestroy {
         if (e.step === 'done') {
           this.clearSlowHint();
           this.store.set(e.result, this.previewUrl());
-          this.handedOver = true; // el store es ahora dueño del object URL
+          this.handedOver = true; // the store now owns the object URL
           this.navigateToResult();
           return;
         }
@@ -813,9 +813,9 @@ export class Capture implements OnDestroy {
   }
 
   /**
-   * Abre la pantalla de resultado. Si la navegación falla —el caso típico es un trozo de JS
-   * que ya no existe porque la app se actualizó con la página abierta— no dejamos la pantalla
-   * colgada en «analizando»: se avisa y el análisis sigue disponible en el historial.
+   * Opens the result screen. If navigation fails—typically because a JS chunk no longer
+   * exists after an app update while the page was open—don't leave the screen stuck on
+   * "analyzing": show a notice, and the analysis remains available in history.
    */
   private navigateToResult(): void {
     const failed = (): void => {
@@ -846,8 +846,8 @@ export class Capture implements OnDestroy {
   }
 
   /**
-   * Inicializa y desbloquea el `AudioContext` de forma síncrona dentro del gesto del usuario
-   * para que iOS Safari permita reproducir los pitidos durante el nivelado y la cuenta atrás.
+   * Initializes and unlocks `AudioContext` synchronously inside the user gesture
+   * so iOS Safari allows playing beeps during leveling and countdown.
    */
   private unlockAudio(): void {
     try {
@@ -858,13 +858,13 @@ export class Capture implements OnDestroy {
         void this.audio.resume();
       }
     } catch {
-      // Sin soporte de Web Audio API.
+      // No Web Audio API support.
     }
   }
 
   /**
-   * Pitido corto. Con el móvil plano el usuario no ve la pantalla, así que el sonido es
-   * la única confirmación fiable (iOS no soporta navigator.vibrate).
+   * Short beep. With the phone flat, the user cannot see the screen, so sound is
+   * the only reliable confirmation (iOS does not support navigator.vibrate).
    */
   private chime(frequency: number): void {
     try {
@@ -887,7 +887,7 @@ export class Capture implements OnDestroy {
       osc.start();
       osc.stop(ctx.currentTime + 0.2);
     } catch {
-      // Sin audio disponible: el indicador visual sigue funcionando.
+      // No audio available: visual indicator still works.
     }
   }
 

@@ -4,7 +4,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { MessageKey } from '../../core/i18n/messages';
 
-/** Frases de bienvenida: la clave se elige al azar una vez y el texto sigue al idioma. */
+/** Welcome taglines: the key is chosen randomly once and the text follows the language. */
 const LOGIN_PHRASE_KEYS: readonly MessageKey[] = [
   'login.phrase1',
   'login.phrase2',
@@ -58,11 +58,11 @@ export class Login implements AfterViewInit {
   protected readonly dynamicTagline = computed(() => this.i18n.t(LOGIN_PHRASE_KEYS[this.phraseIndex]));
   protected readonly loading = signal(false);
   protected readonly error = signal<MessageKey | null>(null);
-  /** Mientras se descarga el script de Google; el botón aún no existe. */
+  /** While downloading Google's script; the button does not exist yet. */
   protected readonly gisLoading = signal(true);
   protected readonly gisFailed = signal(false);
 
-  /** Motivo por el que se cerró la sesión, si lo hubo. */
+  /** Reason the session ended, if any. */
   protected readonly notice = computed<MessageKey | null>(() => {
     const reason = this.auth.logoutReason();
     if (reason === 'idle') return 'session.idleLogout';
@@ -74,7 +74,7 @@ export class Login implements AfterViewInit {
     this.mountButton();
   }
 
-  /** Descarga Google Identity Services y pinta el botón. Se puede reintentar. */
+  /** Downloads Google Identity Services and renders the button. Can be retried. */
   protected mountButton(): void {
     this.gisLoading.set(true);
     this.gisFailed.set(false);

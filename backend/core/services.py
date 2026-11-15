@@ -11,7 +11,7 @@ from .r2 import R2NotConfigured, get_r2_client
 
 log = logging.getLogger(__name__)
 
-# El nombre del usuario aparece de vez en cuando, no en cada consejo: cansa y suena artificial.
+# Include the user's name only occasionally, not in every tip: otherwise it feels repetitive.
 NAME_CHANCE = 0.35
 
 GEMINI_PROMPTS = {
@@ -33,10 +33,10 @@ GEMINI_PROMPTS = {
 
 
 def prompt_for(locale: str, name: str | None = None) -> str:
-    """Prompt en el idioma pedido; cualquier idioma desconocido cae a español.
+    """Return the prompt in the requested language; any unknown locale falls back to Spanish.
 
-    `name` solo se pasa cuando toca personalizar (ver `pick_name`): así el asistente no
-    repite el nombre en cada consejo.
+    `name` is only passed when personalizing (see `pick_name`) so the assistant does not
+    repeat the user's name in every tip.
     """
     is_en = (locale or "").lower().startswith("en")
     base = GEMINI_PROMPTS["en" if is_en else "es"]
@@ -48,7 +48,7 @@ def prompt_for(locale: str, name: str | None = None) -> str:
 
 
 def pick_name(first_name: str) -> str | None:
-    """Nombre de pila para el saludo, solo a veces; None la mayoría de las veces."""
+    """First name for the greeting, used occasionally; None most of the time."""
     name = (first_name or "").strip().split(" ")[0][:40]
     if not name or (secrets.randbelow(100) / 100.0) >= NAME_CHANCE:
         return None
@@ -56,12 +56,12 @@ def pick_name(first_name: str) -> str | None:
 
 
 class ServiceError(Exception):
-    """Fallo de un servicio externo (Modal / R2)."""
+    """External service failure (Modal / R2)."""
 
 
 # ---------------------------------------------------------------- R2 + Modal
 def download_image_from_r2(key: str) -> tuple[bytes, str]:
-    """Descarga el objeto a memoria (nada se escribe en disco). Devuelve (bytes, content_type)."""
+    """Download the object into memory (nothing is written to disk). Returns (bytes, content_type)."""
     try:
         obj = get_r2_client().get_object(Bucket=settings.R2_BUCKET_NAME, Key=key)
         return obj["Body"].read(), obj.get("ContentType", "image/jpeg")
@@ -79,11 +79,11 @@ def run_inference(
     f35_mm: float | None = None,
     depth_model: str = "small",
 ) -> dict:
-    """Envía la imagen al endpoint de Modal con el header X-Modal-Secret.
+    """Send the image to the Modal endpoint with the X-Modal-Secret header.
 
-    `f35_mm` es la focal equivalente en 35 mm leída del EXIF en el navegador: la subida
-    va recomprimida (sin EXIF), así que el pipeline no puede leerla por su cuenta.
-    `depth_model` selecciona la variante de Depth Anything V2 ("small" o "large").
+    `f35_mm` is the 35 mm equivalent focal length read from EXIF in the browser: the
+    upload is recompressed (without EXIF), so the pipeline cannot read it on its own.
+    `depth_model` selects the Depth Anything V2 variant ("small" or "large").
     """
     params = {"pipeline": pipeline, "depth_model": depth_model}
     if fov_deg is not None:
@@ -108,10 +108,10 @@ def run_inference(
 def get_nutrition_advice(
     inference: dict, locale: str = "es", user_name: str | None = None, timeout_s: int = 10
 ) -> str:
-    """Devuelve el consejo de Gemini; ante cualquier fallo devuelve '' (no bloquea el registro)."""
+    """Return Gemini's nutrition tip; returns '' on any failure (never blocks saving the log)."""
     if not inference.get("alimentos") or not settings.GEMINI_API_KEY:
         return ""
-    # Solo lo relevante para el LLM.
+    # Only what is relevant for the LLM.
     payload = {
         "alimentos": [
             {
@@ -126,8 +126,8 @@ def get_nutrition_advice(
     try:
         genai.configure(api_key=settings.GEMINI_API_KEY)
         payload_json = json.dumps(payload, ensure_ascii=False)
-        # El modelo configurado puede estar saturado (vimos timeouts con `gemini-flash-latest`):
-        # se intenta primero ese y, si falla, la variante lite, que es rápida y suficiente.
+        # The configured model may be overloaded (we saw timeouts with `gemini-flash-latest`):
+        # try it first, then fall back to the lite variant, which is fast and sufficient.
         models = [settings.GEMINI_MODEL, "gemini-flash-lite-latest"]
         for name in dict.fromkeys(m for m in models if m):
             try:
@@ -135,16 +135,16 @@ def get_nutrition_advice(
                 resp = model.generate_content(
                     payload_json,
                     generation_config={"temperature": 0.4, "max_output_tokens": 200},
-                    # Sin esto el SDK puede quedarse esperando y bloquear el POST completo.
+                    # Without this, the SDK can hang and block the entire POST request.
                     request_options={"timeout": timeout_s},
                 )
                 text = (resp.text or "").strip()
                 if text:
                     return text
             except Exception:  # noqa: BLE001
-                log.warning("Gemini no respondió con %s; se prueba el siguiente", name)
+                log.warning("Gemini did not respond with %s; trying next model", name)
         return ""
-    except Exception:  # SDK lanza varios tipos (bloqueo de seguridad, cuota, red...)
-        log.exception("Gemini no disponible")
+    except Exception:  # SDK raises various errors (safety block, quota, network...)
+        log.exception("Gemini unavailable")
         return ""
 

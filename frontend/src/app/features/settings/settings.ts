@@ -61,7 +61,7 @@ import { Accent, LevelSensitivity, PreferencesService, ThemeMode } from '../../c
         </div>
       </section>
 
-      <!-- Cámara -->
+      <!-- Camera -->
       <section class="card group">
         <h2>{{ i18n.t('settings.camera') }}</h2>
 

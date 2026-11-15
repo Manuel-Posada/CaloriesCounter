@@ -1,18 +1,18 @@
 /**
- * Diccionarios de la interfaz. `ES` es la fuente de verdad: las claves de `EN` están tipadas
- * contra él, así que si falta una traducción el build falla.
+ * UI translation dictionaries. `ES` is the source of truth: `EN` keys are typed
+ * against it, so a missing translation fails the build.
  *
- * Los textos con datos usan marcadores `{nombre}` que `I18nService.t()` sustituye.
+ * Parameterized strings use `{name}` placeholders replaced by `I18nService.t()`.
  */
 export const ES = {
-  // Navegación
+  // Navigation
   'app.capture': 'Capturar',
   'app.history': 'Historial',
   'app.account': 'Cuenta',
   'app.accountMenu': 'Abrir el menú de cuenta',
   'app.primaryNav': 'Principal',
 
-  // Menú lateral
+  // Side drawer
   'drawer.close': 'Cerrar el menú',
   'drawer.profile': 'Perfil',
   'drawer.settings': 'Configuración',
@@ -35,7 +35,7 @@ export const ES = {
   'session.idleLogout': 'Cerramos tu sesión por inactividad.',
   'session.expiredLogout': 'Tu sesión caducó. Vuelve a entrar.',
 
-  // Captura
+  // Capture
   'capture.title': '¿Qué vas a comer?',
   'capture.title1': '¿Qué vas a comer hoy?',
   'capture.title2': 'Listo para tu próxima comida',
@@ -88,7 +88,7 @@ export const ES = {
   'capture.inferFailed': 'No pudimos analizar la foto. Inténtalo de nuevo.',
   'capture.noFood': 'No reconocimos comida en la foto. Prueba con más luz y el plato centrado.',
 
-  // Resultado
+  // Result
   'result.photoAlt': 'Foto de tu plato analizado',
   'result.advice': 'Consejo nutricional',
   'result.tiltTitle': 'Foto poco cenital ({deg}°)',
@@ -192,7 +192,7 @@ export const ES = {
   'result.closeSheet': 'Cerrar el detalle',
   'result.food': 'Alimento {n}',
 
-  // Historial
+  // History
   'history.title': 'Historial',
   'history.retention': 'Las fotos se conservan 3 días; los datos, 1 mes.',
   'history.loadingError': 'No pudimos cargar tu historial.',
@@ -206,7 +206,7 @@ export const ES = {
   'history.openDetail': 'Ver el detalle del análisis',
   'history.macros': 'P {p} g · C {c} g · G {f} g',
 
-  // Perfil
+  // Profile
   'profile.title': 'Perfil',
   'profile.googleAccount': 'Cuenta de Google',
   'profile.personal': 'Datos personales',
@@ -219,7 +219,7 @@ export const ES = {
   'profile.saveError': 'No pudimos guardar los cambios. Inténtalo de nuevo.',
   'profile.myAccount': 'Tu cuenta',
 
-  // Configuración
+  // Settings
   'settings.title': 'Configuración',
   'settings.subtitle': 'Ajustes de la app guardados en este dispositivo.',
   'settings.appearance': 'Apariencia',
@@ -278,7 +278,7 @@ export const ES = {
   'settings.adminTitle': 'Administración',
   'settings.adminSubtitle': 'Ajustes de inferencia reservados a administradores.',
 
-  // Medidor de nivel
+  // Level meter
   'gauge.noSensorShort': 'sin sensor',
   'gauge.level': 'cenital',
   'gauge.fromVertical': 'de la vertical',
@@ -289,7 +289,7 @@ export const ES = {
   'gauge.lowerRight': 'Levanta el borde derecho',
   'gauge.lowerLeft': 'Levanta el borde izquierdo',
 
-  // Avisos del pipeline (códigos)
+  // Pipeline warnings (codes)
   'warning.tilt': 'Foto poco cenital ({deg}°): el volumen puede estar sobreestimado.',
   'warning.classMissing': 'Un alimento detectado no está en la tabla nutricional; se omitió.',
   'warning.lowVolume':

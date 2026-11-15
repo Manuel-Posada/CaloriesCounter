@@ -20,7 +20,7 @@ import { MessageKey } from '../../core/i18n/messages';
 import { CatalogFood, Confidence, DetectedFood, FoodLogCreated, PipelineWarning } from '../../core/models';
 import { TILT_WARN_DEG } from '../../core/tilt.service';
 
-/** Traducción de los motivos que bajan la confianza del análisis. */
+/** Translation of reasons that lower analysis confidence. */
 const CONFIDENCE_REASONS: Record<string, MessageKey> = {
   escala_supuesta: 'confidence.reason.escalaSupuesta',
   escala_sin_referencia: 'confidence.reason.escalaSinReferencia',
@@ -33,17 +33,17 @@ const CONFIDENCE_REASONS: Record<string, MessageKey> = {
   volumen_recortado: 'confidence.reason.volumenRecortado',
 };
 
-/** Diámetros de plato ofrecidos para reescalar sin reprocesar la foto. */
+/** Plate diameters offered to rescale without reprocessing the photo. */
 const PLATE_SIZES_CM = [22, 26, 30] as const;
-/** Duración de la animación de salida del bottom-sheet (sincronizada con `result.scss`). */
+/** Bottom-sheet exit animation duration (synced with `result.scss`). */
 const SHEET_CLOSE_MS = 240;
-/** Umbral en píxeles (o velocidad en px/ms) para cerrar la hoja al arrastrar hacia abajo. */
+/** Pixel threshold (or velocity in px/ms) to close the sheet when swiping down. */
 const SHEET_SWIPE_PX = 100;
 const SHEET_SWIPE_VELOCITY = 0.45;
-/** Duración del conteo progresivo (count-up) de las calorías totales al revelar el resultado. */
+/** Duration of the total calories count-up animation when revealing the result. */
 const KCAL_COUNT_MS = 550;
 
-/** Nutrientes extendidos, agrupados como en una etiqueta nutricional. */
+/** Extended nutrients, grouped like a nutrition facts label. */
 const NUTRIENT_GROUPS: {
   key: string;
   label: MessageKey;
@@ -105,21 +105,21 @@ const NUTRIENT_GROUPS: {
   },
 ];
 
-/** Zona segmentada lista para pintar sobre la foto. */
+/** Segmented zone ready to render over the photo. */
 interface RenderedSegment {
   key: string;
   n: number;
-  /** Centro de la zona (para el punto numerado). */
+  /** Zone center (for the numbered dot). */
   cx: number;
   cy: number;
-  /** Punto donde se ancla la etiqueta (puede separarse para no solaparse). */
+  /** Anchor point for the label (may be offset to avoid overlap). */
   lx: number;
   ly: number;
-  /** Etiqueta por debajo del centro (zonas pegadas al borde superior). */
+  /** Label below the center (for zones near the top edge). */
   below: boolean;
   label: string;
   kcal: number;
-  /** Atributo `points` del `<polygon>`. */
+  /** `<polygon>` `points` attribute. */
   points: string;
 }
 
@@ -184,7 +184,7 @@ interface RenderedSegment {
                     />
                   }
 
-                  <!-- Zonas segmentadas: contorno + etiqueta con nombre y calorías -->
+                  <!-- Segmented zones: contour + label with name and calories -->
                   @if (slidePhoto(r) && segmentsFor(r).length) {
                     <svg class="overlay" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
                       @for (s of segmentsFor(r); track s.key) {
@@ -257,7 +257,7 @@ interface RenderedSegment {
                     </aside>
                   }
 
-                  <!-- Resumen calórico -->
+                  <!-- Calorie summary -->
                   <div class="card summary">
                     <div class="kcal">
                       <strong>
@@ -627,7 +627,7 @@ export class Result implements OnDestroy {
   protected readonly editError = signal<'result.editError' | 'result.editRange' | 'result.deleteError' | null>(null);
   protected readonly searchResults = signal<CatalogFood[]>([]);
   protected readonly searching = signal(false);
-  /** Cargando un análisis del historial (/result/:id) o no encontrado. */
+  /** Loading a history analysis (/result/:id) or not found. */
   protected readonly loading = signal(false);
   protected readonly notFound = signal(false);
   protected readonly fromHistory = signal(false);
@@ -635,19 +635,19 @@ export class Result implements OnDestroy {
   protected readonly sheetDragY = signal(0);
   protected readonly isSheetDragging = signal(false);
   protected readonly isSheetRebounding = signal(false);
-  /** Detalles cuyo `GET` falló (se ofrece reintentar en el panel). */
+  /** Details whose `GET` failed (retry is offered in the slide). */
   protected readonly failedSlideIds = signal<Record<number, boolean>>({});
-  /** Confirmación en dos pasos para borrar un análisis. */
+  /** Two-step confirmation to delete an analysis. */
   protected readonly confirmDeleteId = signal<number | null>(null);
   protected readonly deleting = signal(false);
   protected readonly animatedKcal = signal(0);
-  /** ID del registro activo en el carrusel horizontal con Scroll Snap. */
+  /** Active log ID in the horizontal Scroll Snap carousel. */
   protected readonly activeId = signal<number | null>(null);
 
-  /** Detalles completos (`alimentos` incluidos) ya descargados por ID para la galería. */
+  /** Full details (`alimentos` included) already fetched by ID for the gallery. */
   private readonly detailsById = signal<Record<number, FoodLogCreated>>({});
   private readonly loadingSlideIds = signal<Record<number, boolean>>({});
-  /** Proporción real por foto (`w / h`) para que cada contorno coincida con su imagen. */
+  /** Actual aspect ratio per photo (`w / h`) so each contour matches its image. */
   private readonly aspectsById = signal<Record<number, string>>({});
 
   private searchTimer?: ReturnType<typeof setTimeout>;
@@ -662,9 +662,9 @@ export class Result implements OnDestroy {
   private sheetStartTime = 0;
 
   /**
-   * Paneles del carrusel horizontal (`100vw` cada uno con `scroll-snap-align: center`):
-   * - Si venimos de `/history`, combina la lista del historial con los detalles ya cargados.
-   * - Si venimos de `/capture` (`/result`), muestra únicamente el plato recién analizado.
+   * Horizontal carousel slides (`100vw` each with `scroll-snap-align: center`):
+   * - When coming from `/history`, combines the history list with already-loaded details.
+   * - When coming from `/capture` (`/result`), shows only the newly analyzed dish.
    */
   protected readonly gallerySlides = computed<FoodLogCreated[]>(() => {
     const current = this.result();
@@ -699,14 +699,14 @@ export class Result implements OnDestroy {
   });
 
   constructor() {
-    // Bloquea el scroll y aplica el efecto 3D de profundidad sobre `<main>` mientras la hoja está abierta.
+    // Locks scroll and applies the 3D depth effect on `<main>` while the sheet is open.
     effect((onCleanup) => {
       const active = this.isSheetOpen() && !this.isSheetClosing();
       document.body.classList.toggle('sheet-open', active);
       onCleanup(() => document.body.classList.remove('sheet-open'));
     });
 
-    // Interpola el contador de calorías totales (0 -> calorias_totales) con ease-out-quart cuando cambia el plato activo.
+    // Interpolates the total calories counter (0 -> calorias_totales) with ease-out-quart when the active dish changes.
     let lastAnimatedId: number | null = null;
     let lastTarget = 0;
     effect((onCleanup) => {
@@ -727,8 +727,8 @@ export class Result implements OnDestroy {
       onCleanup(() => this.cancelKcalRaf());
     });
 
-    // Sincroniza el carrusel al hacer scroll: se toma como activo el panel más cercano al centro.
-    // Es más fiable que IntersectionObserver con swipes rápidos o desplazamientos programáticos.
+    // Syncs the carousel on scroll: picks the slide closest to the center as active.
+    // More reliable than IntersectionObserver with fast swipes or programmatic scrolling.
     effect((onCleanup) => {
       const track = this.galleryTrack()?.nativeElement;
       const slides = this.slideEls();
@@ -737,7 +737,7 @@ export class Result implements OnDestroy {
 
       if (isHistory && !this.initialScrollSynced && untracked(() => this.activeId()) !== null) {
         const initialId = untracked(() => this.activeId());
-        // Se centra en el siguiente frame: el ancho de los paneles aún no está medido al crear el efecto.
+        // Center on the next frame: slide widths are not measured yet when the effect runs.
         requestAnimationFrame(() => {
           if (initialId !== null) this.centerSlide(initialId, 'auto');
           this.initialScrollSynced = true;
@@ -754,8 +754,8 @@ export class Result implements OnDestroy {
       });
     });
 
-    // El plato visible siempre debe tener su detalle: cubre swipe rápido, saltos por miniatura
-    // y el arranque; además trae la siguiente página del historial al acercarse al final.
+    // The visible dish must always have its detail: covers fast swipes, thumbnail jumps,
+    // and startup; also fetches the next history page when nearing the end.
     effect(() => {
       const id = this.activeId();
       if (id === null || !this.fromHistory()) return;
@@ -769,8 +769,8 @@ export class Result implements OnDestroy {
       }
     });
 
-    // /result/:id abre un análisis guardado (desde el historial); /result llega del store en
-    // memoria que acaba de rellenar la captura.
+    // /result/:id opens a saved analysis (from history); /result reads from the in-memory
+    // store just populated by capture.
     this.loadSub = this.route.paramMap.subscribe((params) => {
       const raw = params.get('id');
       if (!raw) {
@@ -785,7 +785,7 @@ export class Result implements OnDestroy {
       this.initialScrollSynced = false;
       this.activeId.set(id);
 
-      // Si el usuario entra directo a /result/:id sin pasar antes por /history, precargamos la lista.
+      // If the user lands directly on /result/:id without visiting /history first, preload the list.
       if (this.logs.cachedHistory().length === 0) {
         this.logs.list(1).subscribe({ error: () => void 0 });
       }
@@ -798,7 +798,7 @@ export class Result implements OnDestroy {
   protected readonly selectedIndex = signal(0);
   protected readonly isSheetOpen = computed(() => this.selected() !== null);
 
-  /** Desplaza suavemente el carrusel al plato seleccionado al tocar una miniatura. */
+  /** Smoothly scrolls the carousel to the selected dish when tapping a thumbnail. */
   protected scrollToSlide(id: number, behavior: ScrollBehavior = 'smooth'): void {
     this.centerSlide(id, behavior);
     if (id !== this.activeId()) {
@@ -806,7 +806,7 @@ export class Result implements OnDestroy {
     }
   }
 
-  /** Centra un panel en el carrusel sin tocar el scroll vertical de la página. */
+  /** Centers a slide in the carousel without affecting vertical page scroll. */
   private centerSlide(id: number, behavior: ScrollBehavior = 'smooth'): void {
     const track = this.galleryTrack()?.nativeElement;
     const slide = track?.querySelector<HTMLElement>(`[data-log-id="${id}"]`);
@@ -818,7 +818,7 @@ export class Result implements OnDestroy {
     track.scrollTo({ left: Math.max(0, track.scrollLeft + delta), behavior });
   }
 
-  /** Agrupa los eventos de scroll en un frame para no recalcular en cada píxel. */
+  /** Batches scroll events into one animation frame to avoid recalculating on every pixel. */
   private scheduleSlideSync(track: HTMLElement): void {
     if (this.scrollRaf !== undefined) return;
     this.scrollRaf = requestAnimationFrame(() => {
@@ -834,7 +834,7 @@ export class Result implements OnDestroy {
     }
   }
 
-  /** El panel activo es el más cercano al centro visible del carrusel. */
+  /** The active slide is the one closest to the visible center of the carousel. */
   private syncActiveFromScroll(track: HTMLElement): void {
     const trackRect = track.getBoundingClientRect();
     const center = trackRect.left + trackRect.width / 2;
@@ -854,14 +854,14 @@ export class Result implements OnDestroy {
     }
   }
 
-  /** Se ejecuta cuando un panel hace snap en el carrusel o se elige desde las miniaturas. */
+  /** Runs when a slide snaps in the carousel or is selected from the thumbnails. */
   private onSlideSnapped(id: number): void {
     this.activeId.set(id);
     if (this.fromHistory()) {
       this.location.replaceState(`/result/${id}`);
     }
 
-    // Mantiene visible la miniatura activa en la tira superior (solo en horizontal).
+    // Keeps the active thumbnail visible in the top strip (horizontal only).
     const bar = this.thumbsBar()?.nativeElement;
     const thumb = bar?.querySelector<HTMLElement>(`[data-thumb-id="${id}"]`);
     if (bar && thumb) {
@@ -880,7 +880,7 @@ export class Result implements OnDestroy {
     this.prefetchNeighbors(id);
   }
 
-  /** Foto local (instantánea) para captura reciente o la URL prefirmada de R2 del registro. */
+  /** Local photo (instant) for recent capture, or the log's presigned R2 URL. */
   protected slidePhoto(slide: FoodLogCreated): string | null {
     if (!this.fromHistory() && this.store.preview()) {
       return this.store.preview();
@@ -900,7 +900,7 @@ export class Result implements OnDestroy {
     }
   }
 
-  /** El detalle del panel ya se descargó (aunque no tenga alimentos: análisis antiguos). */
+  /** The slide's detail has already been fetched (even if it has no food items: older analyses). */
   protected isSlideLoaded(slide: FoodLogCreated): boolean {
     return !!this.detailsById()[slide.id];
   }
@@ -915,8 +915,8 @@ export class Result implements OnDestroy {
   }
 
   /**
-   * Zonas segmentadas con su etiqueta colocada para un registro dado.
-   * Si el detalle aún está cargando, usa los `contornos` resumidos del listado para pintar al instante.
+   * Segmented zones with placed labels for a given log.
+   * If the detail is still loading, uses the summary `contornos` from the list to render immediately.
    */
   protected segmentsFor(slide: FoodLogCreated): RenderedSegment[] {
     const out: RenderedSegment[] = [];
@@ -971,7 +971,7 @@ export class Result implements OnDestroy {
     return out;
   }
 
-  /** Reparto energético (Atwater: 4/4/9 kcal por gramo) para la barra de macros de cada tarjeta. */
+  /** Energy split (Atwater: 4/4/9 kcal per gram) for each card's macro bar. */
   protected splitFor(slide: FoodLogCreated): { p: number; c: number; f: number } {
     const m = slide.macronutrientes;
     if (!m) return { p: 1, c: 1, f: 1 };
@@ -988,13 +988,13 @@ export class Result implements OnDestroy {
     });
   }
 
-  /** Inclinación por encima del umbral: el resultado merece una advertencia. */
+  /** Tilt above threshold: the result warrants a warning. */
   protected tiltWarningFor(slide: FoodLogCreated): number | null {
     const deg = slide.angulo_camara_deg;
     return deg != null && deg > TILT_WARN_DEG ? deg : null;
   }
 
-  /** Foto razonablemente cenital: se refuerza con un chip discreto. `null` = no se sabe. */
+  /** Reasonably top-down photo: reinforced with a subtle chip. `null` = unknown. */
   protected tiltOkFor(slide: FoodLogCreated): number | null {
     const deg = slide.angulo_camara_deg;
     return deg != null && deg <= TILT_WARN_DEG ? deg : null;
@@ -1014,7 +1014,7 @@ export class Result implements OnDestroy {
     );
   }
 
-  /** Traduce un aviso por su código; los strings sueltos son de un Modal antiguo. */
+  /** Translates a warning by code; bare strings are from an older Modal response. */
   protected warningText(w: string | PipelineWarning): string {
     if (typeof w === 'string') return w;
     switch (w.code) {
@@ -1033,7 +1033,7 @@ export class Result implements OnDestroy {
     }
   }
 
-  /** Etiqueta del nivel de confianza y de cada motivo (claves i18n). */
+  /** Label for the confidence level and each reason (i18n keys). */
   protected confidenceLabel(confianza: Confidence): MessageKey {
     return confianza.nivel === 'alta'
       ? 'confidence.alta'
@@ -1046,7 +1046,7 @@ export class Result implements OnDestroy {
     return CONFIDENCE_REASONS[code] ?? 'confidence.reason.unknown';
   }
 
-  /** Alimento con clasificación dudosa que el usuario aún no ha revisado. */
+  /** Food item with uncertain classification not yet reviewed by the user. */
   protected needsReview(food: DetectedFood): boolean {
     return (
       !food.clase_editada &&
@@ -1061,13 +1061,13 @@ export class Result implements OnDestroy {
     return text.charAt(0).toUpperCase() + text.slice(1);
   }
 
-  /** Nombre del alimento en el idioma de la interfaz (español del CSV, inglés como respaldo). */
+  /** Food name in the UI language (Spanish from CSV, English fallback). */
   protected foodName(food: DetectedFood): string {
     const raw = this.i18n.locale() === 'es' && food.nombre_es ? food.nombre_es : food.nombre;
     return this.pretty(raw);
   }
 
-  /** Nutrientes del alimento agrupados, omitiendo los que la tabla no trae. */
+  /** Grouped nutrients for the food item, omitting those missing from the table. */
   protected nutrientGroups(food: DetectedFood): {
     key: string;
     label: MessageKey;
@@ -1129,9 +1129,9 @@ export class Result implements OnDestroy {
   }
 
   /**
-   * Inicia el gesto de arrastre hacia abajo únicamente si el contenedor `.sheet` (y el `article`)
-   * está arriba del todo (`scrollTop === 0`). Si el usuario ha hecho scroll dentro del detalle,
-   * se respeta el desplazamiento vertical nativo sin cerrar la hoja accidentalmente.
+   * Starts the swipe-down gesture only if the `.sheet` container (and `article`)
+   * is scrolled to the very top (`scrollTop === 0`). If the user has scrolled inside
+   * the detail, native vertical scrolling is preserved without closing the sheet accidentally.
    */
   protected onSheetTouchStart(ev: TouchEvent): void {
     const dialog = this.sheet()?.nativeElement;
@@ -1176,8 +1176,8 @@ export class Result implements OnDestroy {
 
     if (!this.isSheetDragging()) {
       if (Math.hypot(dx, dy) < 8) return;
-      // Si el usuario desliza el dedo hacia arriba (dy < 0) para bajar por la tabla nutricional
-      // o el movimiento es horizontal, cedemos el control al scroll nativo de `.sheet`.
+      // If the user swipes up (dy < 0) to scroll down the nutrition table
+      // or the gesture is horizontal, hand control back to `.sheet` native scroll.
       if (dy <= 0 || Math.abs(dx) > Math.abs(dy)) {
         this.canDragSheet = false;
         return;
@@ -1208,7 +1208,7 @@ export class Result implements OnDestroy {
     this.sheetDragY.set(0);
   }
 
-  /** Corrige los gramos del alimento abierto. */
+  /** Updates the grams of the open food item. */
   protected setGrams(event: Event): void {
     const value = Number((event.target as HTMLInputElement).value);
     if (!Number.isFinite(value) || value < 1 || value > 5000) {
@@ -1218,7 +1218,7 @@ export class Result implements OnDestroy {
     this.patch({ items: [{ index: this.selectedIndex(), peso_g: Math.round(value) }] });
   }
 
-  /** Busca en el catálogo para corregir un alimento mal clasificado (con retardo al teclear). */
+  /** Searches the catalog to replace a misclassified food item (debounced on input). */
   protected onSearch(event: Event): void {
     const query = (event.target as HTMLInputElement).value.trim();
     if (this.searchTimer !== undefined) clearTimeout(this.searchTimer);
@@ -1244,7 +1244,7 @@ export class Result implements OnDestroy {
     this.patch({ items: [{ index: this.selectedIndex(), idx: food.idx }] });
   }
 
-  /** Reescala el análisis completo con el diámetro real del plato (26 cm por defecto). */
+  /** Rescales the full analysis using the actual plate diameter (26 cm by default). */
   protected setPlate(cm: number): void {
     const current = this.result();
     if (!current || current.escala_origen !== 'plate' || current.plate_diameter_cm === cm) return;
@@ -1260,7 +1260,7 @@ export class Result implements OnDestroy {
     this.confirmDeleteId.set(null);
   }
 
-  /** Borra el análisis (con confirmación en dos pasos) y pasa al siguiente plato del carrusel. */
+  /** Deletes the analysis (with two-step confirmation) and moves to the next dish in the carousel. */
   protected deleteLog(slide: FoodLogCreated): void {
     if (this.deleting()) return;
     const indexBefore = this.gallerySlides().findIndex((item) => item.id === slide.id);
@@ -1275,7 +1275,7 @@ export class Result implements OnDestroy {
           return next;
         });
 
-        // En el resultado recién capturado no hay carrusel: al borrar se vuelve a la cámara.
+        // On a freshly captured result there is no carousel: deleting returns to the camera.
         if (!this.fromHistory()) {
           this.store.clear();
           void this.router.navigate(['/']);
@@ -1289,8 +1289,8 @@ export class Result implements OnDestroy {
           return;
         }
 
-        // Se toma el vecino de la lista ya sin el borrado. Hay que actualizar el store antes de
-        // volver a leer `gallerySlides`, que reinyecta el resultado actual si sigue en memoria.
+        // Pick the neighbor from the list after deletion. The store must be updated before
+        // reading `gallerySlides` again, which re-injects the current result if still in memory.
         const nextItem = remaining[Math.min(Math.max(indexBefore, 0), remaining.length - 1)];
         const nextDetail =
           this.detailsById()[nextItem.id] ??
@@ -1318,7 +1318,7 @@ export class Result implements OnDestroy {
     this.editError.set(null);
     this.logs.update(current.id, body).subscribe({
       next: (updated) => {
-        // El servidor devuelve los totales y el detalle ya recalculados.
+        // The server returns the recalculated totals and breakdown.
         this.detailsById.update((cur) => ({ ...cur, [updated.id]: updated }));
         this.store.set(updated, this.store.preview() ?? updated.imagen_url);
         this.selected.set(updated.alimentos[this.selectedIndex()] ?? null);
@@ -1331,7 +1331,7 @@ export class Result implements OnDestroy {
     });
   }
 
-  /** Cierra al tocar el fondo (fuera del contenido), no al tocar la hoja. */
+  /** Closes on backdrop click (outside content), not when tapping the sheet. */
   protected onSheetClick(event: MouseEvent): void {
     if (event.target === this.sheet()?.nativeElement) this.closeSheet();
   }
@@ -1357,7 +1357,7 @@ export class Result implements OnDestroy {
     const tick = (now: number): void => {
       const elapsed = now - start;
       const progress = Math.min(1, Math.max(0, elapsed / duration));
-      // Suavizado ease-out-quart: aceleración rápida al inicio y frenado suave al llegar al total.
+      // Ease-out-quart smoothing: fast acceleration at the start and gentle deceleration toward the total.
       const eased = 1 - Math.pow(1 - progress, 4);
       this.animatedKcal.set(Math.round(from + (target - from) * eased));
 
@@ -1403,7 +1403,7 @@ export class Result implements OnDestroy {
       return;
     }
 
-    // Ya hay una petición en vuelo para este panel: al llegar, si es el activo, se entra solo.
+    // A request is already in flight for this slide: once it arrives, it will be applied if active.
     if (this.loadingSlideIds()[id]) {
       onDone?.();
       return;
@@ -1431,7 +1431,7 @@ export class Result implements OnDestroy {
     });
   }
 
-  /** Precarga silenciosamente el detalle de los paneles vecinos para que deslizar sea instantáneo. */
+  /** Silently prefetches neighboring slide details so swiping feels instant. */
   private prefetchNeighbors(centerId: number): void {
     const slides = this.gallerySlides();
     const idx = slides.findIndex((s) => s.id === centerId);

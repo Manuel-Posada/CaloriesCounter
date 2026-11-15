@@ -1,19 +1,19 @@
 import { Injectable, NgZone, computed, inject, signal } from '@angular/core';
 
-/** Estado del permiso del sensor de orientación. */
+/** Orientation sensor permission state. */
 export type TiltPermission = 'unknown' | 'granted' | 'denied' | 'unsupported';
 
 /**
- * Inclinación a partir de la cual el resultado avisa de que la foto no era cenital.
- * Lo calcula el pipeline sobre la foto ya tomada (no el sensor), así que puede ser mayor
- * que el umbral del nivel en vivo: aquí solo se advierte, no se bloquea nada.
+ * Tilt threshold above which the result warns that the photo was not top-down.
+ * Computed by the pipeline on the taken photo (not the sensor), so it can be higher
+ * than the live level threshold: this only warns, it does not block anything.
  */
 export const TILT_WARN_DEG = 15;
 
 export interface BubbleOffset {
-  /** Desplazamiento de la burbuja en grados, eje X de la pantalla (derecha +). */
+  /** Bubble offset in degrees, screen X axis (right +). */
   x: number;
-  /** Desplazamiento en grados, eje Y de la pantalla (abajo +, como en CSS). */
+  /** Offset in degrees, screen Y axis (down +, as in CSS). */
   y: number;
 }
 
@@ -24,7 +24,7 @@ interface OrientationPermission {
   requestPermission?: () => Promise<'granted' | 'denied'>;
 }
 
-/** Ángulo entre la normal de la pantalla y la vertical del mundo, en grados. */
+/** Angle between the screen normal and world vertical, in degrees. */
 export function tiltDegrees(betaDeg: number, gammaDeg: number): number {
   const beta = (betaDeg * Math.PI) / 180;
   const gamma = (gammaDeg * Math.PI) / 180;
@@ -40,12 +40,12 @@ function screenAngleDeg(): number {
 }
 
 /**
- * Posición de la burbuja en ejes de pantalla. La burbuja sube hacia el lado alto:
- * con `beta > 0` el borde superior está levantado, con `gamma > 0` el derecho está bajo.
+ * Bubble position in screen axes. The bubble rises toward the high side:
+ * with `beta > 0` the top edge is raised, with `gamma > 0` the right edge is low.
  *
- * En CSS el eje +Y apunta hacia abajo (sentido horario), mientras que `screen.orientation.angle`
- * mide el giro físico del dispositivo en sentido antihorario (90° = landscape-primary), por lo
- * que la rotación al sistema de pantalla invierte el signo del seno.
+ * In CSS the +Y axis points down (clockwise), while `screen.orientation.angle`
+ * measures physical device rotation counterclockwise (90° = landscape-primary), so
+ * rotating to screen coordinates flips the sine sign.
  */
 export function bubbleOffset(betaDeg: number, gammaDeg: number): BubbleOffset {
   const rad = (screenAngleDeg() * Math.PI) / 180;
@@ -58,13 +58,13 @@ export function bubbleOffset(betaDeg: number, gammaDeg: number): BubbleOffset {
 }
 
 /**
- * Nivel de burbuja basado en `DeviceOrientationEvent`.
+ * Bubble level based on `DeviceOrientationEvent`.
  *
- * `tilt()` vale 0 cuando el móvil está plano boca arriba, que es justo la postura en la
- * que la cámara trasera mira perpendicular a la mesa (lo que asume el cálculo de volumen).
+ * `tilt()` is 0 when the phone is flat face-up, which is the exact posture where
+ * the rear camera points perpendicular to the table (as assumed by volume estimation).
  *
- * Requiere contexto seguro (HTTPS o localhost) y, en iOS 13+, un permiso que sólo se
- * puede pedir dentro de un gesto del usuario: por eso `enable()` se llama desde un click.
+ * Requires a secure context (HTTPS or localhost) and, on iOS 13+, a permission that can
+ * only be requested inside a user gesture: that is why `enable()` is called from a click.
  */
 @Injectable({ providedIn: 'root' })
 export class TiltService {
@@ -75,12 +75,12 @@ export class TiltService {
   readonly gamma = signal<number | null>(null);
   readonly bubble = signal<BubbleOffset>({ x: 0, y: 0 });
   readonly permission = signal<TiltPermission>('unknown');
-  /** El permiso está dado pero no llega ningún dato: el dispositivo no tiene sensor. */
+  /** Permission is granted but no data arrives: the device has no sensor. */
   readonly silent = signal(false);
   readonly available = computed(() => this.tilt() !== null);
 
   private listening = false;
-  /** Vector normal suavizado en 3D para evitar discontinuidades de Euler (gimbal lock en ±90°). */
+  /** Smoothed 3D normal vector to avoid Euler discontinuities (gimbal lock at ±90°). */
   private smoothNx: number | null = null;
   private smoothNy: number | null = null;
   private smoothNz: number | null = null;
@@ -90,8 +90,8 @@ export class TiltService {
   private readonly onOrientation = (e: DeviceOrientationEvent): void => {
     if (e.beta === null || e.gamma === null) return;
 
-    // Los sensores emiten a 60 Hz; 20 Hz bastan para el indicador y evitan 60 ciclos
-    // de detección de cambios por segundo en un móvil modesto.
+    // Sensors emit at 60 Hz; 20 Hz is enough for the indicator and avoids 60 change
+    // detection cycles per second on a modest phone.
     const now = performance.now();
     if (now - this.lastEmit < 50) return;
     this.lastEmit = now;
@@ -101,8 +101,8 @@ export class TiltService {
       this.silenceTimer = undefined;
     }
 
-    // Proyectamos (beta, gamma) a la normal unitaria 3D de la pantalla antes de suavizar:
-    // así evitamos el salto brusco de Euler cuando gamma salta entre +89° y -89° en vertical.
+    // Project (beta, gamma) onto the 3D unit normal of the screen before smoothing:
+    // this avoids sudden Euler jumps when gamma flips between +89° and -89° vertically.
     const betaRad = (e.beta * Math.PI) / 180;
     const gammaRad = (e.gamma * Math.PI) / 180;
     const nx = -Math.cos(betaRad) * Math.sin(gammaRad);
@@ -124,7 +124,7 @@ export class TiltService {
 
     const bubble = bubbleOffset(smoothBeta, smoothGamma);
 
-    // Reentramos en la zona de Angular únicamente a 20 Hz al actualizar las señales.
+    // Re-enter Angular zone only at 20 Hz when updating signals.
     this.ngZone.run(() => {
       this.silent.set(false);
       this.beta.set(smoothBeta);
@@ -134,7 +134,7 @@ export class TiltService {
     });
   };
 
-  /** Pide permiso (iOS) y empieza a escuchar. Devuelve si hay sensor utilizable. */
+  /** Requests permission (iOS) and starts listening. Returns whether a usable sensor is available. */
   async enable(): Promise<boolean> {
     if (typeof window === 'undefined' || !('DeviceOrientationEvent' in window)) {
       this.permission.set('unsupported');
@@ -188,7 +188,7 @@ export class TiltService {
       this.listening = true;
     }
     if (this.silenceTimer) clearTimeout(this.silenceTimer);
-    // Si en 1,5 s no ha llegado nada, el dispositivo no tiene giroscopio (típico en desktop).
+    // If nothing arrives within 1.5 s, the device has no gyroscope (typical on desktop).
     this.silenceTimer = this.ngZone.runOutsideAngular(() =>
       setTimeout(() => {
         if (this.tilt() === null) {

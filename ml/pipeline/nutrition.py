@@ -1,7 +1,7 @@
-"""Tabla nutricional (CSV USDA + densidad) y cálculo físico-matemático.
+"""Nutrition table (USDA CSV + density) and physical/math calculation.
 
-    gramos        = volumen_cm3 * densidad_g_cm3
-    valor_total   = (gramos / 100) * valor_por_100g
+    grams       = volume_cm3 * density_g_cm3
+    total_value = (grams / 100) * value_per_100g
 """
 import csv
 import math
@@ -79,13 +79,13 @@ class NutritionTable:
 
             missing = [c for c in (COL_KCAL, COL_PROTEIN, COL_CARBS, COL_FAT) if c.lower() not in lower]
             if missing:
-                raise ValueError(f"Columnas nutricionales ausentes en el CSV: {missing}. Encontradas: {fieldnames}")
+                raise ValueError(f"Missing nutritional columns in CSV: {missing}. Found: {fieldnames}")
 
             density_col = _find(lower, _DENSITY_CANDIDATES) or next(
                 (orig for low, orig in lower.items() if "dens" in low), None
             )
             if density_col is None:
-                raise ValueError(f"No se encontró columna de densidad. Columnas: {fieldnames}")
+                raise ValueError(f"Density column not found. Columns: {fieldnames}")
             idx_col = _find(lower, _IDX_CANDIDATES)
             name_col = _find(lower, _NAME_CANDIDATES)
 
@@ -94,7 +94,7 @@ class NutritionTable:
                 row = {k.strip(): v for k, v in raw.items() if k is not None}
                 idx = int(float(row[idx_col])) if idx_col else row_number
                 if idx in records:
-                    raise ValueError(f"idx duplicado en el CSV: {idx}")
+                    raise ValueError(f"Duplicate idx in CSV: {idx}")
 
                 density = _num(row.get(density_col))
                 density_assumed = density is None or density <= 0
@@ -102,7 +102,7 @@ class NutritionTable:
                 records[idx] = FoodRecord(
                     idx=idx,
                     name=name,
-                    # Traducción opcional del CSV; si falta, se usa el nombre original.
+                    # Optional translation from CSV; falls back to original name if missing.
                     name_es=(row.get("nombre_es") or "").strip() or name,
                     density_g_cm3=DEFAULT_DENSITY_G_CM3 if density_assumed else density,
                     density_assumed=density_assumed,
@@ -113,14 +113,14 @@ class NutritionTable:
                 )
 
         if expected_classes is not None and len(records) != expected_classes:
-            raise ValueError(f"El CSV tiene {len(records)} clases, se esperaban {expected_classes}.")
+            raise ValueError(f"CSV has {len(records)} classes, expected {expected_classes}.")
         return cls(records)
 
     def compute(self, idx: int, volume_cm3: float) -> dict:
-        """Aplica 4.1 (volumen→masa) y 4.2 (nutrientes) para una clase."""
+        """Apply volume-to-mass and nutrient scaling for a class."""
         r = self._records[idx]
-        grams = volume_cm3 * r.density_g_cm3  # 4.1
-        factor = grams / 100.0  # 4.2
+        grams = volume_cm3 * r.density_g_cm3
+        factor = grams / 100.0
         return {
             "nombre": r.name,
             "nombre_es": r.name_es,
@@ -131,7 +131,7 @@ class NutritionTable:
             "proteinas_g": factor * r.protein_100g,
             "carbohidratos_g": factor * r.carbs_100g,
             "grasas_g": factor * r.fat_100g,
-            # Valores de la tabla (el "mapeo" del CSV) para que el usuario pueda consultarlos.
+            # Table values (the CSV mapping) so the user can inspect them.
             "por_100g": {
                 "calorias_kcal": r.kcal_100g,
                 "proteinas_g": r.protein_100g,

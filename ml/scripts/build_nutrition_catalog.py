@@ -1,7 +1,7 @@
-"""Genera backend/core/data/nutrition_catalog.csv desde el CSV del pipeline.
+"""Generate backend/core/data/nutrition_catalog.csv from the pipeline CSV.
 
-Solo las columnas que usa Django: recálculo de totales (kcal, macros, densidad) y el detalle
-nutricional extendido que se muestra en la ficha de cada alimento.
+Only the columns used by Django: totals recalculation (kcal, macros, density)
+and the extended nutrition details shown on each food item's card.
 
     python ml/scripts/build_nutrition_catalog.py
 """
@@ -12,8 +12,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 SRC = ROOT / "ml" / "data" / "nutrition_wide_densidad.csv"
 DST = ROOT / "backend" / "core" / "data" / "nutrition_catalog.csv"
 
-# código interno -> prefijo de la columna en el CSV de origen (el nombre exacto lleva µ y
-# paréntesis; se busca por prefijo para no depender de la codificación).
+# internal code -> source CSV column prefix (exact name includes µ and parentheses;
+# matched by prefix to avoid encoding issues).
 DETAIL = {
     "agua_g": "Water (g)",
     "fibra_g": "Fiber, total dietary (g)",
@@ -74,7 +74,7 @@ def main() -> None:
     for code, prefix in DETAIL.items():
         col = column_for(header, prefix)
         if col is None:
-            raise SystemExit(f"No se encontró la columna para {code} ({prefix})")
+            raise SystemExit(f"Column not found for {code} ({prefix})")
         resolved[code] = col
 
     DST.parent.mkdir(parents=True, exist_ok=True)
@@ -91,7 +91,7 @@ def main() -> None:
             values += ["" if (v := num(row[resolved[code]])) is None else v for code in DETAIL]
             writer.writerow(values)
 
-    print(f"{len(rows)} clases -> {DST} ({DST.stat().st_size / 1024:.1f} KB)")
+    print(f"{len(rows)} classes -> {DST} ({DST.stat().st_size / 1024:.1f} KB)")
 
 
 if __name__ == "__main__":

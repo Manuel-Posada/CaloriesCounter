@@ -1,4 +1,4 @@
-"""Clasificador de recortes (Opción B): Inception-V4 (timm) con 323 clases."""
+"""Crop classifier (Option B): Inception-V4 (timm) with 323 classes."""
 import timm
 import torch
 from PIL import Image
@@ -11,8 +11,8 @@ BACKBONE_NAME = "inception_v4"
 
 
 class _BackboneWithHead(torch.nn.Module):
-    """Reproduce la arquitectura con la que se entrenó `inception_v4_food323.pt`:
-    timm `inception_v4` sin clasificador bajo `backbone` + una capa `fc` aparte.
+    """Matches the architecture used to train `inception_v4_food323.pt`:
+    timm `inception_v4` without classifier under `backbone` + a separate `fc` layer.
     """
 
     def __init__(self, num_classes: int):
@@ -34,14 +34,14 @@ def _load_state_dict(path: str, device: str) -> dict:
 
 
 def build_inception(weights: str, num_classes: int, device: str) -> torch.nn.Module:
-    """Soporta el checkpoint con prefijo `backbone.`/`fc.` y el timm estándar."""
+    """Supports checkpoints with `backbone.`/`fc.` prefix as well as standard timm."""
     state = _load_state_dict(weights, device)
     wrapped = any(k.startswith("backbone.") for k in state)
 
     model = _BackboneWithHead(num_classes) if wrapped else timm.create_model(
         BACKBONE_NAME, pretrained=False, num_classes=num_classes
     )
-    model.load_state_dict(state)  # strict: si no encaja, queremos el error a la vista
+    model.load_state_dict(state)  # strict: fail loudly on mismatch
     return model
 
 
@@ -50,8 +50,8 @@ class InceptionV4Classifier:
         self.device = device
         self.model = build_inception(weights, num_classes, device)
         self.model.to(device).eval()
-        # Preprocesado por defecto de timm para inception_v4 (299x299, mean/std 0.5).
-        # Debe coincidir con el usado en el entrenamiento.
+        # Default timm preprocessing for inception_v4 (299x299, mean/std 0.5).
+        # Must match what was used during training.
         self.transform = create_transform(
             **resolve_data_config({}, model=getattr(self.model, "backbone", self.model)),
             is_training=False,
@@ -64,7 +64,7 @@ class InceptionV4Classifier:
 
     @torch.inference_mode()
     def classify(self, image: Image.Image, segments: list[Segment], batch_size: int = 16) -> None:
-        """Asigna class_idx / class_score in-place a cada segmento."""
+        """Assign class_idx and class_score in-place to each segment."""
         for i in range(0, len(segments), batch_size):
             chunk = segments[i : i + batch_size]
             batch = torch.stack([self.transform(self._crop(image, s)) for s in chunk]).to(self.device)

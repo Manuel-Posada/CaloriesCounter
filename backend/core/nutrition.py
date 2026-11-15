@@ -1,8 +1,8 @@
-"""Catálogo nutricional de las 323 clases, para editar un análisis sin pasar por el modelo.
+"""Nutrition catalog for the 323 food classes, enabling edits without calling the model.
 
-`data/nutrition_catalog.csv` se genera desde `ml/data/nutrition_wide_densidad.csv` (solo las
-columnas que hacen falta para recalcular): así Django puede recomputar kcal y macros de un
-alimento sin depender del servicio de inferencia.
+`data/nutrition_catalog.csv` is generated from `ml/data/nutrition_wide_densidad.csv` (only
+the columns needed to recalculate), so Django can recompute kcal and macros for a food
+item without depending on the inference service.
 """
 import csv
 import unicodedata
@@ -11,7 +11,7 @@ from pathlib import Path
 
 CATALOG_PATH = Path(__file__).parent / "data" / "nutrition_catalog.csv"
 MACRO_FIELDS = ("proteinas_g", "carbohidratos_g", "grasas_g")
-# Detalle extendido que se muestra en la ficha (claves del CSV generado).
+# Extended breakdown shown in the detail sheet (columns from the generated CSV).
 DETAIL_FIELDS = (
     "agua_g", "fibra_g", "azucares_g", "sodio_mg",
     "grasas_saturadas_g", "grasas_mono_g", "grasas_poli_g", "grasas_trans_g", "colesterol_mg",
@@ -22,7 +22,7 @@ DETAIL_FIELDS = (
     "vitamina_e_mg", "vitamina_k_ug",
 )
 
-# Nombres de uso corriente en Colombia que no coinciden con la tabla (FDA, en español neutro).
+# Common Colombian names that differ from the neutral Spanish FDA table.
 SYNONYMS = {
     "papa": "patata",
     "papas": "patata",
@@ -39,7 +39,7 @@ SYNONYMS = {
 
 
 def _norm(text: str) -> str:
-    """Minúsculas y sin tildes, para que 'platano' encuentre 'plátano'."""
+    """Lowercase and strip accents so 'platano' matches 'plátano'."""
     text = unicodedata.normalize("NFKD", (text or "").lower())
     return "".join(c for c in text if not unicodedata.combining(c))
 
@@ -82,18 +82,18 @@ def _by_name() -> dict[str, dict]:
 
 
 def by_name(name: str) -> dict | None:
-    """Entrada del catálogo por nombre de clase en inglés (como se guarda en los contornos)."""
+    """Catalog entry by English class name (as stored in contours)."""
     return _by_name().get(_norm(name))
 
 
 def details(idx: int) -> dict:
-    """Detalle extendido por 100 g (minerales, vitaminas, grasas), vacío si no hay datos."""
+    """Extended breakdown per 100 g (minerals, vitamins, fats); empty if unavailable."""
     entry = _catalog().get(int(idx))
     return dict(entry.get("detalles") or {}) if entry else {}
 
 
 def search(query: str, limit: int = 20) -> list[dict]:
-    """Búsqueda por nombre en español o inglés, sin tildes y con sinónimos locales."""
+    """Search by Spanish or English name, accent-insensitive and with local synonyms."""
     q = _norm(query.strip())
     rows = list(_catalog().values())
     if not q:
@@ -117,7 +117,7 @@ def search(query: str, limit: int = 20) -> list[dict]:
 
 
 def totals_for(weight_g: float, por_100g: dict) -> dict:
-    """kcal y macros de una porción, a partir de los valores por 100 g."""
+    """Portion kcal and macros computed from per-100 g values."""
     factor = weight_g / 100.0
     return {
         "calorias_kcal": round(por_100g["calorias_kcal"] * factor, 2),

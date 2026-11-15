@@ -1,4 +1,4 @@
-/* --- Galería deslizable con CSS Scroll Snap --- */
+/* --- Swipeable gallery with CSS Scroll Snap --- */
 
 .page {
   padding: var(--space-4) 0 0;
@@ -120,7 +120,7 @@
 .photo {
   position: relative;
   margin: 0;
-  /* La proporción real la fija el componente al cargar la imagen; 4/3 es el respaldo. */
+  /* Actual aspect ratio is set by the component on image load; 4/3 is the fallback. */
   aspect-ratio: 4 / 3;
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -144,7 +144,7 @@
     color: #fff;
   }
 
-  /* Foto bien alineada: refuerzo positivo, discreto. */
+  /* Well-aligned photo: subtle positive reinforcement. */
   .tilt-ok {
     position: absolute;
     top: var(--space-3);
@@ -155,7 +155,7 @@
   }
 }
 
-/* --- Zonas segmentadas sobre la foto --- */
+/* --- Segmented zones over the photo --- */
 
 .overlay {
   position: absolute;
@@ -343,7 +343,7 @@
   }
 }
 
-/* Peso total y tamaño del plato (el plato reescala el análisis sin reprocesar la foto). */
+/* Total weight and plate size (plate size rescales the analysis without reprocessing the photo). */
 .grams-total {
   margin: calc(var(--space-2) * -1) 0 0;
   color: var(--c-muted);
@@ -391,7 +391,7 @@
   }
 }
 
-/* Corrección del alimento y los gramos, dentro de la hoja de detalle. */
+/* Food item and grams correction inside the detail sheet. */
 .edit {
   display: flex;
   flex-direction: column;
@@ -468,7 +468,7 @@
 
 .note--error { color: var(--c-danger, #b3261e); }
 
-/* Borrado de un análisis: enlace discreto y confirmación en dos pasos. */
+/* Analysis deletion: subtle link and two-step confirmation. */
 .link {
   align-self: center;
   padding: 0;
@@ -509,7 +509,7 @@
   border-color: transparent;
 }
 
-/* Nivel de confianza del análisis: color y motivos, sin tecnicismos. */
+/* Analysis confidence level: color and reasons, without jargon. */
 .confidence {
   display: flex;
   flex-wrap: wrap;
@@ -537,7 +537,7 @@
   &--baja .confidence__dot { background: var(--c-danger, #b3261e); }
 }
 
-/* Alimento cuya clasificación el clasificador no tenía clara. */
+/* Food item whose classification the classifier was uncertain about. */
 .food-check {
   display: inline-flex;
   align-items: center;
@@ -551,7 +551,7 @@
   font-weight: 700;
 }
 
-/* Volver al historial cuando el análisis se abre desde una tarjeta del historial. */
+/* Back to history when the analysis is opened from a history card. */
 .back-link {
   align-self: flex-start;
   color: var(--c-muted);
@@ -561,7 +561,7 @@
   &:hover { color: var(--c-primary); }
 }
 
-/* Tabla nutricional extendida: cerrada por defecto para no saturar la hoja. */
+/* Extended nutrition table: collapsed by default to keep the sheet uncluttered. */
 .nutrients {
   margin-top: var(--space-3);
 
@@ -615,7 +615,7 @@
   }
 }
 
-/* --- Lista de alimentos (abre el detalle) --- */
+/* --- Food list (opens detail sheet) --- */
 
 .foods {
   list-style: none;
@@ -694,7 +694,7 @@
   transition: transform 0.25s var(--ease-spring-pop, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
-/* --- Hoja de detalle nutricional --- */
+/* --- Nutrition detail sheet --- */
 
 .sheet {
   --sheet-drag-y: 0px;
@@ -747,8 +747,8 @@
     transition: transform 0.38s var(--ease-spring-sheet, cubic-bezier(0.22, 1, 0.36, 1));
   }
 
-  /* La hoja nativa mantiene `[open]` durante la salida; se necesita la misma especificidad
-     (.sheet[open] = .sheet.sheet--closing) y esta regla después para que gane la salida. */
+  /* Native dialog keeps `[open]` during exit; same specificity is needed
+     (.sheet[open] = .sheet.sheet--closing) with this rule after so exit wins. */
   &.sheet--closing {
     animation: sheet-out 0.24s var(--ease-in-accelerate, cubic-bezier(0.32, 0, 0.67, 0)) forwards;
     pointer-events: none;

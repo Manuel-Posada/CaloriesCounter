@@ -1,11 +1,11 @@
-"""Backend de CaloriesCounter (Django) en Modal, sin GPU.
+"""CaloriesCounter backend (Django) on Modal, CPU-only.
 
 Deploy:   modal deploy modal_app.py
-Migrar:   modal run modal_app.py::migrate
+Migrate:  modal run modal_app.py::migrate
 Logs:     modal app logs caloriescounter-api
 
-El secreto `caloriescounter-backend` tiene que existir antes de desplegar
-(DATABASE_URL de Neon, claves de R2, Gemini, etc.).
+The `caloriescounter-backend` secret must exist before deploying
+(Neon DATABASE_URL, R2 keys, Gemini, etc.).
 """
 import subprocess
 import sys
@@ -21,14 +21,14 @@ image = (
     modal.Image.debian_slim(python_version="3.12")
     .pip_install_from_requirements(str(HERE / "requirements.txt"))
     .env({"DJANGO_SETTINGS_MODULE": "config.settings", "DJANGO_DEBUG": "False"})
-    # `copy=True` permite encadenar más pasos de build (collectstatic) después.
+    # `copy=True` allows chaining more build steps (collectstatic) afterward.
     .add_local_dir(str(HERE / "config"), "/app/config", copy=True)
     .add_local_dir(str(HERE / "core"), "/app/core", copy=True)
     .add_local_file(str(HERE / "manage.py"), "/app/manage.py", copy=True)
     .workdir("/app")
     .run_commands(
-        # Credenciales falsas solo para poder importar settings durante el build;
-        # las reales llegan por el secreto en tiempo de ejecución.
+        # Dummy secret just to allow importing settings during build;
+        # the real one is injected via the Modal secret at runtime.
         "DJANGO_SECRET_KEY=build-only python manage.py collectstatic --noinput"
     )
 )
@@ -38,14 +38,14 @@ secrets = [modal.Secret.from_name("caloriescounter-backend")]
 
 @app.function(image=image, secrets=secrets, timeout=600)
 def migrate() -> None:
-    """Aplica migraciones contra la base de datos configurada en DATABASE_URL."""
+    """Apply migrations against the database configured in DATABASE_URL."""
     subprocess.run([sys.executable, "manage.py", "migrate", "--noinput"], cwd="/app", check=True)
-    print("migraciones aplicadas")
+    print("migrations applied")
 
 
 @app.function(image=image, secrets=secrets, timeout=300)
 def db_check() -> None:
-    """Comprueba desde el contenedor que la base de datos responde."""
+    """Verify from inside the container that the database responds."""
     sys.path.insert(0, "/app")
     import django
 
@@ -55,13 +55,13 @@ def db_check() -> None:
 
     db = settings.DATABASES["default"]
     print(f"DB: {db['NAME']} @ {db['HOST']}")
-    print(f"usuarios={User.objects.count()} foodlogs={FoodLog.objects.count()}")
-    print(f"modelo gemini={settings.GEMINI_MODEL} r2={bool(settings.R2_ACCOUNT_ID)}")
+    print(f"users={User.objects.count()} foodlogs={FoodLog.objects.count()}")
+    print(f"gemini_model={settings.GEMINI_MODEL} r2={bool(settings.R2_ACCOUNT_ID)}")
 
 
 @app.function(image=image, secrets=secrets, timeout=300)
 def set_staff(email: str) -> None:
-    """Marca como staff (acceso a Administración) al usuario ya registrado con ese email."""
+    """Grant staff status (Django Admin access) to the registered user with this email."""
     sys.path.insert(0, "/app")
     import django
 
@@ -69,7 +69,7 @@ def set_staff(email: str) -> None:
     from core.models import User
 
     updated = User.objects.filter(email=email).update(is_staff=True)
-    print(f"usuarios actualizados: {updated}")
+    print(f"updated users: {updated}")
 
 
 @app.function(

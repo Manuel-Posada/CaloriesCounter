@@ -73,7 +73,7 @@ export class Profile {
   private filled = false;
 
   constructor() {
-    // El perfil puede llegar después de crear el componente.
+    // Profile may arrive after the component is created.
     effect(() => {
       const p = this.auth.profile();
       if (!p || this.filled) return;

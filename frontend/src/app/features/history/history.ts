@@ -127,17 +127,17 @@ export class History implements OnInit {
   protected readonly loading = this.logs.historyLoading;
   protected readonly error = signal<MessageKey | null>(null);
   protected readonly hasMore = this.logs.historyHasMore;
-  /** IDs cuya imagen falló al cargar (p. ej. borrada entre el listado y la vista). */
+  /** IDs whose image failed to load (e.g. deleted between listing and view). */
   protected readonly failed = new Set<number | string>();
-  /** Tamaño natural de cada miniatura, para alinear el contorno con la imagen recortada. */
+  /** Natural size of each thumbnail, to align the contour with the cropped image. */
   private readonly sizes = signal<Record<number, { w: number; h: number }>>({});
 
   ngOnInit(): void {
-    // La caché se comparte con la galería del resultado: si ya hay páginas, no se repiten.
+    // Cache is shared with the result gallery: if pages already exist, don't re-fetch.
     if (this.items().length === 0) this.load();
   }
 
-  /** Recarga desde la primera página (primera visita o reintento). */
+  /** Reloads from the first page (initial visit or retry). */
   load(): void {
     this.error.set(null);
     this.logs.refreshHistory().subscribe({
@@ -145,7 +145,7 @@ export class History implements OnInit {
     });
   }
 
-  /** Carga la siguiente página sin salir de la lista. */
+  /** Loads the next page without leaving the list. */
   protected loadMore(): void {
     this.error.set(null);
     this.logs.loadMoreHistory()?.subscribe({
@@ -157,7 +157,7 @@ export class History implements OnInit {
     return !!log.imagen_url && !this.failed.has(log.id);
   }
 
-  /** Foto tomada con la cámara torcida: se marca con el mismo umbral que en el resultado. */
+  /** Photo taken with a tilted camera: flagged with the same threshold as in the result. */
   protected tilted(log: FoodLog): boolean {
     const deg = log.angulo_camara_deg;
     return deg != null && deg > TILT_WARN_DEG;
@@ -174,7 +174,7 @@ export class History implements OnInit {
     return this.sizes()[id];
   }
 
-  /** Pasa el polígono normalizado a coordenadas de la imagen (el SVG usa su viewBox). */
+  /** Maps the normalized polygon to image coordinates (SVG uses its viewBox). */
   protected points(contour: FoodContour, size: { w: number; h: number }): string {
     return contour.poligono
       .map(([x, y]) => `${(x * size.w).toFixed(1)},${(y * size.h).toFixed(1)}`)
@@ -195,7 +195,7 @@ export class History implements OnInit {
     this.currentReference();
   }
 
-  /** Nueva referencia del array para forzar la reactividad (`failed` es un Set). */
+  /** New array reference to trigger reactivity (`failed` is a Set). */
   private currentReference(): void {
     const current = this.items() || [];
     this.items.set([...current]);

@@ -1,21 +1,21 @@
 import { Injectable, NgZone, inject, signal } from '@angular/core';
 import { AuthService } from './auth.service';
 
-/** Cierre de sesión por inactividad. */
+/** Idle session timeout. */
 export const IDLE_TIMEOUT_MS = 30 * 60_000;
-/** Aviso con margen para poder seguir conectado sin perder nada. */
+/** Warning lead time so the user can stay signed in without losing anything. */
 export const IDLE_WARNING_MS = 60_000;
 
-// Cualquier gesto cuenta como actividad. `pointermove` se limita para no reprogramar el
-// temporizador en cada píxel.
+// Any gesture counts as activity. `pointermove` is throttled to avoid rescheduling the
+// timer on every pixel.
 const ACTIVITY_EVENTS = ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart', 'scroll'] as const;
 const THROTTLE_MS = 1000;
 
 /**
- * Cierra la sesión tras un rato sin actividad y avisa un minuto antes.
+ * Logs out after a period of inactivity and warns one minute beforehand.
  *
- * No se apoya en la caducidad del JWT a propósito: el refresh dura 14 días, así que un móvil
- * olvidado en una mesa seguiría con la sesión abierta.
+ * Intentionally does not rely on JWT expiration: the refresh token lasts 14 days, so a phone
+ * left on a table would otherwise stay signed in.
  */
 @Injectable({ providedIn: 'root' })
 export class IdleService {
@@ -27,10 +27,10 @@ export class IdleService {
   private lastReset = 0;
   private listening = false;
 
-  /** `true` cuando queda menos de un minuto para el cierre automático. */
+  /** `true` when less than a minute remains before automatic logout. */
   readonly warning = signal(false);
 
-  /** Arranca la vigilancia (idempotente). Se llama cuando hay sesión. */
+  /** Starts watching (idempotent). Called when a session is active. */
   start(): void {
     if (!this.listening) {
       this.listening = true;
@@ -42,14 +42,14 @@ export class IdleService {
     this.reset(true);
   }
 
-  /** Detiene los temporizadores (al cerrar sesión). Los listeners se quedan, son baratos. */
+  /** Stops timers (on logout). Event listeners remain attached as they are cheap. */
   stop(): void {
     this.clearTimers();
     this.warning.set(false);
     this.lastReset = 0;
   }
 
-  /** «Seguir conectado»: reinicia la cuenta atrás y quita el aviso. */
+  /** "Stay signed in": resets the countdown and dismisses the warning. */
   keepAlive(): void {
     this.reset(true);
   }
@@ -57,8 +57,8 @@ export class IdleService {
   private readonly onActivity = (): void => this.reset();
 
   private readonly onVisibility = (): void => {
-    // Volver a la pestaña cuenta como actividad; con la pestaña oculta los temporizadores
-    // siguen corriendo, que es justo lo que se quiere medir.
+    // Returning to the tab counts as activity; while the tab is hidden, timers keep
+    // running, which is exactly what we want to measure.
     if (!document.hidden) this.reset();
   };
 

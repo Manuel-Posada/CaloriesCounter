@@ -137,8 +137,8 @@ CaloriesCounter/
 │   └── visual_resources/    # Scripts generadores de figuras y visualizaciones 3D
 │
 ├── docs/                     # Auditorías técnicas, motion plans e investigación
-│   ├── audit_report.md       # Auditoría exhaustiva de ciclo de vida, DOM y giroscopio
-│   └── motion_plan.md        # Especificación de animaciones morfológicas
+│   ├── frontend/             # Auditoría de ciclo de vida, DOM y plan de animaciones
+│   └── paper/                # Borradores de Sección V, calibración y Nutrition5k
 │
 ├── .gitignore                # Reglas estrictas de exclusión (pesos, temporales, runs)
 └── ROADMAP.md                # Registro de hitos completados y trabajo futuro

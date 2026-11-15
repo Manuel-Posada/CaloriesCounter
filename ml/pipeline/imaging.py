@@ -9,9 +9,9 @@ _TAG_FOCAL_35MM = 0xA405
 
 
 def load_image(raw: bytes) -> tuple[Image.Image, float | None]:
-    """Decodifica, corrige orientación, convierte a RGB y limita el lado mayor.
+    """Decode, fix orientation, convert to RGB, and cap the longest side.
 
-    Devuelve (imagen, focal equivalente 35 mm del EXIF o None).
+    Returns (image, 35mm-equivalent focal length from EXIF or None).
     """
     img = Image.open(io.BytesIO(raw))
     f35 = None

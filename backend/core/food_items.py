@@ -1,7 +1,7 @@
-"""Detalle por alimento de un análisis: creación, correcciones del usuario y recálculo.
+"""Per-food breakdown of an analysis: creation, user corrections, and recalculation.
 
-Los totales del `FoodLog` (volumen, kcal, macros, contornos) son siempre una proyección de
-`items`; ninguna edición del usuario escribe los totales a mano.
+`FoodLog` totals (volume, kcal, macros, contours) are always a projection of
+`items`; no user edit writes the totals directly.
 """
 from __future__ import annotations
 
@@ -9,14 +9,14 @@ from . import confidence, nutrition
 
 MIN_WEIGHT_G = 1.0
 MAX_WEIGHT_G = 5000.0
-# Tope de cordura: un plato de comida no pesa más que esto. Por encima, algo se midió mal.
+# Sanity cap: a plate of food does not weigh more than this. Above it, something was mismeasured.
 MAX_PLATE_WEIGHT_G = 2500.0
 MIN_PLATE_DIAMETER_CM = 15.0
 MAX_PLATE_DIAMETER_CM = 40.0
 
 
 def items_from_inference(alimentos: list[dict]) -> list[dict]:
-    """Normaliza la respuesta de Modal a la lista editable que se guarda."""
+    """Normalize Modal's response into the editable item list that is persisted."""
     items = []
     for a in alimentos:
         nut = a.get("nutricion") or {}
@@ -48,15 +48,15 @@ def items_from_inference(alimentos: list[dict]) -> list[dict]:
 
 
 def apply_edits(log, edits: list[dict]) -> None:
-    """Aplica [{index, idx?, peso_g?}] sobre los items y recalcula los totales."""
+    """Apply [{index, idx?, peso_g?}] edits to items and recalculate totals."""
     items = list(log.items or [])
     if not items:
-        raise ValueError("Este análisis no tiene detalle editable.")
+        raise ValueError("This analysis has no editable breakdown.")
 
     for edit in edits:
         index = int(edit["index"])
         if not 0 <= index < len(items):
-            raise ValueError(f"Índice de alimento fuera de rango: {index}")
+            raise ValueError(f"Food item index out of range: {index}")
         item = items[index]
 
         if "idx" in edit and edit["idx"] is not None:
@@ -76,7 +76,7 @@ def apply_edits(log, edits: list[dict]) -> None:
                 editado=True,
                 clase_editada=True,
             )
-            # El volumen es lo que se midió; el peso sale de la densidad del alimento nuevo.
+            # Volume is what was measured; weight is derived from the new food's density.
             item["peso_g"] = round(item["volumen_cm3"] * entry["densidad_g_cm3"], 2)
             item["peso_manual"] = False
 
@@ -95,10 +95,10 @@ def apply_edits(log, edits: list[dict]) -> None:
 
 
 def apply_plate_diameter(log, diameter_cm: float) -> None:
-    """Reescala el volumen según el diámetro real del plato (volumen ∝ diámetro³)."""
+    """Rescale volume according to the real plate diameter (volume ∝ diameter³)."""
     if not MIN_PLATE_DIAMETER_CM <= diameter_cm <= MAX_PLATE_DIAMETER_CM:
         raise ValueError(
-            f"Diámetro fuera de rango ({MIN_PLATE_DIAMETER_CM}-{MAX_PLATE_DIAMETER_CM} cm)."
+            f"Diameter out of range ({MIN_PLATE_DIAMETER_CM}-{MAX_PLATE_DIAMETER_CM} cm)."
         )
     current = float(log.plate_diameter_cm or 26.0)
     if abs(diameter_cm - current) < 1e-6:
@@ -119,7 +119,7 @@ def apply_plate_diameter(log, diameter_cm: float) -> None:
 
 
 def recalc(log) -> None:
-    """Recomputa todos los totales del registro a partir de `items`."""
+    """Recompute all log totals from `items`."""
     items = log.items or []
     kcal = 0.0
     proteinas = carbohidratos = grasas = 0.0
@@ -158,12 +158,12 @@ def recalc(log) -> None:
 
 
 def attach_confidence(log) -> None:
-    """Recalcula el nivel de confianza que se muestra en la ficha."""
+    """Recompute the confidence level shown in the detail view."""
     log.confianza = confidence.evaluate(log)
 
 
 def inference_like(log) -> dict:
-    """Forma que espera el generador de consejos (la misma que devuelve Modal), desde un registro."""
+    """Build the inference-shaped dict expected by the advice generator from a FoodLog."""
     items = log.items or []
     return {
         "alimentos": alimentos_from_items(items),
@@ -177,11 +177,11 @@ def inference_like(log) -> dict:
 
 
 def alimentos_from_items(items: list[dict]) -> list[dict]:
-    """Vista tipo Modal (lo que consume la pantalla de resultado) a partir de `items`."""
+    """Modal-shaped view (consumed by the results screen) built from `items`."""
     out = []
     for i in items:
         nut = dict(i.get("nutricion") or {})
-        # La tabla por 100 g se guarda aparte; la pantalla la muestra en la hoja de detalle.
+        # The per-100 g table is stored separately; the UI shows it in the detail sheet.
         nut["por_100g"] = i.get("por_100g") or {}
         out.append(
             {
