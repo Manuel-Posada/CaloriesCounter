@@ -139,10 +139,6 @@ CaloriesCounter/
 │   ├── nutrition_mapping/    # Construction and audit of the USDA nutrition table
 │   └── visual_resources/     # Scripts that generate figures and 3D visualizations
 │
-├── docs/                     # Technical audits, motion plans and research notes
-│   ├── frontend/             # Lifecycle and DOM audit, animation plan
-│   └── paper/                # Section V drafts, calibration and Nutrition5k
-│
 ├── .gitignore                # Strict exclusion rules (weights, temp files, runs)
 └── ROADMAP.md                # Log of completed milestones and future work
 ```

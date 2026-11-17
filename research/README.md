@@ -44,7 +44,7 @@ research/
     └── food_names_es.csv
 ```
 
-> Paper drafts live in [`../docs/paper/`](../docs/paper/) and core pipeline unit tests live in [`../ml/tests/test_core.py`](../ml/tests/test_core.py).
+> Core pipeline unit tests live in [`../ml/tests/test_core.py`](../ml/tests/test_core.py).
 
 ## What is included
 
