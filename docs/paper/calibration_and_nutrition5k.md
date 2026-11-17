@@ -66,9 +66,9 @@ ES version path: research/visual_resources/11_calibracion_escala_plato_hough.png
 Description: Fiducial calibration pipeline: (a) Circular Hough plate rim detection; (b) Focal length f_px recovery and analytical z_plate computation; (c) Uniform linear rescaling of the depth map, collapsing MAE from ~75 cm to <2.5 cm.]
 ```
 
-As a result, mean absolute depth error (MAE) relative to the table plane drops dramatically:
-- **Small:** from $75.81\text{ cm}$ to **$2.31\text{ cm}$**.
-- **Large:** from $137.24\text{ cm}$ to **$1.87\text{ cm}$**.
+As a result, mean absolute depth error (MAE) across five real Nutrition5k RGB-D dishes drops dramatically:
+- **Small:** from $53.9\text{ cm}$ to **$5.5\text{ cm}$**.
+- **Large:** from $62.2\text{ cm}$ to **$5.8\text{ cm}$**.
 
 ---
 
@@ -114,14 +114,14 @@ Five canonical dishes spanning continuous, granular, fibrous, and composite geom
 [TABLE 7: Depth Calibration & Gravimetric Parity Results on Nutrition5k]
 ```
 
-| Nutrition5k Dish ID | Food Description | Ground-Truth Mass [g] | True Distance [cm] | Raw MAE Small [cm] | Calib. MAE Small [cm] | Pred. Mass Small [g] | Error Small [%] | Raw MAE Large [cm] | Calib. MAE Large [cm] | Pred. Mass Large [g] | Error Large [%] |
-|---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `dish_1556572657` | Grilled chicken, rice & salad | 285.0 | 38.5 | 74.27 | 2.12 | 251.4 | 11.8% | 136.61 | 1.82 | 246.7 | 13.4% |
-| `dish_1556573450` | Pasta Bolognese | 340.0 | 39.0 | 75.58 | 2.57 | 363.9 | 7.0% | 137.30 | 1.95 | 342.2 | **0.6%** |
-| `dish_1556574120` | Mixed fruit plate | 195.0 | 38.0 | 79.62 | 2.67 | 225.8 | 15.8% | 139.93 | 1.80 | 200.6 | **2.9%** |
-| `dish_1556575005` | Beef with vegetables | 410.0 | 39.5 | 75.09 | 2.25 | 473.0 | 15.4% | 136.37 | 1.88 | 396.9 | **3.2%** |
-| `dish_1556576210` | Rice with beans & avocado | 250.0 | 38.8 | 74.49 | 1.96 | 257.2 | **2.9%** | 135.97 | 1.90 | 272.8 | 9.1% |
-| **MEAN / TOTAL** | **Global Metrics** | **296.0** | **38.76** | **74.81** | **2.31** | **314.3** | **10.58%** | **137.24** | **1.87** | **291.8** | **5.84%** |
+| Nutrition5k Dish ID | Food Description | Ground-Truth Mass [g] | True Distance [cm] | Raw MAE Small [cm] | Calib. MAE Small [cm] | Raw MAE Large [cm] | Calib. MAE Large [cm] |
+|---|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| `dish_1557853429` | Strawberries, eggs & yam | 276.0 | 36.95 | 59.63 | 4.10 | 51.56 | 4.06 |
+| `dish_1557862783` | Steak, chicken & cauliflower | 258.0 | 36.97 | 64.75 | **2.05** | 51.60 | 4.25 |
+| `dish_1557937157` | Eggs, bacon, broccoli & berries | 271.0 | 35.43 | 33.36 | 5.36 | 82.10 | 5.85 |
+| `dish_1558029324` | Potatoes, bacon & honeydew | 250.0 | 35.98 | 49.82 | 8.12 | 58.33 | 7.34 |
+| `dish_1558031394` | Potatoes, yam & cantaloupe | 318.0 | 35.91 | 62.12 | 8.05 | 67.28 | 7.40 |
+| **MEAN** | **Global Depth Metrics** | **274.6** | **36.25** | **53.94** | **5.54** | **62.17** | **5.78** |
 
 ---
 

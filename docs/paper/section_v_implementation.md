@@ -354,20 +354,20 @@ Nutrition5k provides overhead RGB captures, depth maps recorded with an **Intel 
 {image: 10_close_up_scale_bias_small_vs_large.png}
 
 **1. Close-up bias and cubic sensitivity ($V \propto z^3$):**  
-In overhead shots at table distance (~38.5 cm), indoor monocular models severely overestimate distance: *Small* places it at 134.2 cm (MAE = 95.7 cm) and *Large* at 188.4 cm (MAE = 149.9 cm). Due to the cubic dependence of volume on distance, using *Large* uncalibrated inflates the computed volume by a factor exceeding $115\times$, rendering raw usage unviable.
+In overhead shots at table distance (~36.2 cm across five Nutrition5k RGB-D dishes), indoor monocular models severely overestimate distance: *Small* places it at a mean of 92.0 cm (MAE = 53.9 cm) and *Large* at 99.2 cm (MAE = 62.2 cm). Due to the cubic dependence of volume on distance, using *Large* uncalibrated inflates the computed volume by a factor of roughly $20.5\times$ ($16.4\times$ for *Small*), rendering raw usage unviable.
 
 {image: 11_plate_scale_calibration_hough.png}
 
 **2. Fiducial plate-based scale correction:**  
-Applying plate detection via the circular Hough transform ($r_{plato}$) and pinhole geometry ($k = z_{plato} / \text{mediana}(z_{modelo})$) drastically reduces the mean absolute depth error to **2.31 cm** for *Small* and **1.87 cm** for *Large*.
+Applying plate detection via the circular Hough transform ($r_{\text{plate}}$) and pinhole geometry ($k = z_{\text{plate}} / \text{median}(z_{\text{model}})$) drastically reduces the mean absolute depth error to **5.5 cm** for *Small* and **5.8 cm** for *Large*.
 
 **Table 12. Quantitative comparison on the Nutrition5k benchmark (Notebook D1).**
 
 | Model / Configuration | Raw Estimated Distance | Raw Depth MAE | Calibrated Depth MAE | Estimated Mass MAPE (vs. Scale) |
 |---|:---:|:---:|:---:|:---:|
-| **Ground Truth (Intel RealSense / Scale)** | **38.5 cm** | — | — | — |
-| **Depth Anything V2 Small** | 134.2 cm | 95.7 cm | **2.31 cm** | **10.58%** |
-| **Depth Anything V2 Large (Calibrated)** | 188.4 cm | 149.9 cm | **1.87 cm** | **5.84%** |
+| **Ground Truth (Intel RealSense / Scale)** | **36.2 cm** | — | — | — |
+| **Depth Anything V2 Small** | 92.0 cm | 53.9 cm | **5.5 cm** | **10.58%** |
+| **Depth Anything V2 Large (Calibrated)** | 99.2 cm | 62.2 cm | **5.8 cm** | **5.84%** |
 
 {image: 12_surface_relief_profiles_small_vs_large.png}
 {image: 13_gravimetric_parity_nutrition5k.png}

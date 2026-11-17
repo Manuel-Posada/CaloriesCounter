@@ -1,6 +1,6 @@
-dish_id,food_name,real_mass_g,mass_small_raw_g,mass_small_calib_g,error_small_calib_pct,mass_large_raw_g,mass_large_calib_g,error_large_calib_pct
-Dish 1,grilled_chicken_rice_salad,285.0,5958.2,251.4,11.8,12868.2,246.8,13.4
-Dish 2,pasta_bolognese,340.0,8677.7,363.8,7.0,17947.0,342.0,0.6
-Dish 3,fresh_fruit_platter,195.0,6335.4,225.8,15.8,12388.5,200.7,2.9
-Dish 4,beef_steak_vegetables,410.0,10998.3,473.1,15.4,20299.1,396.9,3.2
-Dish 5,rice_beans_avocado,250.0,6150.8,257.2,2.9,14352.6,272.8,9.1
+dish_id,food_name,real_mass_g,dist_gt_cm,dist_small_raw_cm,mae_small_raw_cm,mae_small_calib_cm,dist_large_raw_cm,mae_large_raw_cm,mae_large_calib_cm
+dish_1557853429,"Strawberries, eggs & yam",276.0,36.95,99.4,59.63,4.1,89.4,51.56,4.06
+dish_1557862783,"Steak, chicken & cauliflower",258.0,36.97,102.7,64.75,2.05,89.4,51.6,4.25
+dish_1557937157,"Eggs, bacon, broccoli & berries",271.0,35.43,67.6,33.36,5.36,117.3,82.1,5.85
+dish_1558029324,"Potatoes, bacon & honeydew",250.0,35.98,89.1,49.82,8.12,95.3,58.33,7.34
+dish_1558031394,"Potatoes, yam & cantaloupe",318.0,35.91,101.4,62.12,8.05,104.4,67.28,7.4
