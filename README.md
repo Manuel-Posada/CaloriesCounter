@@ -1,5 +1,7 @@
 <div align="center">
-  <img src="frontend/public/logo.png" alt="CaloriesCounter Logo" width="120" />
+  <a href="https://caloriescounter.app">
+    <img src="frontend/public/logo.png" alt="CaloriesCounter Logo" width="120" />
+  </a>
   <h1>Calorie Counter</h1>
   <p><strong>A Decoupled Modular Pipeline for Monocular 3D Food Portion Estimation and Grounded LLM Nutritional Guidance</strong></p>
   <p>
