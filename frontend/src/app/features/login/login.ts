@@ -16,7 +16,9 @@ const LOGIN_PHRASE_KEYS: readonly MessageKey[] = [
   selector: 'app-login',
   template: `
     <section class="login">
-      <div class="logo" aria-hidden="true">🥗</div>
+      <div class="logo" aria-hidden="true">
+        <img src="logo.png" alt="" width="60" height="60" />
+      </div>
       <h1>CaloriesCounter</h1>
       <p class="muted">{{ dynamicTagline() }}</p>
 

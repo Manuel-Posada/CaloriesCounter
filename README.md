@@ -1,11 +1,18 @@
-# Calorie Counter: A Decoupled Modular Pipeline for Monocular 3D Food Portion Estimation and Grounded LLM Nutritional Guidance
+<div align="center">
+  <img src="frontend/public/logo.png" alt="CaloriesCounter Logo" width="120" />
+  <h1>Calorie Counter</h1>
+  <p><strong>A Decoupled Modular Pipeline for Monocular 3D Food Portion Estimation and Grounded LLM Nutritional Guidance</strong></p>
+  <p>
+    <strong>Live App:</strong> <a href="https://caloriescounter.app">caloriescounter.app</a>
+  </p>
 
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Angular](https://img.shields.io/badge/Angular-20-DD0031?logo=angular&logoColor=white)](https://angular.dev/)
-[![Django](https://img.shields.io/badge/Django-6.1-092E20?logo=django&logoColor=white)](https://www.djangoproject.com/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![Modal](https://img.shields.io/badge/Deployment-Modal_GPU_A10G-00FF66)](https://modal.com/)
-[![Gemini](https://img.shields.io/badge/LLM-Gemini_Flash_Lite-8E75B2?logo=google-gemini&logoColor=white)](https://ai.google.dev/)
+  [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+  [![Angular](https://img.shields.io/badge/Angular-20-DD0031?logo=angular&logoColor=white)](https://angular.dev/)
+  [![Django](https://img.shields.io/badge/Django-6.1-092E20?logo=django&logoColor=white)](https://www.djangoproject.com/)
+  [![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+  [![Modal](https://img.shields.io/badge/Deployment-Modal_GPU_A10G-00FF66)](https://modal.com/)
+  [![Gemini](https://img.shields.io/badge/LLM-Gemini_Flash_Lite-8E75B2?logo=google-gemini&logoColor=white)](https://ai.google.dev/)
+</div>
 
 **Calorie Counter** is a decoupled, intelligent system that estimates the 3D volume and nutritional content of food from a **single smartphone photo**, taken in real-world, uncontrolled environments.
 

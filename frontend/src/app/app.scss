@@ -41,8 +41,10 @@
   }
 
   &__logo {
-    font-size: 1.25rem;
-    line-height: 1;
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    display: block;
   }
 
   &__profile {

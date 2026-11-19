@@ -17,7 +17,7 @@ import { Drawer } from './core/ui/drawer';
       <header class="topbar" [class.topbar--scrolled]="isScrolled()">
         <div class="topbar__inner">
           <a routerLink="/" class="topbar__brand" aria-label="CaloriesCounter">
-            <span class="topbar__logo" aria-hidden="true">🥗</span>
+            <img class="topbar__logo" src="logo.png" alt="" aria-hidden="true" width="26" height="26" />
             <span class="topbar__title">CaloriesCounter</span>
           </a>
 
