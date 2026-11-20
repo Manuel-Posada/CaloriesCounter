@@ -1,7 +1,7 @@
-"""Dibuja los recursos visuales a partir de `datos_visuales.npz`.
+"""Renders the visual resource figures from `datos_visuales.npz`.
 
-No carga modelos: así matplotlib dispone de toda la RAM. Lo llama
-`generar_recursos.py` después de `generar_datos.py`.
+Does not load ML models so matplotlib has full access to RAM. Invoked by
+`generar_recursos.py` after `generar_datos.py`.
 """
 import json
 from pathlib import Path
@@ -91,7 +91,7 @@ def main():
         ))
     H, W = image.shape[:2]
 
-    # 01 · Flujo del pipeline
+    # 01 · Pipeline flow
     fig = plt.figure(figsize=(14.5, 9.2))
     ax = fig.add_axes([0.02, 0.03, 0.58, 0.90])
     ax.set_xlim(0, 10); ax.set_ylim(0, 10); ax.axis("off")
@@ -114,8 +114,8 @@ def main():
         ax.text(1.12, y - 0.24, title, fontsize=11, weight="bold", color=COL["ink"], va="top")
         ax.text(1.12, y - 0.55, body, fontsize=8.8, color=COL["muted"], va="top")
         if i < len(steps) - 1:
-            # La punta se dibuja en `xy`, así que debe ser el punto inferior:
-            # el flujo va del recuadro de arriba al de abajo.
+            # The arrowhead is drawn at `xy`, so it must be the lower point:
+            # the flow goes from the upper box to the lower box.
             ax.annotate("", xy=(5.0, y - h - 0.29), xytext=(5.0, y - h - 0.03),
                         arrowprops=dict(arrowstyle="-|>", color="#94a3b8", lw=1.3))
     fig.suptitle("Cómo estima el peso el pipeline (Opción B)", fontsize=17, weight="bold", y=0.985)
@@ -141,7 +141,7 @@ def main():
         axm.set_title(title, fontsize=9.5, loc="left", color=COL["ink"])
     _save(fig, "01_flujo_pipeline.png")
 
-    # 02 · Mapa de profundidad
+    # 02 · Depth map
     fig, axes = plt.subplots(2, 2, figsize=(13, 10), constrained_layout=True)
     ax = axes[0, 0]
     _overlay(ax, image, pairs); _plate_circle(ax, plate, "white")
@@ -175,7 +175,7 @@ def main():
     fig.suptitle("Del mapa de profundidad al volumen aparente", fontsize=16, weight="bold")
     _save(fig, "02_mapa_profundidad.png")
 
-    # 03 · Volumen 3D por alimento
+    # 03 · 3D volume per food item
     fig = plt.figure(figsize=(15, 5.2))
     for i, p in enumerate(pairs, 1):
         ax = fig.add_subplot(1, 3, i, projection="3d")
@@ -200,7 +200,7 @@ def main():
     fig.tight_layout()
     _save(fig, "03_volumen_3d.png")
 
-    # 04 · Resultado sobre el plato
+    # 04 · Result overlaid on plate
     fig = plt.figure(figsize=(15, 8))
     ax = fig.add_axes([0.02, 0.04, 0.58, 0.90])
     _overlay(ax, image, pairs); _plate_circle(ax, plate, "white")
@@ -234,7 +234,7 @@ def main():
     axc.text(0.0, 0.12, corrected_line, fontsize=8, color=COL["muted"])
     _save(fig, "04_resultado_plato.png")
 
-    # 05 · Peso estimado vs real
+    # 05 · Estimated vs actual weight
     labels = ["Plátano\n(seg. izquierdo)", "Cerdo\n(seg. central)", "Patata asada\n(seg. inferior)"]
     raw = [p["weight"] for p in pairs]
     corrected = [p["correct_g"] for p in pairs]
@@ -257,7 +257,7 @@ def main():
     fig.tight_layout()
     _save(fig, "05_pesos_vs_reales.png")
 
-    # 06 · Detección vs corrección de clase
+    # 06 · Detection vs class correction
     fig, axes = plt.subplots(1, 2, figsize=(14, 6.2))
     for ax, corrected in zip(axes, [False, True]):
         ax.imshow(image)
@@ -282,7 +282,7 @@ def main():
     fig.tight_layout(rect=[0, 0.03, 1, 0.96])
     _save(fig, "06_deteccion_vs_correccion.png")
 
-    print("Figuras listas en:", HERE)
+    print("Figures ready in:", HERE)
 
 
 if __name__ == "__main__":

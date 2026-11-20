@@ -1,121 +1,122 @@
-# Recursos visuales · mapa de profundidad y estimación de peso
+# Visual Resources · Depth Map and Weight Estimation
 
-Estos recursos explican, con la **foto real de prueba** y el **pipeline real de la app (Opción B)**, cómo se pasa de una foto a un peso en gramos:
+These resources illustrate, using a **real test photo** and the **production app pipeline (Option B)**, how a single photo is converted into weight in grams:
 
 ```
-foto → Mask2Former (máscaras) → Inception-V4 (clases)
-     → Depth Anything V2 métrico → escala con el plato (26 cm)
-     → retroproyección 3D + plano RANSAC → volumen → peso y nutrición
+photo → Mask2Former (masks) → Inception-V4 (classes)
+      → Metric Depth Anything V2 → plate scale calibration (26 cm)
+      → 3D back-projection + RANSAC plane → volume → weight & nutrition
 ```
 
-Foto: `34g_platano_163cerdo_105papa.jpg` (1024×768 tras el preprocesado de la app).
-Pesos reales anotados en el nombre: **34 g de plátano + 163 g de cerdo + 105 g de patata asada = 302 g**.
+Photo: `34g_platano_163cerdo_105papa.jpg` (1024×768 after app preprocessing).
+Ground-truth weights encoded in the filename: **34 g plantain/banana + 163 g pork + 105 g roasted potato = 302 g**.
 
-## Archivos
+## Files
 
-| Archivo | Qué muestra |
+| File | Description |
 |---|---|
-| `01_flujo_pipeline.png` | Infografía de los 7 pasos del pipeline, con miniaturas de foto, máscaras y profundidad. |
-| `02_mapa_profundidad.png` | Foto con máscaras y plato, profundidad monocular en metros, profundidad corregida con el plato y altura sobre la mesa en cm. |
-| `03_volumen_3d.png` | Superficie 3D de cada alimento (altura sobre la mesa) con su volumen y peso estimados. |
-| `04_resultado_plato.png` | Resultado final sobre la foto + tarjeta con peso, volumen, densidad y calorías. |
-| `05_pesos_vs_reales.png` | Comparación de peso: pipeline con la clase detectada, tras corregir la clase y peso real. |
-| `06_deteccion_vs_correccion.png` | Lado a lado: lo que detecta el pipeline y lo que queda al cambiar la clase en la app. |
-| `07_mapeo_flujo.png` | Cómo se construyó el mapeo nutricional: 323 clases → USDA → revisión → densidad → validación. |
-| `08_mapeo_cobertura.png` | Cobertura y calidad: match, origen USDA, fuentes de densidad, confianza y límites. |
-| `09_mapeo_ejemplo.png` | Tres clases reales (plátano, cerdo, patata) y el paso volumen × densidad → gramos. |
-| `10_sesgo_primer_plano_small_vs_large.png` | Sesgo de escala en primer plano (38.5 cm vs 110-175 cm) en Depth Anything V2 Small vs Large. |
-| `11_calibracion_escala_plato_hough.png` | Detección fiduciaria del plato por Hough circular y normalización métrica de profundidad. |
-| `12_perfiles_relieve_3d_small_vs_large.png` | Corte transversal y resolución de microtopografía superficial (Small vs Large). |
-| `13_paridad_gravimetrica_nutrition5k.png` | Dispersión gravimétrica sobre el benchmark Nutrition5k con banda clínica del ±15%. |
-| `14_panel_comparativo_multimodal_plato.png` | Panel completo multimodal: RGB original, máscaras de segmentación, mapa 3D y desglose nutricional. |
-| `en/` | Colección completa de las figuras 10 a 14 con textos, etiquetas y leyendas en inglés para publicación. |
-| `profundidad_volumen_metricas.csv` | Métricas cuantitativas detalladas de distancia, MAE y masas predichas en Nutrition5k. |
-| `resultado_pipeline_B.json` | Salida JSON completa del pipeline (la misma estructura que devuelve la app). |
-| `segmentos.csv` | Tabla por segmento: clase, confianza, volumen, densidad, peso, altura, plano, corrección y peso real. |
-| `datos_visuales.npz` | Arrays usados por las figuras (foto, profundidades, máscaras, mapas de altura). |
-| `index.html` | Galería navegable con todas las figuras, la tabla de resultados y el resumen del pipeline. |
-| `generar_recursos.py` | Regenera todo en dos procesos (modelos y figuras separados). |
-| `generar_datos.py` | Ejecuta el pipeline y guarda los datos. |
-| `generar_figuras.py` | Dibuja las figuras del pipeline a partir de los datos guardados. |
-| `generar_mapeo.py` | Lee `nutrition_wide_densidad.csv` y dibuja las figuras 07–09 del mapeo nutricional. |
+| `es/01_flujo_pipeline.png` | Infographic of the 7 pipeline stages, with thumbnails of the photo, masks, and depth map (Spanish). |
+| `es/02_mapa_profundidad.png` | Photo with masks and plate circle, monocular depth in meters, plate-calibrated depth, and height above the table in cm (Spanish). |
+| `es/03_volumen_3d.png` | 3D surface of each food item (height above the table) with estimated volume and weight (Spanish). |
+| `es/04_resultado_plato.png` | Final result overlaid on the photo + summary card with weight, volume, density, and calories (Spanish). |
+| `es/05_pesos_vs_reales.png` | Weight comparison: pipeline with detected class, after class correction, and ground-truth weight (Spanish). |
+| `es/06_deteccion_vs_correccion.png` | Side-by-side: what the pipeline detects vs. the result after correcting the class in the app (Spanish). |
+| `es/07_mapeo_flujo.png` | How the nutritional mapping was built: 323 classes → USDA → manual review → density → validation (Spanish). |
+| `es/08_mapeo_cobertura.png` | Coverage and quality: match type, USDA source, density sources, confidence, and limitations (Spanish). |
+| `es/09_mapeo_ejemplo.png` | Three real classes (banana/plantain, pork, potato) and the volume × density → grams step (Spanish). |
+| `es/10_sesgo_primer_plano_small_vs_large.png` | Close-up scale bias (38.5 cm vs. 110–175 cm) in Depth Anything V2 Small vs. Large (Spanish). |
+| `es/11_calibracion_escala_plato_hough.png` | Fiducial plate detection via circular Hough transform and metric depth normalization (Spanish). |
+| `es/12_perfiles_relieve_3d_small_vs_large.png` | Cross-section profile and surface microtopography resolution: Small vs. Large (Spanish). |
+| `es/13_paridad_gravimetrica_nutrition5k.png` | Gravimetric parity scatter plot on the Nutrition5k benchmark with ±15% clinical band (Spanish). |
+| `es/14_panel_comparativo_multimodal_plato.png` | Full multimodal comparison panel: original RGB, segmentation masks, 3D map, and nutritional breakdown (Spanish). |
+| `es/` | Complete collection of all 14 figures (01–14) with Spanish labels and legends. |
+| `en/` | Complete collection of figures 10–14 with English text, labels, and legends for publication. |
+| `profundidad_volumen_metricas.csv` | Detailed quantitative metrics for distance, MAE, and predicted masses on Nutrition5k. |
+| `resultado_pipeline_B.json` | Full JSON output from the pipeline (the same structure returned by the app). |
+| `segmentos.csv` | Per-segment table: class, confidence, volume, density, weight, height, plane, class correction, and ground-truth weight. |
+| `datos_visuales.npz` | Arrays used to generate the figures (photo, depth maps, masks, height maps). |
+| `index.html` | Browsable gallery with all figures, results table, and pipeline summary. |
+| `generar_recursos.py` | Regenerates all resources in separate processes (models and figures isolated). |
+| `generar_datos.py` | Runs the pipeline and saves the intermediate data. |
+| `generar_figuras.py` | Renders the pipeline figures (01–06) from the saved data. |
+| `generar_mapeo.py` | Reads `nutrition_wide_densidad.csv` and renders the nutritional mapping figures (07–09). |
 
-## Cómo se calcula el volumen
+## How Volume Is Computed
 
-1. **Profundidad monocular.** Depth Anything V2 métrico devuelve `z_modelo(x, y)` en metros. En primeros planos el modelo sobreestima la distancia: en esta foto la mediana es **1,58 m** cuando el plato está a unos **30 cm**.
-2. **Escala con el plato.** Se detecta el borde del plato (Hough, 26 cm de diámetro). Con geometría pinhole:
+1. **Monocular depth.** Metric Depth Anything V2 outputs `z_model(x, y)` in meters. At close range, the model overestimates distance: in this photo the median is **1.58 m**, while the plate is roughly **30 cm** away.
+2. **Plate-based scaling.** The plate rim is detected (Hough circle, 26 cm reference diameter). Using pinhole geometry:
 
    ```text
-   z_plato = f_px · D_plato / (2 · r_plato)
-   k       = z_plato / z_modelo
-   z_real  = k · z_modelo
+   z_plate = f_px · D_plate / (2 · r_plate)
+   k       = z_plate / z_model
+   z_real  = k · z_model
    ```
 
-   En esta foto: `k = 0,188`; la mediana corregida baja a **~0,30 m**.
-3. **Retroproyección 3D.** Cada píxel se lleva a coordenadas de cámara con el modelo pinhole:
+   In this photo: `k = 0.188`; the calibrated median distance drops to **~0.30 m**.
+3. **3D back-projection.** Each pixel is projected into camera coordinates using the pinhole model:
 
    ```text
    P = z_real · ((x - cx)/f, (y - cy)/f, 1)
    ```
 
-4. **Plano de apoyo.** Se ajusta un plano `n·P = d` con RANSAC usando el anillo de mesa alrededor de la comida (sin incluir ninguna máscara de alimento).
-5. **Altura y volumen.** Para cada píxel de la máscara:
+4. **Support plane.** A plane `n·P = d` is fitted with RANSAC using the ring of table/plate pixels around the food (excluding all food masks).
+5. **Height and volume.** For each pixel inside the mask:
 
    ```text
-   h     = clip(n·P - d, 0, 20 cm)
-   A_px  = z_real² / (f² · |n·d|)
-   V     = Σ h · A_px
+   h    = clip(n·P - d, 0, 20 cm)
+   A_px = z_real² / (f² · |n·d|)
+   V    = Σ h · A_px
    ```
 
-6. **Peso y nutrición.**
+6. **Weight and nutrition.**
 
    ```text
-   peso_g = V · densidad_g_cm3
-   kcal   = peso_g / 100 · kcal_100g
+   weight_g = V · density_g_cm3
+   kcal     = weight_g / 100 · kcal_100g
    ```
 
-Es un **volumen aparente**: solo mide lo que se ve desde la cámara. El plato es la referencia de escala; sin plato fiable, el pipeline avisa y acota la distancia.
+This is an **apparent volume**: it only measures what is visible from the camera. The plate serves as the metric scale reference; without a reliable plate detection, the pipeline issues a warning and falls back to a bounded typical distance.
 
-## Resultado de esta foto
+## Results on This Photo
 
-El pipeline detectó 3 segmentos, pero confundió dos clases: el plátano salió como **pollo** y la patata como **ensalada caprese**. La app permite cambiar la clase sin repetir la medición: el volumen no cambia, solo la densidad.
+The pipeline detected 3 segments, but misclassified two of them: banana/plantain was predicted as **chicken** and roasted potato as **caprese salad**. The app lets the user change the class without re-measuring: the volume stays the same, only the density changes.
 
-| Segmento | Clase detectada | Volumen | Peso detectado | Clase corregida | Peso corregido | Peso real |
+| Segment | Detected class | Volume | Detected weight | Corrected class | Corrected weight | Ground-truth weight |
 |---|---|---:|---:|---|---:|---:|
-| izquierdo | pollo | 97,9 cm³ | 103,2 g | plátano | 77,6 g | 34 g |
-| central | cerdo | 234,7 cm³ | 190,6 g | cerdo | 190,6 g | 163 g |
-| inferior | ensalada caprese | 85,1 cm³ | 57,5 g | patata asada | 90,2 g | 105 g |
-| **total** | | **417,6 cm³** | **351,3 g** | | **358,4 g** | **302 g** |
+| left | chicken | 97.9 cm³ | 103.2 g | banana/plantain | 77.6 g | 34 g |
+| center | pork | 234.7 cm³ | 190.6 g | pork | 190.6 g | 163 g |
+| bottom | caprese salad | 85.1 cm³ | 57.5 g | roasted potato | 90.2 g | 105 g |
+| **total** | | **417.6 cm³** | **351.3 g** | | **358.4 g** | **302 g** |
 
-- El **cerdo** es el caso bueno: 190,6 g frente a 163 g reales (**+17 %**).
-- El plátano y la patata sí se confunden de clase; aun así, la corrección manual deja el total en **358 g** frente a 302 g.
-- El volumen del plátano está sobreestimado (97,9 cm³ para 34 g), probablemente porque la máscara incluye parte del borde/brillo del plato. Es el segmento más difícil de esta foto.
+- **Pork** is the strong case: 190.6 g vs. 163 g actual (**+17%**).
+- Banana/plantain and potato are misclassified; even so, manual class correction brings the total to **358 g** vs. 302 g actual.
+- The banana/plantain volume is overestimated (97.9 cm³ for 34 g), likely because the mask captures part of the plate rim/glare. It is the hardest segment in this photo.
 
-## Mapeo nutricional (figuras 07–09)
+## Nutritional Mapping (Figures 07–09)
 
-El detalle completo está en [`../README_mapeo nutricional.md`](../README_mapeo%20nutricional.md).
+Full documentation is available in [`../nutrition_mapping/README.md`](../nutrition_mapping/README.md).
 
-El mapeo asigna a cada una de las **323 clases** un alimento de USDA FoodData Central, sus nutrientes por 100 g y una densidad (g/cm³). Se revisaron las 323 filas a mano en 7 lotes (88 cambios respecto al borrador) y se validó la coherencia energética y una muestra de 20 clases.
+The mapping assigns each of the **323 classes** a USDA FoodData Central food item, its nutrients per 100 g, and a density (g/cm³). All 323 rows were manually reviewed across 7 batches (88 edits over the initial draft), followed by energy-coherence validation and a manual audit of 20 classes.
 
-- **Match:** exacto 183, manual 73, close 41, receta 15, proxy 10, composite 1.
-- **Origen USDA:** SR Legacy 172, Survey (FNDDS) 111, Foundation 25, receta 15.
-- **Densidad:** medida USDA 203, tabla publicada 60, cálculo geométrico 43, receta 15, referencia de categoría 2.
-- **Calidad:** 173 densidades de confianza alta, 92 media y 58 baja; 316/323 filas con coherencia energética; 18/20 en la verificación manual; 48 filas pendientes de revisión técnica.
+- **Match types:** exact 183, manual 73, close 41, recipe 15, proxy 10, composite 1.
+- **USDA source:** SR Legacy 172, Survey (FNDDS) 111, Foundation 25, recipe 15.
+- **Density:** USDA measured 203, published table 60, geometric calculation 43, recipe 15, category reference 2.
+- **Quality:** 173 high-confidence densities, 92 medium, and 58 low; 316/323 rows pass energy coherence; 18/20 in manual verification; 48 rows flagged for further technical review.
 
-La figura 09 usa los volúmenes medidos en la foto para los tres alimentos: plátano 97,9 cm³ × 0,793 = 77,6 g; cerdo 234,7 × 0,812 = 190,6 g; patata 85,1 × 1,060 = 90,2 g.
+Figure 09 uses the volumes measured from the photo for the three food items: banana/plantain 97.9 cm³ × 0.793 = 77.6 g; pork 234.7 × 0.812 = 190.6 g; roasted potato 85.1 × 1.060 = 90.2 g.
 
-## Regenerar
+## Regenerating
 
-Desde la raíz del repositorio, con el entorno de `ml` que tenga `torch`, `transformers`, `timm`, `opencv-python-headless` y los pesos en la raíz:
+From the repository root, using the `ml` environment with `torch`, `transformers`, `timm`, `opencv-python-headless`, and the model weights in the repository root:
 
 ```powershell
-python presentación/tests/Recursos_visuales/generar_recursos.py
+python research/visual_resources/generar_recursos.py
 ```
 
-El script ejecuta `generar_datos.py` (modelos, profundidad, máscaras, volúmenes) y después `generar_figuras.py` en otro proceso, para que matplotlib no comparta memoria con los modelos. En CPU tarda unos segundos; no necesita GPU.
+The script runs `generar_datos.py` (models, depth, masks, volumes) and then `generar_figuras.py` and `generar_mapeo.py` in separate processes so matplotlib does not share memory with the inference models. On CPU it takes a few seconds and does not require a GPU.
 
-## Notas
+## Notes
 
-- La foto es difícil a propósito: tres alimentos, uno grande y dos pequeños, con brillos y salsa. Sirve para enseñar **cómo funciona la geometría**, no como benchmark de precisión.
-- El pipeline de la app es la **Opción B** (`mask2former_agnostic.pt` + `inception_v4_food323.pt`) + Depth Anything V2 *Metric Indoor Small*.
-- Las cifras de profundidad y volumen dependen del plato detectado; si el plato no se detecta, el pipeline cambia a una distancia típica y añade una advertencia.
+- The photo is intentionally challenging: three foods, one large and two small, with specular highlights and sauce. It is meant to demonstrate **how the geometry works**, not to serve as an accuracy benchmark.
+- The app pipeline is **Option B** (`mask2former_agnostic.pt` + `inception_v4_food323.pt`) + Depth Anything V2 *Metric Indoor Small*.
+- Depth and volume estimates depend on plate detection; if no plate is detected, the pipeline falls back to a typical camera distance and attaches a warning.

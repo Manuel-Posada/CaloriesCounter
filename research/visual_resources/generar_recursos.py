@@ -1,14 +1,15 @@
-"""Genera los recursos visuales del pipeline de profundidad.
+"""Generates the visual resources for the depth pipeline.
 
-Uso, desde la raíz del repositorio:
+Usage, from the repository root:
 
-    python presentación/tests/Recursos_visuales/generar_recursos.py
+    python research/visual_resources/generar_recursos.py
 
-Se ejecuta en dos procesos para no juntar los modelos de inferencia con
-matplotlib en la misma memoria:
+Runs in separate processes so inference models and matplotlib do not share
+memory at the same time:
 
-  1. `generar_datos.py`  -> modelos + profundidad + máscaras + volúmenes.
-  2. `generar_figuras.py` -> figuras a partir de `datos_visuales.npz`.
+  1. `generar_datos.py`   -> models + depth + masks + volumes.
+  2. `generar_figuras.py` -> figures from `datos_visuales.npz`.
+  3. `generar_mapeo.py`   -> nutritional mapping figures (07-09).
 """
 import subprocess
 import sys
@@ -21,7 +22,7 @@ def main():
     for script in ("generar_datos.py", "generar_figuras.py", "generar_mapeo.py"):
         print(f"\n=== {script} ===")
         subprocess.run([sys.executable, str(HERE / script)], check=True, cwd=HERE.parent.parent.parent)
-    print("\nRecursos generados en:", HERE)
+    print("\nResources generated in:", HERE)
 
 
 if __name__ == "__main__":

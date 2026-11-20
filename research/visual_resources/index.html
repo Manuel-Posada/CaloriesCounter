@@ -58,61 +58,61 @@
     <section class="card wide">
       <h2>1 · End-to-End Flow</h2>
       <p>Infographic of all seven steps, showing the input photo, instance masks, and calibrated depth map.</p>
-      <img src="01_flujo_pipeline.png" alt="Pipeline flow">
+      <img src="es/01_flujo_pipeline.png" alt="Pipeline flow">
     </section>
 
     <section class="card wide">
       <h2>2 · From Depth Map to Volume</h2>
       <p>Raw monocular depth estimates a ~1.58 m median; the 26 cm plate calibrates scale to ~0.30 m. Each pixel is then back-projected to 3D and measured above the table plane.</p>
-      <img src="02_mapa_profundidad.png" alt="Depth map and height above table">
+      <img src="es/02_mapa_profundidad.png" alt="Depth map and height above table">
     </section>
 
     <section class="card">
       <h2>3 · 3D Surface per Food Item</h2>
       <p>Height above the table (cm) and apparent volume. Volume accounts only for geometry visible to the camera.</p>
-      <img src="03_volumen_3d.png" alt="3D surfaces and volumes">
+      <img src="es/03_volumen_3d.png" alt="3D surfaces and volumes">
     </section>
 
     <section class="card">
       <h2>4 · Plate Result</h2>
       <p>Masks, detected classes, volume, density, weight, and calories. The summary card shows plate totals.</p>
-      <img src="04_resultado_plato.png" alt="Pipeline result on test plate">
+      <img src="es/04_resultado_plato.png" alt="Pipeline result on test plate">
     </section>
 
     <section class="card">
       <h2>5 · Estimated vs. Ground-Truth Weight</h2>
       <p>Class selection only changes density; volume comes from depth. Grilled pork is the closest match.</p>
-      <img src="05_pesos_vs_reales.png" alt="Estimated vs real weights">
+      <img src="es/05_pesos_vs_reales.png" alt="Estimated vs real weights">
     </section>
 
     <section class="card">
       <h2>6 · Class Correction in the App</h2>
       <p>Masks and volumes stay fixed; correcting the class swaps density and updates weight deterministically.</p>
-      <img src="06_deteccion_vs_correccion.png" alt="Detection vs class correction">
+      <img src="es/06_deteccion_vs_correccion.png" alt="Detection vs class correction">
     </section>
 
     <section class="card wide" style="margin-top:8px">
       <span class="pill" style="background:#f3e8ff;color:#6b21a8">Nutritional Mapping</span>
       <h2>How the 323-Class Table Was Built</h2>
-      <p>Each dataset class is mapped to a <b>USDA FoodData Central</b> entry, per-100 g nutrients, and an apparent <b>density</b> (g/cm³) to convert volume into grams. All 323 rows were manually reviewed, with energy coherence and a 20-class sample verified. <a href="../nutrition_mapping/README_mapeo%20nutricional.md">Full mapping details</a>.</p>
+      <p>Each dataset class is mapped to a <b>USDA FoodData Central</b> entry, per-100 g nutrients, and an apparent <b>density</b> (g/cm³) to convert volume into grams. All 323 rows were manually reviewed, with energy coherence and a 20-class sample verified. <a href="../nutrition_mapping/README.md">Full mapping details</a>.</p>
     </section>
 
     <section class="card wide">
       <h2>7 · Mapping Workflow</h2>
       <p>From the 323 raw classes to the final table: USDA candidates, manual review, nutrients, density, validation, and app CSV export.</p>
-      <img src="07_mapeo_flujo.png" alt="Nutritional mapping workflow">
+      <img src="es/07_mapeo_flujo.png" alt="Nutritional mapping workflow">
     </section>
 
     <section class="card">
       <h2>8 · Coverage &amp; Quality</h2>
       <p>183 exact matches, 73 manual, 41 close, 15 recipe, 10 proxy, and 1 composite. Densities come from USDA (203), published tables (60), geometric calculation (43), recipes (15), and references (2).</p>
-      <img src="08_mapeo_cobertura.png" alt="Mapping coverage and quality">
+      <img src="es/08_mapeo_cobertura.png" alt="Mapping coverage and quality">
     </section>
 
     <section class="card">
       <h2>9 · Three Real Examples</h2>
       <p>Banana (USDA measure), pork (geometric calculation), and baked potato (published table), with volume-to-gram conversion below.</p>
-      <img src="09_mapeo_ejemplo.png" alt="Nutritional mapping examples">
+      <img src="es/09_mapeo_ejemplo.png" alt="Nutritional mapping examples">
     </section>
 
     <section class="card wide" style="margin-top:16px">

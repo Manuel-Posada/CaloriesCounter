@@ -39,7 +39,7 @@ research/
 │   ├── resultado_pipeline_B.json / segmentos.csv / profundidad_volumen_metricas.csv
 │   └── generar_*.py
 └── nutrition_mapping/
-    ├── README_mapeo nutricional.md
+    ├── README.md
     ├── nutrition_wide_densidad.csv
     └── food_names_es.csv
 ```

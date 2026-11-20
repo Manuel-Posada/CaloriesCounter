@@ -1,8 +1,8 @@
-"""Extrae los datos reales del pipeline para los recursos visuales.
+"""Extracts real pipeline data for the visual resources.
 
-Guarda `datos_visuales.npz`, `resultado_pipeline_B.json` y `segmentos.csv`.
-Se ejecuta desde `generar_recursos.py`; no dibuja nada (así los modelos se
-liberan antes de que matplotlib necesite RAM).
+Saves `datos_visuales.npz`, `resultado_pipeline_B.json`, and `segmentos.csv`.
+Run from `generar_recursos.py`; does not render any figures (so the models are
+freed from memory before matplotlib needs RAM).
 """
 import csv
 import gc
@@ -51,7 +51,7 @@ def _to_3d(depth_m, ys, xs, focal_px, cx, cy):
 
 
 def _heightmap(mask, food_union, depth_m, focal_px, seed=0):
-    """Replica la geometría de volume.estimate_volume_cm3 y devuelve el mapa de altura."""
+    """Replicates the geometry of volume.estimate_volume_cm3 and returns the height map."""
     h, w = mask.shape
     area_px = int(mask.sum())
     cx, cy = (w - 1) / 2.0, (h - 1) / 2.0
@@ -109,7 +109,7 @@ def _heightmap(mask, food_union, depth_m, focal_px, seed=0):
 
 
 def main():
-    print("Cargando foto y modelos (CPU)...")
+    print("Loading photo and models (CPU)...")
     image, f35 = load_image(IMG.read_bytes())
     depth = DepthEstimator(config.DEPTH_MODEL_ID, "cpu")
     depth_m = depth.predict(image)
@@ -119,7 +119,7 @@ def main():
     segments = m2f.segment(image)
     classifier.classify(image, segments)
     segments = [s for s in segments if s.mask.sum() >= config.MIN_MASK_AREA_FRAC * image.width * image.height and s.class_idx is not None]
-    print(f"  máscaras: {len(segments)}")
+    print(f"  masks: {len(segments)}")
 
     focal_px = resolve_focal_px(image.width, image.height, None, f35)
     food_union = np.logical_or.reduce([s.mask for s in segments])
@@ -131,7 +131,7 @@ def main():
         fallback_distance_cm=config.PLATE_FALLBACK_DISTANCE_CM,
     )
     depth_scaled = (depth_m * scale).astype(np.float32)
-    print(f"  escala: x{scale:.4f} ({scale_source}) | plato: {plate.radius_px:.0f}px")
+    print(f"  scale: x{scale:.4f} ({scale_source}) | plate: {plate.radius_px:.0f}px")
 
     nutrition = NutritionTable.load(config.NUTRITION_CSV)
     pipeline = FoodPipeline({"B": lambda _img: segments}, depth=depth, nutrition=nutrition)
@@ -219,10 +219,10 @@ def main():
         real_g=np.array([p["real_g"] for p in pairs], np.float32),
         focal_px=np.float32(focal_px),
     )
-    print("  guardado datos_visuales.npz")
-    print("Total detectado:", result["totales"]["peso_g"], "g | real: 302 g")
+    print("  saved datos_visuales.npz")
+    print("Total detected:", result["totales"]["peso_g"], "g | actual: 302 g")
     for p in pairs:
-        print(f"  {p['food']['nombre_es']}: {p['food']['peso_g']:.1f} g -> {p['correct_name']} {p['correct_g']:.1f} g (real {p['real_g']} g)")
+        print(f"  {p['food']['nombre_es']}: {p['food']['peso_g']:.1f} g -> {p['correct_name']} {p['correct_g']:.1f} g (actual {p['real_g']} g)")
 
     del pipeline, depth, m2f, classifier
     gc.collect()

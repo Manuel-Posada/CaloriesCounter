@@ -1,11 +1,11 @@
-"""Genera los recursos visuales del mapeo nutricional.
+"""Generates the visual resources for the nutritional mapping.
 
-Lee `ml/data/nutrition_wide_densidad.csv` (323 clases) y dibuja:
-  07_mapeo_flujo.png      -> cómo se construyó el mapeo
-  08_mapeo_cobertura.png  -> cobertura, fuentes y calidad
-  09_mapeo_ejemplo.png    -> tres clases reales y el paso volumen -> gramos
+Reads `ml/data/nutrition_wide_densidad.csv` (323 classes) and renders:
+  07_mapeo_flujo.png      -> how the mapping was built
+  08_mapeo_cobertura.png  -> coverage, sources, and quality
+  09_mapeo_ejemplo.png    -> three real classes and the volume -> grams step
 
-No necesita modelos ni GPU.
+Does not require ML models or a GPU.
 """
 import textwrap
 from pathlib import Path
@@ -18,7 +18,7 @@ import pandas as pd
 from matplotlib.patches import Circle, FancyBboxPatch
 
 HERE = Path(__file__).resolve().parent
-# `HERE` es `research/visual_resources`, así que la raíz del repo es parents[1].
+# `HERE` is `research/visual_resources`, so the repo root is parents[1].
 CSV = HERE.parents[1] / "ml" / "data" / "nutrition_wide_densidad.csv"
 
 COL = dict(ink="#0f172a", muted="#64748b", grid="#cbd5e1", blue="#2563eb",
@@ -41,8 +41,8 @@ def _save(fig, name, tight=True):
 
 
 def _box(ax, x, y, w, h, color, alpha=0.10, lw=1.2, pad=0.02):
-    # El radio de la esquina debe quedar muy por debajo de la altura de la caja;
-    # si no, los arcos se solapan y dibujan aspas dentro del recuadro.
+    # The corner radius must stay well below the box height;
+    # otherwise the arcs overlap and draw crosses inside the box.
     radius = min(0.12, h * 0.30)
     ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle=f"round,pad={pad},rounding_size={radius:.3f}",
                                 linewidth=lw, edgecolor=color, facecolor=color + f"{int(alpha*100):02x}"))
@@ -58,7 +58,7 @@ def _step(ax, i, y, title, body, color):
 
 
 def _stat_card(ax, x, y, w, h, number, label, color):
-    # `pad=0` para que el relleno del parche no invada el hueco entre tarjetas.
+    # `pad=0` so the patch padding does not invade the gap between cards.
     _box(ax, x, y, w, h, color, alpha=0.08, pad=0.0)
     ax.text(x + 0.04, y + h * 0.56, number, fontsize=22, weight="bold", color=color, va="center")
     ax.text(x + 0.04, y + h * 0.20, label, fontsize=8.2, color=COL["muted"], va="center")
@@ -88,8 +88,8 @@ def fig_flujo(df):
         y = top - (i - 1) * (h + gap)
         _step(ax, i, y, title, body, color)
         if i < len(steps):
-            # La punta se dibuja en `xy`, así que debe ser el punto inferior:
-            # el flujo va del recuadro de arriba al de abajo.
+            # The arrowhead is drawn at `xy`, so it must be the lower point:
+            # the flow goes from the upper box to the lower box.
             ax.annotate("", xy=(5.0, y - h - 0.29), xytext=(5.0, y - h - 0.03),
                         arrowprops=dict(arrowstyle="-|>", color="#94a3b8", lw=1.3))
 
@@ -97,7 +97,7 @@ def fig_flujo(df):
     fig.text(0.02, 0.005, "USDA FoodData Central · FAO/INFOODS · Engineering Properties of Foods · USDA AMS · DeepSeek V4 Pro",
              fontsize=8.5, color=COL["muted"])
 
-    # Panel derecho: cobertura
+    # Right panel: coverage
     axr = fig.add_axes([0.60, 0.06, 0.34, 0.86]); axr.set_xlim(0, 1.04); axr.set_ylim(0, 1); axr.axis("off")
     axr.text(0, 0.98, "COBERTURA", fontsize=10, color=COL["muted"], weight="bold")
     _stat_card(axr, 0.00, 0.80, 0.44, 0.13, f"{n}", "clases en el dataset", COL["blue"])
@@ -255,11 +255,11 @@ def fig_ejemplo(df):
 
 def main():
     df = pd.read_csv(CSV)
-    print(f"  mapeo: {len(df)} clases")
+    print(f"  mapping: {len(df)} classes")
     fig_flujo(df)
     fig_cobertura(df)
     fig_ejemplo(df)
-    print("Figuras del mapeo listas en:", HERE)
+    print("Mapping figures ready in:", HERE)
 
 
 if __name__ == "__main__":
