@@ -1,6 +1,6 @@
-dish_id,food_name,real_mass_g,dist_gt_cm,dist_small_raw_cm,mae_small_raw_cm,mae_small_calib_cm,dist_large_raw_cm,mae_large_raw_cm,mae_large_calib_cm
-dish_1557853429,"Strawberries, eggs & yam",276.0,36.95,99.4,59.63,4.1,89.4,51.56,4.06
-dish_1557862783,"Steak, chicken & cauliflower",258.0,36.97,102.7,64.75,2.05,89.4,51.6,4.25
-dish_1557937157,"Eggs, bacon, broccoli & berries",271.0,35.43,67.6,33.36,5.36,117.3,82.1,5.85
-dish_1558029324,"Potatoes, bacon & honeydew",250.0,35.98,89.1,49.82,8.12,95.3,58.33,7.34
-dish_1558031394,"Potatoes, yam & cantaloupe",318.0,35.91,101.4,62.12,8.05,104.4,67.28,7.4
+dish_id,food_name,real_mass_g,dist_gt_cm,dist_small_raw_cm,mae_small_raw_cm,mae_small_calib_cm,dist_large_raw_cm,mae_large_raw_cm,mae_large_calib_cm,mass_small_calib_g,err_small_pct,mass_large_calib_g,err_large_pct
+dish_1557853429,"Strawberries, eggs & yam",276.0,36.95,99.4,59.63,4.1,89.4,51.56,4.06,243.4,11.8,239.0,13.4
+dish_1557862783,"Steak, chicken & cauliflower",258.0,36.97,102.7,64.75,2.05,89.4,51.6,4.25,276.1,7.0,259.5,0.6
+dish_1557937157,"Eggs, bacon, broccoli & berries",271.0,35.43,67.6,33.36,5.36,117.3,82.1,5.85,313.8,15.8,278.9,2.9
+dish_1558029324,"Potatoes, bacon & honeydew",250.0,35.98,89.1,49.82,8.12,95.3,58.33,7.34,288.5,15.4,242.0,3.2
+dish_1558031394,"Potatoes, yam & cantaloupe",318.0,35.91,101.4,62.12,8.05,104.4,67.28,7.4,327.2,2.9,346.9,9.1
