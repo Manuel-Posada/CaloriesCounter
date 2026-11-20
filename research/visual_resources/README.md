@@ -101,7 +101,7 @@ The mapping assigns each of the **323 classes** a USDA FoodData Central food ite
 - **Match types:** exact 183, manual 73, close 41, recipe 15, proxy 10, composite 1.
 - **USDA source:** SR Legacy 172, Survey (FNDDS) 111, Foundation 25, recipe 15.
 - **Density:** USDA measured 203, published table 60, geometric calculation 43, recipe 15, category reference 2.
-- **Quality:** 173 high-confidence densities, 92 medium, and 58 low; 316/323 rows pass energy coherence; 18/20 in LLM-assisted verification; 48 rows flagged for further technical review.
+- **Quality:** 173 high-confidence densities, 92 medium, and 58 low; 316/323 rows pass energy coherence; 18/20 in manual verification; 48 rows flagged for further technical review.
 
 Figure 09 uses the volumes measured from the photo for the three food items: banana/plantain 97.9 cm³ × 0.793 = 77.6 g; pork 234.7 × 0.812 = 190.6 g; roasted potato 85.1 × 1.060 = 90.2 g.
 
