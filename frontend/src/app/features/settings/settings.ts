@@ -67,7 +67,7 @@ import { Accent, LevelSensitivity, PreferencesService, ThemeMode } from '../../c
 
         <label class="field">
           <span class="label">{{ i18n.t('settings.fov') }}</span>
-          <select [value]="selectValue()" (change)="onFov($event)">
+          <select id="settings-fov" name="fov" [value]="selectValue()" (change)="onFov($event)">
             @for (opt of fovOptions(); track opt.value) {
               <option [value]="opt.value">{{ opt.label }}</option>
             }
@@ -98,6 +98,8 @@ import { Accent, LevelSensitivity, PreferencesService, ThemeMode } from '../../c
             <small>{{ i18n.t('settings.autoShootHint') }}</small>
           </span>
           <input
+            id="settings-auto-shoot"
+            name="autoShoot"
             type="checkbox"
             class="switch"
             [checked]="prefs.autoShoot()"
@@ -111,6 +113,8 @@ import { Accent, LevelSensitivity, PreferencesService, ThemeMode } from '../../c
             <small>{{ i18n.t('settings.classicLevelHint') }}</small>
           </span>
           <input
+            id="settings-bubble-level"
+            name="bubbleLevel"
             type="checkbox"
             class="switch"
             [checked]="prefs.bubbleLevel()"
