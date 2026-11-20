@@ -29,6 +29,17 @@ The key design principle: **every number is computed deterministically; the LLM 
 
 ---
 
+## 🎬 Demo Video
+
+<div align="center">
+  <a href="https://github.com/Manuel-Posada/CaloriesCounter/blob/main/research/video_calories_counter.mp4">
+    <img src="research/visual_resources/video_preview.png" alt="Watch the Calorie Counter demo video" width="680" />
+  </a>
+  <p><em>Click to watch the 52 s promotional demo (<a href="https://github.com/Manuel-Posada/CaloriesCounter/blob/main/research/video_calories_counter.mp4">video_calories_counter.mp4</a>)</em></p>
+</div>
+
+---
+
 ## 🏗️ System Architecture
 
 ```
