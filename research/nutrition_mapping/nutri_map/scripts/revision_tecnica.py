@@ -23,7 +23,7 @@ for _, r in D.iterrows():
                             confianza=r["confianza"], motivo="; ".join(m), nota=r["nota"]))
 R = pd.DataFrame(motivos)
 R.to_csv(OUT / "revision_tecnica.csv", index=False, encoding="utf-8-sig")
-print("filas para revision tecnica:", len(R))
+print("rows for technical review:", len(R))
 print(R["motivo"].str.split("; ").explode().value_counts().to_string())
 for _, r in R.iterrows():
     print(f"{r['idx']}|{r['clase']}|{r['decision']}|{r['final_usda']}|{r['confianza']}|{r['motivo']}")

@@ -1,7 +1,7 @@
-"""Genera el lote de 20 clases para verificación manual del usuario.
+"""Generate the batch of 20 classes for manual user verification.
 
-Criterio: 10 filas de confianza baja (peor caso del mapeo) + 10 recetas
-repartidas a lo largo del índice (parte nueva del pipeline).
+Criteria: 10 low-confidence rows (worst-case mappings) + 10 recipes
+spread across the index (new part of the pipeline).
 """
 import json
 from pathlib import Path
@@ -15,13 +15,13 @@ W = pd.read_csv(OUT / "nutrition_wide_densidad.csv")
 D = pd.read_csv(OUT / "densidad_alimentos.csv")
 
 recetas = DEC[DEC["decision"] == "receta"]["idx"].astype(int).tolist()
-# 10 clases de confianza baja que NO sean receta (mapeo USDA puro)
+# 10 low-confidence classes that are NOT recipes (pure USDA mapping)
 baja = [i for i in DEC[DEC["confianza"].eq("baja")]["idx"].astype(int) if i not in recetas]
 
 sel_baja = baja[::2][:10]
 if len(sel_baja) < 10:
     sel_baja += [i for i in baja if i not in sel_baja][: 10 - len(sel_baja)]
-# 10 recetas, repartidas a lo largo de la lista
+# 10 recipes, spread across the list
 paso = max(1, len(recetas) // 10)
 sel_rec = recetas[::paso][:10]
 sel = sorted(set(sel_baja) | set(sel_rec))
@@ -54,8 +54,8 @@ target = OUT / "verificacion_20.csv"
 if target.exists():
     prev = pd.read_csv(target, dtype=str).fillna("")
     if "tu_veredicto_OK_o_ERROR" in prev and prev["tu_veredicto_OK_o_ERROR"].str.strip().ne("").any():
-        print(f"{target.name} ya tiene veredictos del usuario: no se sobrescribe. Borra el archivo si quieres regenerarlo.")
+        print(f"{target.name} already has user verdicts: not overwriting. Delete the file if you want to regenerate it.")
         raise SystemExit(0)
 V.to_csv(target, index=False, encoding="utf-8-sig")
-print(len(V), "filas |", int((V["densidad_estimada"] == "SÍ").sum()), "con densidad estimada")
+print(len(V), "rows |", int((V["densidad_estimada"] == "SÍ").sum()), "with estimated density")
 print(V[["idx", "clase", "confianza", "kcal_100g"]].to_string(index=False, max_colwidth=40))

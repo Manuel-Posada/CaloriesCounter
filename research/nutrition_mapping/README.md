@@ -1,4 +1,4 @@
-﻿# Nutritional Mapping of the 323 Classes (Calorie Counter)
+# Nutritional Mapping of the 323 Classes (Calorie Counter)
 
 This mapping assigns each class in the dataset (`classes.json`) to a food entry from the **USDA FoodData Central** database, with all its nutrients per 100 g, its **density** (g per cm³), and, where applicable, its **recipe** composition (composite dishes).
 

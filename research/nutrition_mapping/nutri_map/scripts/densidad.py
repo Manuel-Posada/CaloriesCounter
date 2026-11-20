@@ -6,16 +6,16 @@ OUT = Path(__file__).resolve().parents[1]
 M = json.loads((OUT / "nutrition_map.json").read_text(encoding="utf-8"))
 DEC = pd.read_csv(OUT / "decisiones_resumen.csv", dtype=str).fillna("")
 
-# Unidades de volumen. Las líquidas tienen prioridad: en FNDDS muchas porciones
-# traen "1 cup (8 fl oz)" y la cantidad fiable es la de fl oz.
+# Volume units. Liquid units take priority: in FNDDS many portions
+# include "1 cup (8 fl oz)" and the reliable quantity is the fl oz value.
 LIQUID = [(r"\bfl\.?\s*oz\b", 29.5735), (r"\bml\b|\bmilliliters?\b", 1.0), (r"\bliters?\b|\blitres?\b", 1000.0)]
 SOLID = [(r"\bcups?\b", 236.588), (r"\btbsp\b|\btablespoons?\b", 14.7868),
          (r"\btsp\b|\bteaspoons?\b", 4.92892), (r"\bpints?\b", 473.176), (r"\bquarts?\b", 946.353),
          (r"\bgallons?\b", 3785.41)]
 NUM = r"(\d+(?:\.\d+)?|\d+/\d+|\d+\s+\d+/\d+)"
 CONTAINER = r"\b(bottle|can|carton|box|pouch|package|packet|jar|container)\b"
-# Medidas de una forma distinta a la del alimento tal como se sirve, o envases
-# sin volumen explícito: no sirven para densidad aparente del plato.
+# Measures for a different form than the food as served, or containers
+# without an explicit volume: not usable for apparent dish density.
 SKIP_FORM = r"with ice|\bice\b|yield"
 SKIP_CUP = r"ice cream\s+cup|espresso\s+cup|coffee\s+cup|tea\s+cup"
 BULK = r"chopped|sliced|diced|shredded|grated|mashed|pureed|cut|crumbled|minced|slices|pieces|cubed|julienne|strips|rings|halves|balls|cubes"
@@ -47,11 +47,11 @@ def _pairs(txt, units):
 
 
 def usda_volume_density(portions):
-    """Densidad a partir de medidas de volumen de USDA/FNDDS.
+    """Density from USDA/FNDDS volume measures.
 
-    La cantidad puede venir en `amount` o escrita en el texto de la porción
-    (FNDDS suele traer amount=null y "1 cup" en description). Se descartan
-    medidas de otra forma (fundido, rallado, picado) y envases sin volumen.
+    The quantity may come in `amount` or written in the portion text
+    (FNDDS often has amount=null and "1 cup" in description). Measures of
+    another form (melted, grated, chopped) and containers without volume are discarded.
     """
     cands = []
     for p in portions or []:
@@ -67,7 +67,7 @@ def usda_volume_density(portions):
             continue
         pairs = _pairs(low, LIQUID) or _pairs(low, SOLID)
         if not pairs and p.get("amount"):
-            # "1 tbsp"/"1 cup" sin número en el texto: la unidad está en modifier
+            # "1 tbsp"/"1 cup" without a number in the text: the unit is in modifier
             for rx, ml in SOLID + LIQUID:
                 if re.search(rx, low):
                     pairs = [(float(p["amount"]), ml)]
@@ -84,8 +84,8 @@ def usda_volume_density(portions):
     return round(statistics.median(c[0] for c in use), 3), bool(plain), "; ".join(f"{c[2]}={c[0]:.2f}" for c in use[:3])
 
 
-# Medidas USDA recuperadas que NO se usan porque la porción mide otra forma
-# física del alimento (fruta entera vs. rodajas, bloque vs. rallado, etc.).
+# Retrieved USDA measures that are NOT used because the portion measures a different
+# physical form of the food (whole fruit vs. slices, block vs. grated, etc.).
 NO_USDA = {
     39: "manzana entera: la medida USDA es 1 cup en láminas (0,53), no la pieza entera",
     57: "naranja entera: la medida USDA es 1 cup en gajos (0,76), no la pieza entera",
@@ -110,23 +110,23 @@ NO_USDA = {
 }
 
 
-# Valores medidos en tablas publicadas, aplicados a una clase concreta.
-# Cada entrada: idx -> (densidad, tipo, fuente, confianza)
-# Fuente principal: tabla 4.2 "Density of Selected Foods" de Engineering Properties
-# of Foods (3.a ed., p. 153), que recoge densidades verdaderas (no a granel).
+# Measured values from published tables, applied to a specific class.
+# Each entry: idx -> (density, type, source, confidence)
+# Main source: Table 4.2 "Density of Selected Foods" from Engineering Properties
+# of Foods (3rd ed., p. 153), which lists true (non-bulk) densities.
 T42 = "referencia tabulada: tabla 4.2 de Engineering Properties of Foods"
 PUB = {}
 
-# --- carnes y pescados compactos (filete, loncha, pieza) ---
-# Tabla 4.2: carnes 74-84 % de agua, beef rho = 1076 - 1,37*x_f (kg/m3) -> 1,05-1,07;
-# pescado magro 1,055 y pescado graso 0,93. Se usa 1,055 para la pieza compacta.
+# --- compact meats and fish (fillet, slice, piece) ---
+# Table 4.2: meats 74-84% water, beef rho = 1076 - 1.37*x_f (kg/m3) -> 1.05-1.07;
+# lean fish 1.055 and fatty fish 0.93. Using 1.055 for compact pieces.
 for i in (117, 118, 119, 121, 198, 228, 294, 309, 317):
     PUB[i] = (1.055, "sólido", T42 + ": carnes 74-84 % agua, 1,05-1,07 g/cm3", "media")
 for i in (124, 125, 126, 177):
     PUB[i] = (1.055, "sólido", T42 + ": pescado, 1,055 g/cm3 (magro)", "media")
 
-# --- fruta y queso ---
-# Tabla 4.2: manzanas 775-925 kg/m3 (20 C); peras 1000 kg/m3; queso 1080-1230 kg/m3.
+# --- fruit and cheese ---
+# Table 4.2: apples 775-925 kg/m3 (20 C); pears 1000 kg/m3; cheese 1080-1230 kg/m3.
 PUB[39] = (0.85, "sólido", T42 + ": manzana 775-925 kg/m3, punto medio", "media")
 PUB[315] = (1.00, "sólido", T42 + ": peras 1000 kg/m3", "media")
 for i in (86, 290, 291):
@@ -137,21 +137,21 @@ PUB[82] = (1.08, "sólido", T42 + ": queso 1080-1230 kg/m3, extremo bajo (queso 
 PUB[85] = (1.08, "sólido", T42 + ": queso 1080-1230 kg/m3, extremo bajo (mozzarella)", "media")
 PUB[116] = (1.055, "sólido", T42 + ": carnes 74-84 % agua, 1,05-1,07 g/cm3", "media")
 
-# --- frutos secos y semillas (FAO/INFOODS, tabla 2) ---
+# --- nuts and seeds (FAO/INFOODS, Table 2) ---
 for i in (71, 73):
     PUB[i] = (0.63, "aparente (a granel)", "FAO/INFOODS Density DB v2: Nuts", "media")
 PUB[66] = (0.62, "aparente (a granel)", "FAO/INFOODS Density DB v2: Sunflower, seed (proxy de semillas peladas)", "media")
 PUB[183] = (1.082, "sólido", "referencia tabulada: USDA (FNDDS), mantequilla de cacahuete 1,082 g/cm3 (proxy de crema de frutos secos)", "media")
 
-# Patata entera: USDA AMS publica la prueba de peso especifico de la patata
-# (tabla de conversion con valores ~1,06), que es la densidad de la pieza.
+# Whole potato: USDA AMS publishes the potato specific gravity test
+# (conversion table with values ~1.06), which is the density of the whole piece.
 PUB[206] = (1.06, "sólido", "referencia tabulada: USDA AMS, peso especifico de la patata (~1,06)", "media")
 
-# --- panes y bolleria salada (FAO/INFOODS: pan 0,29; pan blanco 0,42; panecillo blando 0,18) ---
+# --- breads and savory bakery (FAO/INFOODS: bread 0.29; white bread 0.42; soft roll 0.18) ---
 for i in (104, 105, 106, 107, 108, 109, 111, 112, 113, 182, 254, 255, 256, 258, 259, 260, 261, 262, 263):
     PUB[i] = (0.29, "aparente (a granel)", "FAO/INFOODS Density DB v2: Bread / Bread, white, sliced, prepacked", "media")
 
-# Valores de la base FAO/INFOODS Density Database v2.0 (tabla 2), aplicados a la clase concreta.
+# Values from the FAO/INFOODS Density Database v2.0 (Table 2), applied to the specific class.
 FAO = {
     11: (0.68, "Stew, vegetable"),
     65: (0.62, "Sunflower, seed"),
@@ -185,7 +185,7 @@ FAO = {
     299: (1.09, "Soup, thick (squash, potato)"),
 }
 
-# Referencias de tabla para clases que USDA no mide en volumen.
+# Table references for classes that USDA does not measure by volume.
 REF = {
     "butter": (0.911, "Engineering ToolBox: mantequilla"),
     "mayonnaise": (0.910, "Engineering ToolBox: mayonesa"),
@@ -210,14 +210,14 @@ IDX_REF = {231: "butter", 278: "mayonnaise", 72: "cashew", 226: "peanut", 74: "c
            25: "beets", 114: "breadcrumbs", 236: "biscuit", 142: "cookie", 143: "cookie", 302: "muesli", 303: "muesli",
            285: "honey", 254: "bread", 261: "bread", 262: "bread"}
 
-# Cálculo geométrico para las clases sin medición publicada de densidad.
-# rho = masa de la porción (USDA) / volumen de un sólido de dimensiones típicas.
-# Las dimensiones son tamaños comerciales o de porción estándar, NO medidos sobre
-# la foto: el resultado es una densidad calculada, no una medida.
-#   forma: esfera (d), elipsoide (L, A, H), cilindro/disco (d, h), prisma (a, b, c),
-#          cuña de pizza (D, grosor, n_porciones), cono (r, h), taza (V = 236,6 cm3)
+# Geometric calculation for classes without a published density measurement.
+# rho = portion mass (USDA) / volume of a solid with typical dimensions.
+# Dimensions are commercial or standard portion sizes, NOT measured from
+# the photo: the result is a calculated density, not a measurement.
+#   shape: esfera (d), elipsoide (L, W, H), cilindro/disco (d, h), prisma (a, b, c),
+#          cuña de pizza (D, thickness, n_slices), cono (r, h), taza (V = 236.6 cm3)
 GEOM = {
-    # fruta y hortaliza de una pieza
+    # whole single-piece fruits and vegetables
     15: (128, "elipsoide", (8.0, 8.0, 8.5), "1 alcachofa mediana USDA"),
     19: (40.4, "cilindro", (2.8, 8.0), "1 pepinillo USDA"),
     20: (300, "cilindro", (4.4, 21.0), "1 pepino típico"),
@@ -229,10 +229,10 @@ GEOM = {
     52: (75, "elipsoide", (6.5, 4.7, 4.7), "1 kiwi típico (la porción USDA de 140 g es un fruto grande)"),
     57: (154, "esfera", (7.2,), "1 naranja USDA"),
     306: (230, "elipsoide", (8.0, 8.0, 7.0), "1 bulbo de hinojo típico (sin tallos)"),
-    # bayas servidas en taza
+    # berries served by the cup
     48: (148, "taza", (), "1 taza de arándanos USDA"),
     49: (123, "taza", (), "1 taza de frambuesas USDA"),
-    # platos y productos
+    # dishes and products
     110: (65, "prisma", (10.0, 10.0, 1.5), "1 rebanada USDA"),
     115: (10, "prisma", (7.5, 4.5, 1.0), "1 biscote USDA"),
     120: (28, "prisma", (10.0, 4.0, 1.0), "10 lonchas finas USDA (0,1 cm cada una)"),
@@ -301,8 +301,8 @@ def geom_dim_txt(forma, d):
         return f"montón cónico r={d[0]:.1f} cm, h={d[1]:.1f} cm"
     return "taza (236,6 cm3)"
 
-# Clases que siguen siendo estimación: no hay medición publicada de su densidad
-# en la forma en que se sirven.
+# Classes that remain estimates: there is no published density measurement
+# in the form in which they are served.
 MOTIVO = {
     48: "arándanos sueltos apilados: no se localizó densidad a granel publicada",
     49: "frambuesas sueltas apiladas: no se localizó densidad a granel publicada",
@@ -346,12 +346,12 @@ def norm(s):
 
 
 def cat_density(desc, cls=""):
-    """Densidad aparente de un alimento tal como se sirve. Devuelve (g/cm3, tipo, fuente, confianza)."""
+    """Apparent density of a food as served. Returns (g/cm3, type, source, confidence)."""
     s = norm(desc) or norm(cls)
     def R(d, tipo, fuente="estimación por categoría", conf="baja"):
         return d, tipo, fuente, conf
 
-    # --- platos preparados (antes que los ingredientes que contienen) ---
+    # --- prepared dishes (before the ingredients they contain) ---
     if re.search(r"\bsoup\b", s):
         if re.search(r"thick|pumpkin|squash|potato|cream", s):
             return R(1.09, "aparente (a granel)", "estimación por categoría (FAO: sopa espesa)")
@@ -382,7 +382,7 @@ def cat_density(desc, cls=""):
     if re.search(r"fries|french fried|fried potatoes", s): return R(0.50, "aparente (a granel)", "estimación por categoría (patatas fritas)")
     if re.search(r"potato.*baked|baked potato", s): return R(0.95, "sólido")
 
-    # --- salsas y untables ---
+    # --- sauces and spreads ---
     if re.search(r"gravy", s): return R(1.02, "líquido")
     if re.search(r"pesto", s): return R(1.05, "pasta")
     if re.search(r"curry sauce", s): return R(1.02, "líquido")
@@ -392,7 +392,7 @@ def cat_density(desc, cls=""):
     if re.search(r"jam|marmalade|preserve|syrup|\bhoney\b", s):
         return R(1.33, "sólido", "estimación por categoría (FAO: confitura/sirope)")
 
-    # --- bebidas ---
+    # --- beverages ---
     if re.search(r"\bwater\b|\bagua\b", s): return R(1.00, "líquido", "física: agua", "alta")
     if re.search(r"ice cream|helado", s): return R(0.55, "aparente (a granel)", "referencia: helado (aireado)", "media")
     if re.search(r"\bcream\b|\bcrema\b|\bnata\b|\bheavy\b", s) and not re.search(r"cream cheese", s):
@@ -407,7 +407,7 @@ def cat_density(desc, cls=""):
     if re.search(r"coffee|\bcafe\b|espresso|ristretto|\btea\b|cappuccino|latte|macchiato|smoothie|\bdrink\b|punch|beverage", s):
         return R(1.00, "líquido")
 
-    # --- bollería y cereales ---
+    # --- bakery and grains ---
     if re.search(r"rusk|crouton|crispbread", s): return R(0.30, "aparente (a granel)", "estimación por categoría (pan tostado)")
     if re.search(r"\bbread\b|baguette|bagel|\bpita\b|naan|focaccia|\btoast\b|brioche|pretzel|\broll\b|tortilla|fajita", s):
         return R(0.29, "aparente (a granel)", "estimación por categoría (FAO: pan en rebanadas)")
@@ -432,7 +432,7 @@ def cat_density(desc, cls=""):
     if re.search(r"lentil|chickpea|\bbeans?\b|\bpeas?\b|soybean", s):
         return R(0.75 if re.search(r"cooked|boiled", s) else 0.80, "aparente (a granel)")
 
-    # --- lácteos y huevo ---
+    # --- dairy and eggs ---
     if re.search(r"fondue", s): return R(1.05, "sólido")
     if re.search(r"cheese|queso|emmental|gruyere|tomme|raclette|halloumi|parmesan|mozzarella|feta|paneer|gouda|monterey|cottage|curd", s):
         if re.search(r"parmesan|gruyere|emmental|raclette|tomme|gouda|swiss|monterey|halloumi|paneer|hard", s):
@@ -444,7 +444,7 @@ def cat_density(desc, cls=""):
         if re.search(r"boiled|hard|cooked", s): return R(0.60, "aparente (a granel)", "estimación por categoría (FAO: huevo cocido)")
         return R(1.03, "sólido", "referencia: huevo entero", "media")
 
-    # --- carne, pescado, embutidos ---
+    # --- meat, fish, cured meats ---
     if re.search(r"shrimp|prawn", s): return R(0.77, "aparente (a granel)", "estimación por categoría (FAO: gambas cocidas)")
     if re.search(r"bacon", s): return R(0.60, "aparente (a granel)")
     if re.search(r"dried meat|jerky", s): return R(1.10, "sólido")
@@ -455,7 +455,7 @@ def cat_density(desc, cls=""):
     if re.search(r"meat|chicken|beef|pork|veal|\blamb\b|turkey|game|deer|ostrich|emu|cordon bleu", s):
         return R(0.95, "sólido")
 
-    # --- frutos secos y semillas ---
+    # --- nuts and seeds ---
     if re.search(r"peanut butter|almond butter|nut butter|cashew butter", s): return R(1.10, "sólido")
     if re.search(r"almond", s): return R(0.46, "aparente (a granel)", "estimación por categoría (FAO: almendras)")
     if re.search(r"peanut", s): return R(0.69, "aparente (a granel)", "estimación por categoría (FAO: cacahuetes)")
@@ -465,7 +465,7 @@ def cat_density(desc, cls=""):
     if re.search(r"seed|sunflower|sesame|pumpkin", s):
         return R(0.62, "aparente (a granel)", "estimación por categoría (FAO: semillas)")
 
-    # --- frutas ---
+    # --- fruits ---
     if re.search(r"olive", s): return R(0.65, "aparente (a granel)", "estimación por categoría (FAO: aceitunas)")
     if re.search(r"pineapple", s): return R(0.85, "sólido")
     if re.search(r"apple|pear", s): return R(0.85, "sólido")
@@ -478,7 +478,7 @@ def cat_density(desc, cls=""):
         return R(0.95, "sólido")
     if re.search(r"fruit", s): return R(0.90, "sólido")
 
-    # --- verduras ---
+    # --- vegetables ---
     if re.search(r"artichoke", s): return R(0.75, "sólido")
     if re.search(r"pickl", s): return R(0.90, "sólido")
     if re.search(r"lettuce|salad|spinach|chicory|rocket|arugula|chard|basil|parsley|lamb.?s ear|m[aâ]che|greens|\bleaf\b", s):
@@ -498,7 +498,7 @@ def cat_density(desc, cls=""):
 
 
 def ing_density(name):
-    """Densidad para la fórmula de mezcla de recetas (valores de ingrediente, sin aire entre piezas)."""
+    """Density for the recipe mixture formula (ingredient values, without air between pieces)."""
     s = norm(name)
     if re.search(r"\bwater\b|agua", s): return 1.00
     if re.search(r"oil|aceite", s): return 0.92
@@ -615,15 +615,15 @@ baja = (D["confianza"] == "baja") & ~D["estado"].isin(
 D.loc[baja, "estado"] = "ESTIMADA - pendiente de pesar"
 D["estimada"] = (D["estado"] == "ESTIMADA - pendiente de pesar").map({True: "SÍ", False: "no"})
 
-# Motivos de las clases sin medición publicada de su densidad en la forma en que
-# se sirven (diccionario MOTIVO, definido arriba).
+# Reasons for classes without a published density measurement in the form
+# in which they are served (MOTIVO dictionary, defined above).
 
 D["motivo"] = D["motivo"].fillna("") if "motivo" in D else ""
 for i, txt in MOTIVO.items():
     D.loc[(D["idx"] == i) & (D["estimada"] == "SÍ"), "motivo"] = txt
 D.to_csv(OUT / "densidad_alimentos.csv", index=False, encoding="utf-8-sig")
 
-# diff contra la versión anterior, para auditar cada cambio
+# diff against the previous version, to audit each change
 v1 = OUT / "densidad_alimentos_v1.csv"
 if v1.exists():
     V = pd.read_csv(v1, dtype=str)
@@ -635,10 +635,10 @@ if v1.exists():
     C["delta"] = (C["densidad_despues"].astype(float) - C["densidad_antes"].astype(float)).round(3)
     C[["idx", "clase", "densidad_antes", "densidad_despues", "delta", "fuente_antes", "fuente_despues", "estado"]].to_csv(
         OUT / "densidad_cambios.csv", index=False, encoding="utf-8-sig")
-    print("cambios respecto a v1:", len(C), "| suben:", int((C["delta"] > 0).sum()), "| bajan:", int((C["delta"] < 0).sum()))
+    print("changes vs v1:", len(C), "| increased:", int((C["delta"] > 0).sum()), "| decreased:", int((C["delta"] < 0).sum()))
 
-print("filas:", len(D), "| sin densidad:", D["densidad"].isna().sum())
+print("rows:", len(D), "| missing density:", D["densidad"].isna().sum())
 print(D["estado"].value_counts().to_string())
 print(D["confianza"].value_counts().to_string())
-print("rango:", D["densidad"].min(), "-", D["densidad"].max())
+print("range:", D["densidad"].min(), "-", D["densidad"].max())
 print(D[["idx", "clase", "densidad", "fuente", "confianza"]].head(15).to_string(index=False))

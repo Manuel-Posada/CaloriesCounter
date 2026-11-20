@@ -21,20 +21,20 @@ for f in sorted(DEC_DIR.glob("lote*.txt")):
 
 missing = sorted(set(Q["idx_i"]) - set(dec))
 extra = sorted(set(dec) - set(Q["idx_i"]))
-print("decisiones:", len(dec), "| faltan:", missing, "| sobran:", extra)
+print("decisions:", len(dec), "| missing:", missing, "| extra:", extra)
 
-# las filas 'ok' usan el borrador; si el id escrito no coincide, aviso
+# 'ok' rows use the draft; warn if the written id does not match
 for i, d in dec.items():
     row = Q[Q["idx_i"] == i].iloc[0]
     if d["decision"] == "ok" and d["final"] and d["final"] != row["usda_draft"]:
-        print("ok convertido a cambiar (id distinto al borrador):", i, d["final"], row["usda_draft"])
+        print("ok converted to cambiar (id differs from draft):", i, d["final"], row["usda_draft"])
         d["decision"] = "cambiar"
     if d["decision"] == "ok" and not row["usda_draft"] and not d["final"]:
-        print("AVISO ok sin borrador:", i)
+        print("WARNING ok without draft:", i)
     if d["decision"] not in ("ok", "cambiar", "sin_match", "receta"):
-        print("AVISO decision desconocida:", i, d["decision"])
+        print("WARNING unknown decision:", i, d["decision"])
     if d["decision"] == "cambiar" and not d["final"]:
-        print("AVISO cambiar sin id:", i)
+        print("WARNING cambiar without id:", i)
 
 Q["decision"] = Q["idx_i"].map(lambda i: dec[i]["decision"] if i in dec else "")
 Q["final_usda"] = Q["idx_i"].map(lambda i: dec[i]["final"] if i in dec and dec[i]["decision"] == "cambiar" else "")
@@ -46,7 +46,7 @@ conf_rows = [dict(idx=i, clase=Q.loc[Q["idx_i"] == i, "clase"].iloc[0], decision
 pd.DataFrame(conf_rows).to_csv(OUT / "decisiones_resumen.csv", index=False, encoding="utf-8-sig")
 
 RECETAS = [
-    # idx, clase, ingrediente, fdc, gramos por 100 g de plato listo, porcion_g, nota
+    # idx, clase, ingredient, fdc, grams per 100 g of finished dish, porcion_g, note
     (8, "rosti_n_s", "Potatoes boiled in skin flesh without salt", "170438", 85, 150, "Rosti: patata cocida + aceite; porcion tipica estimada"),
     (8, "rosti_n_s", "Canola oil", "172336", 15, 150, "Aceite para freir"),
     (10, "coleslaw_chopped_without_sauce", "Cabbage raw", "169975", 85, 100, "Col cruda sin aderezo"),
@@ -107,10 +107,10 @@ sums = {}
 for r in RECETAS:
     sums[r[0]] = sums.get(r[0], 0) + r[4]
 bad = {k: v for k, v in sums.items() if v != 100}
-print("recetas:", len(sums), "| suma != 100:", bad)
+print("recipes:", len(sums), "| sum != 100:", bad)
 recetas_ids = {r[0] for r in RECETAS}
 rec_expected = {i for i, d in dec.items() if d["decision"] == "receta"}
-print("receta en decisiones sin fila de receta:", sorted(rec_expected - recetas_ids), "| filas sin decision receta:", sorted(recetas_ids - rec_expected))
+print("recipe in decisions without recipe row:", sorted(rec_expected - recetas_ids), "| rows without recipe decision:", sorted(recetas_ids - rec_expected))
 
 with open(ROOT / "recetas.csv", "w", encoding="utf-8-sig", newline="") as f:
     w = csv.writer(f)

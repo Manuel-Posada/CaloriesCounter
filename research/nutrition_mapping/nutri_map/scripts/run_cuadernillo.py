@@ -15,4 +15,4 @@ for c in nb["cells"]:
     if c["id"] == "e2886512" and limit:
         g["CFG"]["limit"] = int(limit)
         print(f"[runner] limit = {limit}")
-print(f"[runner] terminado en {time.time() - t0:.0f} s")
+print(f"[runner] finished in {time.time() - t0:.0f} s")

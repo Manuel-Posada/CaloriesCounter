@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "nutri_map"
 L = pd.read_csv(OUT / "nutrition_long.csv", dtype={"number": str, "fdc_id": str})
 L["number"] = L["number"].astype(str)
-M = pd.read_csv(OUT / "mapping_draft.csv", dtype=str)  # solo para tener el universo de clases
+M = pd.read_csv(OUT / "mapping_draft.csv", dtype=str)  # only to get the full set of classes
 DEC = pd.read_csv(OUT / "decisiones_resumen.csv", dtype=str).fillna("")
 rows = []
 clases = L.groupby("idx")["clase"].first().to_dict()
@@ -33,5 +33,5 @@ for idx in sorted({int(x) for x in DEC["idx"]}):
 V = pd.DataFrame(rows)
 V.to_csv(OUT / "validacion_coherencia.csv", index=False, encoding="utf-8-sig")
 print("total:", len(V))
-print("problema:", V["problema"].value_counts().to_dict())
+print("issue:", V["problema"].value_counts().to_dict())
 print(V[V["problema"] != ""][["idx", "clase", "decision", "fdc_id", "kcal", "prot", "grasa", "carb", "fibra", "dif_pct", "problema"]].to_string(index=False))
