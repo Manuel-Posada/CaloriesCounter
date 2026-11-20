@@ -1,0 +1,6 @@
+47|cambiar|173033|alta|toronja cruda: la entrada Foundation no traia proteina, grasa ni carbohidratos
+60|cambiar|168165|alta|pasas oscuras: la entrada Foundation no traia macronutrientes
+121|cambiar|174582|media|salchichon/salami seco: entrada SR Legacy (cerdo y res); la Foundation estaba incompleta
+254|cambiar|174924|media|pan blanco comercial; la entrada Foundation estaba incompleta
+261|cambiar|174924|alta|pan blanco comercial; la entrada Foundation estaba incompleta
+278|cambiar|171009|alta|mayonesa regular; la entrada Foundation estaba incompleta

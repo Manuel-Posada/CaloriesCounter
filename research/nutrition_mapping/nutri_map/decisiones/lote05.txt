@@ -1,0 +1,54 @@
+16|cambiar|169229|media|berenjena cocida hervida sin sal
+22|cambiar|168449|media|calabaza cocida
+29|cambiar|170420|media|guisantes cocidos sin sal
+30|cambiar|169999|media|maiz dulce cocido sin sal
+33|cambiar|170401|media|acelgas cocidas sin sal
+64|cambiar|170190|media|castanas asadas
+91|cambiar|168914|media|fideos de arroz cocidos
+92|cambiar|170287|media|bulgur cocido
+94|ok|169697|baja|polenta: no hay version cocida entre los candidatos; entrada seca
+96|cambiar|168897|media|arroz salvaje cocido
+102|cambiar|168910|media|pasta integral cocida
+116|cambiar|171477|media|pechuga de pollo cocida asada sin piel
+117|cambiar|173617|media|muslo de pollo cocido asado con piel
+125|cambiar|175168|media|salmon cocido al horno (cultivo)
+126|cambiar|172006|baja|atun cocido: tipo generico; yellowfin como aproximacion
+132|cambiar|167587|media|huevo de chocolate: chocolate con leche
+139|cambiar|172185|alta|tortilla: huevo cocido tipo omelet
+148|cambiar|171564|media|salsa salada lista para servir (tipo gravy)
+164|cambiar|172105|baja|rollito frito: proxy egg roll vegetal frito (no hay spring roll frito en USDA); la entrada sin freir daba 112 kcal frente a ~250
+197|cambiar|171538|media|caldo servido (listo para consumir), no caldo en polvo
+208|cambiar|2710387|media|latte macchiato: latte sin grasa como aproximacion
+216|cambiar|170373|alta|pizza margarita: pizza de queso fina horneada, sin marca
+221|cambiar|2710387|media|cafe con leche: latte sin grasa como aproximacion
+226|cambiar|173806|media|cacahuete tostado sin sal
+230|cambiar|169292|media|calabacin cocido sin sal
+232|cambiar|169704|media|arroz integral cocido
+233|cambiar|168878|media|arroz blanco cocido
+246|cambiar|169100|alta|zumo de naranja refrigerado (no papilla infantil)
+253|cambiar|167587|media|chocolate con leche
+276|cambiar|172421|media|lentejas cocidas sin sal
+277|cambiar|172421|media|lentejas du Puy: entrada de lentejas cocidas como aproximacion
+281|cambiar|168322|media|bacon cocido
+282|cambiar|174034|media|carne picada cocida
+287|cambiar|169971|media|coles de Bruselas cocidas sin sal
+288|cambiar|2705704|media|queso generico (FNDDS)
+290|cambiar|171241|media|queso semicurado: gouda
+294|cambiar|173617|media|pollo cocido asado con piel
+295|cambiar|171054|media|pollo en tiras, solo carne cocida
+297|cambiar|173757|media|garbanzos cocidos sin sal
+299|cambiar|2709718|media|sopa de calabaza
+311|cambiar|168426|media|puerro cocido sin sal
+312|cambiar|174034|baja|carne generica: carne de res picada cocida como aproximacion
+316|cambiar|168374|media|cerdo picado cocido (84/16)
+150|receta|||media|bolognesa: salsa de tomate + carne picada cocida + cebolla + zanahoria
+165|receta|||media|croissant con jamon: croissant + jamon cocido
+166|receta|||baja|pastel salado de verduras: masa de harina + huevo + leche + queso + verdura + mantequilla
+181|receta|||baja|birchermuesli: avena + yogur + manzana + avellana + leche
+189|receta|||baja|tarte flambee alsaciana: masa + creme fraiche + cebolla + bacon + queso
+191|receta|||baja|porridge con leche semidesnatada: avena cocida + leche 1%
+200|receta|||media|risotto: arroz cocido + champinones + parmesano + mantequilla + caldo
+247|receta|||baja|tarta de albaricoque: masa de tarta + albaricoque + azucar + huevo
+248|receta|||baja|tarta de ciruela: masa de tarta + ciruela + azucar + huevo
+251|receta|||baja|mezcla de bebidas de leche: leche + soja + avena
+272|receta|||baja|salsa de champinones: nata + champinones + mantequilla + harina + leche

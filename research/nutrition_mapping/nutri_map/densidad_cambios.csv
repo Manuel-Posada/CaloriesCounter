@@ -1,0 +1,169 @@
+﻿idx,clase,densidad_antes,densidad_despues,delta,fuente_antes,fuente_despues,estado
+5,country_fries,1.05,0.254,-0.796,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+6,potato_gnocchi,1.05,0.795,-0.255,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+7,chips_french_fries,0.4,0.254,-0.146,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+8,rosti_n_s,1.042,0.92,-0.122,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+10,coleslaw_chopped_without_sauce,0.44,0.432,-0.008,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+11,ratatouille,1.0,0.909,-0.091,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+12,mixed_salad_chopped_without_sauce,0.333,0.212,-0.121,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+15,artichoke,1.0,0.449,-0.551,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+19,cucumber_pickled_ch,1.0,0.82,-0.18,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+20,cucumber,1.0,0.94,-0.06,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+24,red_radish,1.0,0.97,-0.03,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+32,garlic,1.0,0.849,-0.151,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+38,pineapple,0.6,0.694,0.094,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+39,apple,0.9,0.85,-0.05,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: manzana 775-925 kg/m3, punto medio",tabla publicada
+43,berries_n_s,0.6,0.634,0.034,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+46,figs,0.6,0.931,0.331,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+48,blueberries,1.05,0.626,-0.424,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+49,raspberries,0.6,0.52,-0.08,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+50,kaki,0.9,0.998,0.098,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+52,kiwi,0.9,0.998,0.098,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+57,orange,0.9,0.788,-0.112,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+63,peanut_butter,1.05,1.082,0.032,referencia: crema de frutos secos,USDA: medida de volumen de la entrada,medida USDA
+65,seeds_n_s,0.6,0.62,0.02,estimación por categoría,"FAO/INFOODS Density DB v2: Sunflower, seed",tabla publicada
+66,pumpkin_seeds,0.29,0.62,0.33,FAO/INFOODS Density DB v2: pan,"FAO/INFOODS Density DB v2: Sunflower, seed (proxy de semillas peladas)",tabla publicada
+69,mixed_seeds_n_s,0.6,0.613,0.013,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+70,almonds,0.6,0.46,-0.14,estimación por categoría,FAO/INFOODS Density DB v2: Almonds,tabla publicada
+71,walnut,0.6,0.63,0.03,estimación por categoría,FAO/INFOODS Density DB v2: Nuts,tabla publicada
+73,hazelnut,0.6,0.63,0.03,estimación por categoría,FAO/INFOODS Density DB v2: Nuts,tabla publicada
+75,pistachio,0.6,0.646,0.046,estimación por categoría,"FAO/INFOODS Density DB v2: Pistachio, raw, without shell",tabla publicada
+77,green_olives,0.9,0.65,-0.25,estimación por categoría,"FAO/INFOODS Density DB v2: Olives, green, with stone",tabla publicada
+79,kefir_drink,1.03,1.031,0.001,referencia: leche/yogur,USDA: medida de volumen de la entrada,medida USDA
+80,cottage_cheese,1.05,0.888,-0.162,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+82,fresh_cheese_n_s,0.516,1.08,0.564,USDA: medida de volumen de la entrada,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: queso 1080-1230 kg/m3, extremo bajo (queso fresco)",tabla publicada
+83,gruyere_ch,0.507,1.15,0.643,USDA: medida de volumen de la entrada,referencia tabulada: tabla 4.2 de Engineering Properties of Foods: queso 1080-1230 kg/m3,tabla publicada
+84,halloumi,1.15,1.04,-0.11,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+85,mozzarella,0.473,1.08,0.607,USDA: medida de volumen de la entrada,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: queso 1080-1230 kg/m3, extremo bajo (mozzarella)",tabla publicada
+87,cheese_for_raclette_ch,1.15,0.754,-0.396,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+89,tomme_ch,1.15,0.754,-0.396,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+90,tiramisu,1.0,0.613,-0.387,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+98,pasta_n_s,0.7,0.592,-0.108,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+99,pasta_hornli_ch,0.7,0.592,-0.108,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+100,pasta_in_butterfly_form_farfalle,1.05,0.592,-0.458,referencia: crema de frutos secos,USDA: medida de volumen de la entrada,medida USDA
+101,pasta_linguini_parpadelle_tagliatelle,0.7,0.592,-0.108,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+110,white_bread_with_butter_eggs_and_milk,1.05,0.433,-0.617,referencia: crema de frutos secos,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+115,rusk_wholemeal,0.4,0.296,-0.104,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+116,chicken_breast,0.592,1.055,0.463,USDA: medida de volumen de la entrada,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: carnes 74-84 % agua, 1,05-1,07 g/cm3",tabla publicada
+117,chicken_leg,1.05,1.055,0.005,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: carnes 74-84 % agua, 1,05-1,07 g/cm3",tabla publicada
+118,cervelat_ch,1.1,1.055,-0.045,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: carnes 74-84 % agua, 1,05-1,07 g/cm3",tabla publicada
+119,meatloaf_ch,1.1,1.055,-0.045,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: carnes 74-84 % agua, 1,05-1,07 g/cm3",tabla publicada
+120,dried_meat_n_s,1.05,0.7,-0.35,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+121,salami_ch,1.1,1.055,-0.045,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: carnes 74-84 % agua, 1,05-1,07 g/cm3",tabla publicada
+124,fish_n_s,1.05,1.055,0.005,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: pescado, 1,055 g/cm3 (magro)",tabla publicada
+125,salmon,1.05,1.055,0.005,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: pescado, 1,055 g/cm3 (magro)",tabla publicada
+126,tuna,1.05,1.055,0.005,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: pescado, 1,055 g/cm3 (magro)",tabla publicada
+128,praline_n_s,1.3,1.164,-0.136,referencia: chocolate,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+130,dark_chocolate,1.3,1.125,-0.175,referencia: chocolate,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+131,hazelnut_chocolate_spread_nutella_ovomaltine_caotina,1.3,1.251,-0.049,referencia: chocolate,USDA: medida de volumen de la entrada,medida USDA
+133,brownie,0.6,0.571,-0.029,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+134,cake_lemon,0.6,0.423,-0.177,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+135,crepe_with_flour_plain,0.9,0.575,-0.325,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+136,fruit_tart,0.45,0.438,-0.012,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+137,cake_chocolate,0.6,0.423,-0.177,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+138,muffin,0.6,0.415,-0.185,estimación por categoría,FAO/INFOODS Density DB v2: Cake,tabla publicada
+140,tart_n_s,0.45,0.438,-0.012,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+141,croissant_with_chocolate_filling,0.45,0.259,-0.191,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+142,cookies,0.47,0.357,-0.113,"referencia tabulada: FAO/INFOODS Density DB v2: galletas (0,41-0,53)",USDA: medida de volumen de la entrada,medida USDA
+144,smoothie,1.0,0.913,-0.087,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+145,ice_tea_on_black_tea_basis,1.0,1.048,0.048,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+146,aperitif_with_alcohol_n_s_aperol_spritz,1.0,1.014,0.014,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+150,bolognaise_sauce,1.045,0.943,-0.102,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+153,guacamole,1.05,1.014,-0.036,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+155,tzatziki,1.05,1.014,-0.036,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+159,falafel_balls,1.0,0.696,-0.304,estimación por defecto,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+160,savoury_pastry_stick,0.45,0.306,-0.144,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+161,corn_crisps,0.4,0.19,-0.21,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+163,crisps_ch,0.4,0.106,-0.294,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+164,spring_roll_fried,1.05,0.555,-0.495,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+165,ham_croissant_ch,0.547,0.543,-0.004,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+166,salt_cake_ch_vegetables_filled,0.933,0.813,-0.12,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+167,lasagne_meat_prepared,1.05,1.057,0.007,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+169,sushi,1.0,0.634,-0.366,estimación por defecto,USDA: medida de volumen de la entrada,medida USDA
+170,hummus,1.05,1.014,-0.036,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+171,greek_salad,0.95,0.444,-0.506,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+172,chocolate_mousse,0.9,0.577,-0.323,estimación por categoría (postre aireado),cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+173,cheesecake,1.05,0.761,-0.289,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+174,caprese_salad_tomato_mozzarella,1.05,0.676,-0.374,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+175,chili_con_carne_prepared,1.05,1.078,0.028,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+176,taboule_prepared_with_couscous,0.75,0.676,-0.074,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+177,salmon_smoked,1.05,1.055,0.005,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: pescado, 1,055 g/cm3 (magro)",tabla publicada
+178,glucose_drink_50g,1.0,1.102,0.102,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+179,chicken_curry_cream_coconut_milk_curry_spices_paste,1.03,1.014,-0.016,referencia: leche/yogur,USDA: medida de volumen de la entrada,medida USDA
+181,birchermuesli_prepared_no_sugar_added,0.725,0.72,-0.005,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+183,butter_spread_puree_almond,1.05,1.082,0.032,referencia: crema de frutos secos,"referencia tabulada: USDA (FNDDS), mantequilla de cacahuete 1,082 g/cm3 (proxy de crema de frutos secos)",tabla publicada
+184,water_with_lemon_juice,1.0,1.014,0.014,física: agua,USDA: medida de volumen de la entrada,medida USDA
+186,fruit_coulis,1.25,1.353,0.103,referencia: mermeladas,USDA: medida de volumen de la entrada,medida USDA
+187,soup_of_lentils_dahl_dhal,0.8,1.078,0.278,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+188,lasagne_vegetable_prepared,1.05,1.057,0.007,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+189,french_pizza_from_alsace_baked,0.891,0.649,-0.242,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+192,curry_vegetarian,1.05,1.014,-0.036,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+193,banana_cake,0.6,0.507,-0.093,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+194,cappuccino,1.0,1.014,0.014,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+198,ham_raw,1.1,1.055,-0.045,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: carnes 74-84 % agua, 1,05-1,07 g/cm3",tabla publicada
+200,risotto,0.88,0.801,-0.079,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+202,potato_salad,0.2,1.162,0.962,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+205,potato,1.05,0.59,-0.46,estimación por categoría,"FAO/INFOODS Density DB v2: Potato, english, boiled",tabla publicada
+206,baked_potato,1.05,1.06,0.01,estimación por categoría,"referencia tabulada: USDA AMS, peso especifico de la patata (~1,06)",tabla publicada
+207,fruit_mixed,0.95,0.634,-0.316,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+208,latte_macchiato,1.0,1.014,0.014,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+210,croissant,0.45,0.259,-0.191,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+213,tea,1.0,1.014,0.014,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+214,pizza_with_vegetables_baked,1.05,0.873,-0.177,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+215,pizza_with_ham_with_mushrooms_baked,1.1,0.729,-0.371,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+216,pizza_margherita_baked,1.05,0.781,-0.269,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+217,pizza_with_ham_baked,1.1,0.729,-0.371,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+218,hamburger,1.1,0.41,-0.69,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+219,veggie_burger,1.0,0.411,-0.589,estimación por defecto,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+220,coffee,1.0,1.014,0.014,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+221,white_coffee,1.0,1.014,0.014,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+222,ristretto_with_caffeine,1.0,1.014,0.014,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+225,pancake,0.6,0.491,-0.109,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+228,cordon_bleu,1.05,1.055,0.005,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: carnes 74-84 % agua, 1,05-1,07 g/cm3",tabla publicada
+237,salad_leaf_salad_green,0.2,0.148,-0.052,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+239,salad_lambs_ear,1.05,0.148,-0.902,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+240,balsamic_salad_dressing,0.95,1.056,0.106,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+243,quiche,1.05,0.676,-0.374,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+244,juice,1.04,1.047,0.007,referencia: zumo/refresco,USDA: medida de volumen de la entrada,medida USDA
+247,pie_apricot,0.681,0.719,0.038,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+248,pie_plum_baked_with_cake_dough,0.677,0.717,0.04,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+249,apple_pie,0.45,1.057,0.607,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+252,chocolate_milk,1.03,1.048,0.018,referencia: leche/yogur,USDA: medida de volumen de la entrada,medida USDA
+254,bread,0.19,0.29,0.1,USDA: medida de volumen de la entrada,"FAO/INFOODS Density DB v2: Bread / Bread, white, sliced, prepacked",tabla publicada
+261,bread_white,0.19,0.29,0.1,USDA: medida de volumen de la entrada,"FAO/INFOODS Density DB v2: Bread / Bread, white, sliced, prepacked",tabla publicada
+264,pasta_penne,0.7,0.592,-0.108,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+265,pasta_spaghetti,0.7,0.592,-0.108,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+266,pasta_twist,0.7,0.592,-0.108,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+267,pasta_noodles,0.7,0.592,-0.108,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+268,pasta_in_conch_form,0.7,0.592,-0.108,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+269,sauce,1.05,1.014,-0.036,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+271,sauce_pesto,1.05,1.082,0.032,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+272,sauce_mushroom,0.989,0.923,-0.066,fórmula de mezcla sobre ingredientes,fórmula de mezcla sobre ingredientes,calculada (receta)
+273,sauce_curry,1.05,1.082,0.032,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+274,sauce_cream,0.99,1.01,0.02,referencia: nata,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+275,shrimp_prawn,1.05,0.77,-0.28,estimación por categoría,"FAO/INFOODS Density DB v2: Prawns, whole, boiled, without shell",tabla publicada
+280,cola_based_drink,1.038,1.04,0.002,USDA: medida de volumen de la entrada,USDA: medida de volumen de la entrada,medida USDA
+281,bacon,1.1,0.685,-0.415,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+282,beef_n_s,1.05,0.812,-0.238,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+283,bell_pepper_red_raw,1.0,0.51,-0.49,estimación por categoría,"FAO/INFOODS Density DB v2: Sweet pepper, raw, cubes",tabla publicada
+288,cheese_n_s,1.05,0.754,-0.296,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+289,blue_mould_cheese,0.571,1.15,0.579,USDA: medida de volumen de la entrada,referencia tabulada: tabla 4.2 de Engineering Properties of Foods: queso 1080-1230 kg/m3,tabla publicada
+292,soft_cheese,1.05,0.902,-0.148,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+293,goat_cheese_soft,1.05,0.902,-0.148,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+294,chicken,1.05,1.055,0.005,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: carnes 74-84 % agua, 1,05-1,07 g/cm3",tabla publicada
+296,nuggets,1.05,0.592,-0.458,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+298,soup,1.0,1.036,0.036,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+299,soup_pumpkin,0.6,1.036,0.436,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+303,muesli_dry,0.37,0.465,0.095,referencia tabulada: FAO/INFOODS Density DB v2: muesli con frutas y frutos secos,USDA: medida de volumen de la entrada,medida USDA
+304,curds_natural,1.05,0.888,-0.162,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+305,soft_drink_with_a_taste,1.04,1.048,0.008,referencia: zumo/refresco,USDA: medida de volumen de la entrada,medida USDA
+306,fennel,1.0,0.981,-0.019,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+308,fondue,1.05,0.879,-0.171,estimación por categoría,USDA: medida de volumen de la entrada,medida USDA
+309,ham_n_s,1.1,1.055,-0.045,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: carnes 74-84 % agua, 1,05-1,07 g/cm3",tabla publicada
+312,meat_n_s,1.05,0.812,-0.238,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+315,pear,0.636,1.0,0.364,USDA: medida de volumen de la entrada,referencia tabulada: tabla 4.2 de Engineering Properties of Foods: peras 1000 kg/m3,tabla publicada
+316,pork_n_s,1.05,0.812,-0.238,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+317,sausage,1.1,1.055,-0.045,estimación por categoría,"referencia tabulada: tabla 4.2 de Engineering Properties of Foods: carnes 74-84 % agua, 1,05-1,07 g/cm3",tabla publicada
+318,yogurt,1.03,1.036,0.006,referencia: leche/yogur,USDA: medida de volumen de la entrada,medida USDA
+320,red_cabbage_raw,0.4,0.359,-0.041,estimación por categoría,cálculo geométrico: masa de la porción / volumen de un sólido de dimensiones típicas,calculada (geometría)
+322,ice_cream_n_s,0.55,0.571,0.021,referencia: helado (aireado),USDA: medida de volumen de la entrada,medida USDA

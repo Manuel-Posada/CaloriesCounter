@@ -1,0 +1,80 @@
+0|cambiar|169146|media|hervida sin sal; el borrador no tenia la entrada
+1|ok|169141|media|hervida en vez de al vapor; diferencia nutricional minima
+2|ok|167765|alta|
+3|ok|173708|alta|
+4|cambiar|168483|media|consumo cocido (horneada, sin sal) segun criterio
+5|cambiar|2709458|media|fritas frescas; igual que la muestra aprobada
+6|ok|2708722|alta|
+7|cambiar|2709456|alta|mas generica que 'fast food' (312 kcal)
+8|receta|||media|ros ti: patata cocida 85 g + aceite 15 g
+9|ok|170018|alta|SR Legacy cocida sin sal; sin grasa anadida (cambio vs muestra)
+10|receta|||alta|coleslaw sin aderezo: col + zanahoria
+11|ok|2710028|alta|
+12|receta|||alta|ensalada mixta sin aderezo; la entrada del borrador lleva aguacate
+13|ok|168462|baja|clase ambigua (cruda o cocida); se mantiene como en la muestra
+14|ok|170404|alta|
+15|ok|169205|alta|
+16|buscar|||media|berenjena: se come cocida
+17|ok|171705|alta|
+18|cambiar|169141|media|judia verde: se come cocida
+19|ok|324653|media|pepinillo encurtido
+20|ok|2346406|alta|
+21|ok|172238|alta|
+22|buscar|||media|calabaza: se come cocida
+23|ok|170457|alta|
+24|ok|2747665|alta|
+25|ok|2685576|alta|
+26|ok|169979|alta|
+27|ok|169279|alta|
+28|ok|169975|media|col blanca cruda; entrada generica
+29|buscar|||media|guisantes: se comen cocidos
+30|buscar|||media|maiz dulce: se come cocido
+31|ok|170005|alta|
+32|ok|1104647|alta|
+33|buscar|||media|acelgas: se comen cocidas
+34|cambiar|168390|media|esparrago: consumo cocido
+35|ok|169210|baja|brotes de bambu; estado y uso poco claros
+36|ok|168384|alta|
+37|ok|173740|alta|
+38|ok|2346398|alta|
+39|ok|2709215|alta|
+40|ok|169134|alta|
+41|ok|171697|alta|
+42|ok|173944|alta|
+43|ok|2709271|media|berries genericas (mezcla)
+44|ok|171726|media|datil deglet noor: variedad concreta pero tipica
+45|ok|167762|alta|
+46|ok|173021|alta|
+47|ok|2758977|alta|
+48|ok|2346411|alta|
+49|ok|2346410|alta|
+50|ok|169941|alta|
+51|ok|171719|alta|
+52|ok|327046|alta|
+53|ok|169105|alta|
+54|ok|169910|alta|
+55|ok|746770|media|melon tipo galia; aproximacion
+56|ok|169914|alta|
+57|ok|2709171|alta|
+58|ok|169949|alta|
+59|ok|174683|alta|
+60|ok|2758980|media|kcal vacio en la entrada: verificar nutrientes
+61|ok|167746|alta|
+62|ok|169949|media|damson: se usa ciruela generica (aproximacion)
+63|ok|2707537|alta|
+64|buscar|||media|castana: se come asada o cocida, no cruda
+65|ok|2515381|media|semillas genericas: proxy de girasol crudo
+66|ok|2515380|alta|
+67|ok|170591|alta|
+68|ok|170562|alta|
+69|ok|2707589|media|semillas mixtas
+70|ok|2346393|alta|
+71|ok|2346394|alta|
+72|ok|2515374|alta|
+73|ok|2515375|alta|
+74|ok|170169|alta|
+75|ok|2515379|alta|
+76|ok|170150|alta|
+77|ok|169096|alta|
+78|ok|169094|alta|
+79|ok|2705394|alta|

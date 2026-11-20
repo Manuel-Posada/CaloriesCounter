@@ -1,0 +1,80 @@
+80|ok|2705747|alta|
+81|ok|171251|alta|
+82|ok|172223|alta|
+83|ok|171242|alta|
+84|ok|2705740|media|proxy: paneer como queso firme similar; halloumi no tiene entrada
+85|ok|170845|alta|
+86|ok|170848|alta|
+87|ok|2705720|media|proxy: Monterey como queso fundible semiduro
+88|ok|173418|alta|
+89|ok|2705720|media|proxy: Monterey como queso semicurado
+90|ok|2705702|media|
+91|buscar|||media|fideos de arroz: se comen cocidos
+92|buscar|||media|bulgur: se come cocido
+93|ok|169700|alta|
+94|buscar|||media|polenta: se come cocida
+95|ok|168917|alta|
+96|buscar|||media|arroz salvaje: se come cocido
+97|ok|169732|media|aproximacion: fideos de huevo cocidos
+98|ok|2708357|alta|
+99|cambiar|2708357|media|pasta: se come cocida (no seca)
+100|cambiar|2708357|media|pasta: se come cocida (no seca)
+101|cambiar|2708357|media|pasta: se come cocida (no seca)
+102|buscar|||media|pasta integral: se come cocida
+103|ok|171714|baja|fruta del pan: normalmente se consume cocida
+104|ok|2707616|alta|
+105|ok|2707598|media|proxy: pan blanco generico para pan regional suizo
+106|ok|2707599|media|
+107|ok|2707682|alta|
+108|ok|2707655|media|
+109|ok|2707666|media|proxy: roll dulce sin glaseado
+110|ok|2708335|media|
+111|ok|167945|alta|
+112|ok|169064|alta|
+113|ok|2707598|media|
+114|ok|174928|alta|
+115|ok|174981|media|
+116|buscar|||media|pollo: se consume cocido, no crudo
+117|buscar|||media|pata de pollo: se consume cocida
+118|ok|172940|alta|
+119|ok|2706579|media|
+120|ok|170604|alta|
+121|ok|2759005|media|kcal vacia en la entrada: verificar nutrientes
+122|ok|172930|media|
+123|ok|172476|alta|
+124|ok|2706225|media|pescado generico al horno
+125|buscar|||media|salmon: se consume cocido
+126|buscar|||media|atun: se consume cocido
+127|ok|748967|media|huevo entero crudo; cocido difiere poco
+128|ok|168791|media|
+129|ok|169641|alta|
+130|ok|170271|alta|
+131|ok|168000|media|crema de avellana generica (sin marca)
+132|buscar|||media|huevo de chocolate: buscar chocolate con leche
+133|ok|2707903|media|
+134|ok|2707879|alta|
+135|ok|2708342|alta|
+136|ok|2707994|media|
+137|ok|2707866|alta|
+138|ok|2707829|alta|
+139|buscar|||media|tortilla: buscar entrada de omelette cocida
+140|ok|2707994|media|
+141|ok|2707680|alta|
+142|ok|2707968|media|generica: proxy de galleta simple
+143|ok|2707915|alta|
+144|ok|2705513|media|
+145|ok|2710527|alta|
+146|ok|2710674|baja|sin Aperol; ponche alcoholico como aproximacion
+147|ok|173190|alta|
+148|buscar|||media|salsa salada: buscar salsa tipo gravy listo para servir
+149|ok|168556|alta|
+150|receta|||media|bolognesa: salsa de tomate + carne picada cocida (la entrada del borrador no tiene carne)
+151|ok|170054|alta|
+152|ok|171417|alta|
+153|ok|2709307|alta|
+154|ok|171826|alta|
+155|ok|2705448|alta|
+156|ok|172232|alta|
+157|ok|170416|alta|
+158|ok|174277|alta|
+159|ok|2707408|alta|

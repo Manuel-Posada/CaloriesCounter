@@ -1,0 +1,81 @@
+242|ok|171414|alta|
+243|ok|2708733|media|
+244|ok|2709316|alta|
+245|ok|173933|alta|
+246|buscar|||media|zumo de naranja: el borrador es de papilla infantil
+247|receta|||baja|tarta de albaricoque: masa de tarta + albaricoque + azucar (ids pendientes)
+248|receta|||baja|tarta de ciruela: masa de tarta + ciruela + azucar (ids pendientes)
+249|ok|2707995|alta|
+250|ok|169252|alta|
+251|receta|||baja|mezcla de bebidas de leche: leche + soja + avena (ids pendientes)
+252|ok|2705466|alta|
+253|buscar|||media|chocolate generico: se asume chocolate con leche
+254|ok|2758993|media|verificar kcal (vacia en la entrada)
+255|ok|172684|alta|
+256|ok|172688|alta|
+257|ok|172739|alta|
+258|cambiar|168013|baja|pan de cereales: pan multigrano; la entrada anterior era grano crudo seco (371 kcal), no pan
+259|ok|2707797|alta|
+260|ok|172688|alta|
+261|ok|2758993|media|verificar kcal (vacia en la entrada)
+262|ok|2707764|alta|
+263|ok|172689|alta|
+264|cambiar|2708357|media|pasta: se come cocida (no seca)
+265|cambiar|2708357|media|pasta: se come cocida (no seca)
+266|ok|2708357|alta|
+267|ok|2708357|media|
+268|cambiar|2708357|media|pasta: se come cocida (no seca)
+269|ok|2707145|media|
+270|ok|174067|alta|
+271|ok|2710175|alta|
+272|receta|||baja|salsa de champinones: nata + champinones + mantequilla (ids pendientes)
+273|ok|2710178|alta|
+274|ok|2710243|alta|
+275|ok|171971|alta|
+276|buscar|||media|lentejas: se comen cocidas
+277|buscar|||media|lentejas du Puy: se comen cocidas
+278|ok|2758986|alta|
+279|ok|170000|media|
+280|ok|174852|media|cola regular; Coca-Cola Zero difiere solo en azucar
+281|buscar|||media|bacon: se come cocido
+282|buscar|||media|carne picada: se come cocida
+283|ok|2258590|alta|
+284|ok|170110|alta|
+285|ok|169640|alta|
+286|ok|168746|alta|
+287|buscar|||media|coles de Bruselas: se comen cocidas
+288|buscar|||media|queso generico: el borrador es queso procesado
+289|ok|172175|alta|
+290|buscar|||media|queso semicurado: buscar gouda o similar
+291|ok|170848|alta|
+292|ok|173435|media|
+293|ok|173435|alta|
+294|buscar|||media|pollo: se consume cocido
+295|buscar|||media|pollo en tiras: se consume cocido
+296|ok|2706092|alta|
+297|buscar|||media|garbanzos: se comen cocidos
+298|ok|2710113|media|
+299|buscar|||media|sopa de calabaza: el borrador es calabaza cruda
+300|cambiar|170397|media|coliflor: se come cocida (hervida sin sal)
+301|cambiar|169987|media|apio nabo: se come cocido (hervido sin sal)
+302|ok|2708447|baja|cereal crujiente como aproximacion del muesli crujiente
+303|ok|2708461|media|
+304|ok|2705753|media|
+305|ok|2710551|media|
+306|ok|2747655|media|hinojo crudo: se come en ensalada
+307|ok|173904|media|
+308|ok|2705791|alta|
+309|ok|2705878|alta|
+310|ok|168424|media|colinabo crudo: se come en ensalada
+311|buscar|||media|puerro: se consume cocido
+312|buscar|||media|carne generica: buscar carne de res cocida
+313|ok|326698|alta|
+314|ok|325430|alta|
+315|ok|169118|alta|
+316|buscar|||media|cerdo picado: se consume cocido
+317|ok|174585|media|
+318|ok|170886|media|
+319|ok|167772|alta|
+320|ok|2346408|media|
+321|ok|2346386|alta|
+322|ok|2705629|alta|

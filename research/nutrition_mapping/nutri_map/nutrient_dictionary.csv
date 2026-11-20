@@ -1,0 +1,202 @@
+nutrient_id,number,name,unit,column
+1002,202,Nitrogen,g,Nitrogen (g)
+1003,203,Protein,g,Protein (g)
+1004,204,Total lipid (fat),g,Total lipid (fat) (g)
+1005,205,"Carbohydrate, by difference",g,"Carbohydrate, by difference (g)"
+1050,205.2,"Carbohydrate, by summation",g,"Carbohydrate, by summation (g)"
+1007,207,Ash,g,Ash (g)
+1008,208,Energy,kcal,Energy (kcal)
+1009,209,Starch,g,Starch (g)
+1010,210,Sucrose,g,Sucrose (g)
+1011,211,Glucose,g,Glucose (g)
+1012,212,Fructose,g,Fructose (g)
+1013,213,Lactose,g,Lactose (g)
+1014,214,Maltose,g,Maltose (g)
+1018,221,"Alcohol, ethyl",g,"Alcohol, ethyl (g)"
+1032,236,Citric acid,mg,Citric acid (mg)
+1039,243,Malic acid,mg,Malic acid (mg)
+1041,245,Oxalic acid,mg,Oxalic acid (mg)
+1043,247,Pyruvic acid,mg,Pyruvic acid (mg)
+1044,248,Quinic acid,mg,Quinic acid (mg)
+1051,255,Water,g,Water (g)
+1057,262,Caffeine,mg,Caffeine (mg)
+1058,263,Theobromine,mg,Theobromine (mg)
+1062,268,Energy,kj,Energy (kj)
+2000,269,Total Sugars,g,Total Sugars (g)
+1063,269.3,"Sugars, Total",g,"Sugars, Total (g)"
+1075,287,Galactose,g,Galactose (g)
+1079,291,"Fiber, total dietary",g,"Fiber, total dietary (g)"
+1082,295,"Fiber, soluble",g,"Fiber, soluble (g)"
+1084,297,"Fiber, insoluble",g,"Fiber, insoluble (g)"
+1085,298,Total fat (NLEA),g,Total fat (NLEA) (g)
+1087,301,"Calcium, Ca",mg,"Calcium, Ca (mg)"
+1089,303,"Iron, Fe",mg,"Iron, Fe (mg)"
+1090,304,"Magnesium, Mg",mg,"Magnesium, Mg (mg)"
+1091,305,"Phosphorus, P",mg,"Phosphorus, P (mg)"
+1092,306,"Potassium, K",mg,"Potassium, K (mg)"
+1093,307,"Sodium, Na",mg,"Sodium, Na (mg)"
+1095,309,"Zinc, Zn",mg,"Zinc, Zn (mg)"
+1098,312,"Copper, Cu",mg,"Copper, Cu (mg)"
+1099,313,"Fluoride, F",µg,"Fluoride, F (µg)"
+1100,314,"Iodine, I",µg,"Iodine, I (µg)"
+1101,315,"Manganese, Mn",mg,"Manganese, Mn (mg)"
+1102,316,"Molybdenum, Mo",µg,"Molybdenum, Mo (µg)"
+1103,317,"Selenium, Se",µg,"Selenium, Se (µg)"
+1104,318,"Vitamin A, IU",iu,"Vitamin A, IU (iu)"
+1105,319,Retinol,µg,Retinol (µg)
+1106,320,"Vitamin A, RAE",µg,"Vitamin A, RAE (µg)"
+1107,321,"Carotene, beta",µg,"Carotene, beta (µg)"
+1159,321.1,cis-beta-Carotene,µg,cis-beta-Carotene (µg)
+2028,321.2,trans-beta-Carotene,µg,trans-beta-Carotene (µg)
+1108,322,"Carotene, alpha",µg,"Carotene, alpha (µg)"
+1109,323,Vitamin E (alpha-tocopherol),mg,Vitamin E (alpha-tocopherol) (mg)
+1110,324,"Vitamin D (D2 + D3), International Units",iu,"Vitamin D (D2 + D3), International Units (iu)"
+1111,325,Vitamin D2 (ergocalciferol),µg,Vitamin D2 (ergocalciferol) (µg)
+1112,326,Vitamin D3 (cholecalciferol),µg,Vitamin D3 (cholecalciferol) (µg)
+1113,327,25-hydroxycholecalciferol,µg,25-hydroxycholecalciferol (µg)
+1114,328,Vitamin D (D2 + D3),µg,Vitamin D (D2 + D3) (µg)
+1120,334,"Cryptoxanthin, beta",µg,"Cryptoxanthin, beta (µg)"
+2032,335,"Cryptoxanthin, alpha",µg,"Cryptoxanthin, alpha (µg)"
+1122,337,Lycopene,µg,Lycopene (µg)
+1160,337.1,cis-Lycopene,µg,cis-Lycopene (µg)
+2029,337.2,trans-Lycopene,µg,trans-Lycopene (µg)
+1123,338,Lutein + zeaxanthin,µg,Lutein + zeaxanthin (µg)
+1121,338.1,Lutein,µg,Lutein (µg)
+1119,338.2,Zeaxanthin,µg,Zeaxanthin (µg)
+1161,338.3,cis-Lutein/Zeaxanthin,µg,cis-Lutein/Zeaxanthin (µg)
+1125,341,"Tocopherol, beta",mg,"Tocopherol, beta (mg)"
+1126,342,"Tocopherol, gamma",mg,"Tocopherol, gamma (mg)"
+1127,343,"Tocopherol, delta",mg,"Tocopherol, delta (mg)"
+1128,344,"Tocotrienol, alpha",mg,"Tocotrienol, alpha (mg)"
+1129,345,"Tocotrienol, beta",mg,"Tocotrienol, beta (mg)"
+1130,346,"Tocotrienol, gamma",mg,"Tocotrienol, gamma (mg)"
+1131,347,"Tocotrienol, delta",mg,"Tocotrienol, delta (mg)"
+1162,401,"Vitamin C, total ascorbic acid",mg,"Vitamin C, total ascorbic acid (mg)"
+1165,404,Thiamin,mg,Thiamin (mg)
+1166,405,Riboflavin,mg,Riboflavin (mg)
+1167,406,Niacin,mg,Niacin (mg)
+1170,410,Pantothenic acid,mg,Pantothenic acid (mg)
+1175,415,Vitamin B-6,mg,Vitamin B-6 (mg)
+1176,416,Biotin,µg,Biotin (µg)
+1177,417,"Folate, total",µg,"Folate, total (µg)"
+1178,418,Vitamin B-12,µg,Vitamin B-12 (µg)
+1180,421,"Choline, total",mg,"Choline, total (mg)"
+1183,428,Vitamin K (Menaquinone-4),µg,Vitamin K (Menaquinone-4) (µg)
+1184,429,Vitamin K (Dihydrophylloquinone),µg,Vitamin K (Dihydrophylloquinone) (µg)
+1185,430,Vitamin K (phylloquinone),µg,Vitamin K (phylloquinone) (µg)
+1186,431,Folic acid,µg,Folic acid (µg)
+1187,432,"Folate, food",µg,"Folate, food (µg)"
+1188,433,5-methyl tetrahydrofolate (5-MTHF),µg,5-methyl tetrahydrofolate (5-MTHF) (µg)
+1190,435,"Folate, DFE",µg,"Folate, DFE (µg)"
+1194,450,"Choline, free",mg,"Choline, free (mg)"
+1195,451,"Choline, from phosphocholine",mg,"Choline, from phosphocholine (mg)"
+1196,452,"Choline, from phosphotidyl choline",mg,"Choline, from phosphotidyl choline (mg)"
+1197,453,"Choline, from glycerophosphocholine",mg,"Choline, from glycerophosphocholine (mg)"
+1198,454,Betaine,mg,Betaine (mg)
+1199,455,"Choline, from sphingomyelin",mg,"Choline, from sphingomyelin (mg)"
+1210,501,Tryptophan,g,Tryptophan (g)
+1211,502,Threonine,g,Threonine (g)
+1212,503,Isoleucine,g,Isoleucine (g)
+1213,504,Leucine,g,Leucine (g)
+1214,505,Lysine,g,Lysine (g)
+1215,506,Methionine,g,Methionine (g)
+1216,507,Cystine,g,Cystine (g)
+1217,508,Phenylalanine,g,Phenylalanine (g)
+1218,509,Tyrosine,g,Tyrosine (g)
+1219,510,Valine,g,Valine (g)
+1220,511,Arginine,g,Arginine (g)
+1221,512,Histidine,g,Histidine (g)
+1222,513,Alanine,g,Alanine (g)
+1223,514,Aspartic acid,g,Aspartic acid (g)
+1224,515,Glutamic acid,g,Glutamic acid (g)
+1225,516,Glycine,g,Glycine (g)
+1226,517,Proline,g,Proline (g)
+1227,518,Serine,g,Serine (g)
+1228,521,Hydroxyproline,g,Hydroxyproline (g)
+1232,526,Cysteine,g,Cysteine (g)
+1242,573,"Vitamin E, added",mg,"Vitamin E, added (mg)"
+1246,578,"Vitamin B-12, added",µg,"Vitamin B-12, added (µg)"
+1253,601,Cholesterol,mg,Cholesterol (mg)
+1257,605,"Fatty acids, total trans",g,"Fatty acids, total trans (g)"
+1258,606,"Fatty acids, total saturated",g,"Fatty acids, total saturated (g)"
+1259,607,SFA 4:0,g,SFA 4:0 (g)
+1260,608,SFA 6:0,g,SFA 6:0 (g)
+1261,609,SFA 8:0,g,SFA 8:0 (g)
+1262,610,SFA 10:0,g,SFA 10:0 (g)
+1263,611,SFA 12:0,g,SFA 12:0 (g)
+1264,612,SFA 14:0,g,SFA 14:0 (g)
+1265,613,SFA 16:0,g,SFA 16:0 (g)
+1266,614,SFA 18:0,g,SFA 18:0 (g)
+1267,615,SFA 20:0,g,SFA 20:0 (g)
+1268,617,MUFA 18:1,g,MUFA 18:1 (g)
+1269,618,PUFA 18:2,g,PUFA 18:2 (g)
+1270,619,PUFA 18:3,g,PUFA 18:3 (g)
+1271,620,PUFA 20:4,g,PUFA 20:4 (g)
+1272,621,PUFA 22:6 n-3 (DHA),g,PUFA 22:6 n-3 (DHA) (g)
+1273,624,SFA 22:0,g,SFA 22:0 (g)
+1274,625,MUFA 14:1,g,MUFA 14:1 (g)
+1275,626,MUFA 16:1,g,MUFA 16:1 (g)
+1276,627,PUFA 18:4,g,PUFA 18:4 (g)
+1277,628,MUFA 20:1,g,MUFA 20:1 (g)
+1278,629,PUFA 20:5 n-3 (EPA),g,PUFA 20:5 n-3 (EPA) (g)
+1279,630,MUFA 22:1,g,MUFA 22:1 (g)
+1280,631,PUFA 22:5 n-3 (DPA),g,PUFA 22:5 n-3 (DPA) (g)
+1283,636,Phytosterols,mg,Phytosterols (mg)
+1285,638,Stigmasterol,mg,Stigmasterol (mg)
+1286,639,Campesterol,mg,Campesterol (mg)
+1288,641,Beta-sitosterol,mg,Beta-sitosterol (mg)
+1292,645,"Fatty acids, total monounsaturated",g,"Fatty acids, total monounsaturated (g)"
+1293,646,"Fatty acids, total polyunsaturated",g,"Fatty acids, total polyunsaturated (g)"
+1299,652,SFA 15:0,g,SFA 15:0 (g)
+1300,653,SFA 17:0,g,SFA 17:0 (g)
+1301,654,SFA 24:0,g,SFA 24:0 (g)
+1303,662,TFA 16:1 t,g,TFA 16:1 t (g)
+1304,663,TFA 18:1 t,g,TFA 18:1 t (g)
+1305,664,TFA 22:1 t,g,TFA 22:1 t (g)
+1306,665,TFA 18:2 t not further defined,g,TFA 18:2 t not further defined (g)
+1307,666,PUFA 18:2 i,g,PUFA 18:2 i (g)
+1310,669,"TFA 18:2 t,t",g,"TFA 18:2 t,t (g)"
+1311,670,PUFA 18:2 CLAs,g,PUFA 18:2 CLAs (g)
+1312,671,MUFA 24:1 c,g,MUFA 24:1 c (g)
+1313,672,"PUFA 20:2 n-6 c,c",g,"PUFA 20:2 n-6 c,c (g)"
+1314,673,MUFA 16:1 c,g,MUFA 16:1 c (g)
+1315,674,MUFA 18:1 c,g,MUFA 18:1 c (g)
+1316,675,"PUFA 18:2 n-6 c,c",g,"PUFA 18:2 n-6 c,c (g)"
+1317,676,MUFA 22:1 c,g,MUFA 22:1 c (g)
+1321,685,"PUFA 18:3 n-6 c,c,c",g,"PUFA 18:3 n-6 c,c,c (g)"
+1323,687,MUFA 17:1,g,MUFA 17:1 (g)
+1325,689,PUFA 20:3,g,PUFA 20:3 (g)
+1329,693,"Fatty acids, total trans-monoenoic",g,"Fatty acids, total trans-monoenoic (g)"
+1330,694,"Fatty acids, total trans-dienoic",g,"Fatty acids, total trans-dienoic (g)"
+1331,695,"Fatty acids, total trans-polyenoic",g,"Fatty acids, total trans-polyenoic (g)"
+1332,696,SFA 13:0,g,SFA 13:0 (g)
+1333,697,MUFA 15:1,g,MUFA 15:1 (g)
+1334,698,PUFA 22:2,g,PUFA 22:2 (g)
+1335,699,SFA 11:0,g,SFA 11:0 (g)
+1340,710,Daidzein,mg,Daidzein (mg)
+1341,711,Genistein,mg,Genistein (mg)
+2049,717,Daidzin,mg,Daidzin (mg)
+2050,718,Genistin,mg,Genistin (mg)
+2051,719,Glycitin,mg,Glycitin (mg)
+2009,822,MUFA 14:1 c,g,MUFA 14:1 c (g)
+2010,825,MUFA 17:1 c,g,MUFA 17:1 c (g)
+2012,829,MUFA 20:1 c,g,MUFA 20:1 c (g)
+2016,831,PUFA 18:2 c,g,PUFA 18:2 c (g)
+2018,833,PUFA 18:3 c,g,PUFA 18:3 c (g)
+2020,835,PUFA 20:3 c,g,PUFA 20:3 c (g)
+2022,836,PUFA 20:4c,g,PUFA 20:4c (g)
+2023,837,PUFA 20:5c,g,PUFA 20:5c (g)
+2024,838,PUFA 22:5 c,g,PUFA 22:5 c (g)
+2025,839,PUFA 22:6 c,g,PUFA 22:6 c (g)
+2026,840,PUFA 20:2 c,g,PUFA 20:2 c (g)
+1404,851,"PUFA 18:3 n-3 c,c,c (ALA)",g,"PUFA 18:3 n-3 c,c,c (ALA) (g)"
+1405,852,PUFA 20:3 n-3,g,PUFA 20:3 n-3 (g)
+1406,853,PUFA 20:3 n-6,g,PUFA 20:3 n-6 (g)
+1408,855,PUFA 20:4 n-6,g,PUFA 20:4 n-6 (g)
+1409,856,PUFA 18:3i,g,PUFA 18:3i (g)
+1410,857,PUFA 21:5,g,PUFA 21:5 (g)
+1411,858,PUFA 22:4,g,PUFA 22:4 (g)
+1412,859,MUFA 18:1-11 t (18:1t n-7),g,MUFA 18:1-11 t (18:1t n-7) (g)
+1414,861,PUFA 20:3 n-9,g,PUFA 20:3 n-9 (g)
+2047,957,Energy (Atwater General Factors),kcal,Energy (Atwater General Factors) (kcal)
+2048,958,Energy (Atwater Specific Factors),kcal,Energy (Atwater Specific Factors) (kcal)

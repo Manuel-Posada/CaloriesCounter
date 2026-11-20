@@ -1,0 +1,324 @@
+﻿idx,clase,decision,final_usda,confianza,nota
+0,beetroot-steamed-without-addition-of-salt,cambiar,169146,media,hervida sin sal; el borrador no tenia la entrada
+1,green_bean_steamed_without_addition_of_salt,ok,169141,media,hervida en vez de al vapor; diferencia nutricional minima
+2,watermelon_fresh,ok,167765,alta,
+3,tuna_in_oil_drained,ok,173708,alta,
+4,sweet_potato,cambiar,168483,media,"consumo cocido (horneada, sin sal) segun criterio"
+5,country_fries,cambiar,2709458,media,fritas frescas; igual que la muestra aprobada
+6,potato_gnocchi,ok,2708722,alta,
+7,chips_french_fries,cambiar,2709456,alta,mas generica que 'fast food' (312 kcal)
+8,rosti_n_s,receta,,media,ros ti: patata cocida 85 g + aceite 15 g
+9,vegetable_mix_peas_and_carrots,ok,170018,alta,SR Legacy cocida sin sal; sin grasa anadida (cambio vs muestra)
+10,coleslaw_chopped_without_sauce,receta,,alta,coleslaw sin aderezo: col + zanahoria
+11,ratatouille,ok,2710028,alta,
+12,mixed_salad_chopped_without_sauce,receta,,alta,ensalada mixta sin aderezo; la entrada del borrador lleva aguacate
+13,leaf_spinach,ok,168462,baja,clase ambigua (cruda o cocida); se mantiene como en la muestra
+14,witloof_chicory,ok,170404,alta,
+15,artichoke,ok,169205,alta,
+16,aubergine_eggplant,cambiar,169229,media,berenjena cocida hervida sin sal
+17,avocado,ok,171705,alta,
+18,french_beans,cambiar,169141,media,judia verde: se come cocida
+19,cucumber_pickled_ch,ok,324653,media,pepinillo encurtido
+20,cucumber,ok,2346406,alta,
+21,capers,ok,172238,alta,
+22,pumpkin,cambiar,168449,media,calabaza cocida
+23,tomato,ok,170457,alta,
+24,red_radish,ok,2747665,alta,
+25,beetroot_raw,ok,2685576,alta,
+26,chinese_cabbage,ok,169979,alta,
+27,sauerkraut,ok,169279,alta,
+28,white_cabbage,ok,169975,media,col blanca cruda; entrada generica
+29,peas,cambiar,170420,media,guisantes cocidos sin sal
+30,corn,cambiar,169999,media,maiz dulce cocido sin sal
+31,spring_onion_scallion,ok,170005,alta,
+32,garlic,ok,1104647,alta,
+33,swiss_chard,cambiar,170401,media,acelgas cocidas sin sal
+34,white_asparagus,cambiar,168390,media,esparrago: consumo cocido
+35,shoots_n_s,ok,169210,baja,brotes de bambu; estado y uso poco claros
+36,alfa_sprouts,ok,168384,alta,
+37,beans_kidney,ok,173740,alta,
+38,pineapple,ok,2346398,alta,
+39,apple,ok,2709215,alta,
+40,pomegranate,ok,169134,alta,
+41,apricots,ok,171697,alta,
+42,banana,ok,173944,alta,
+43,berries_n_s,ok,2709271,media,berries genericas (mezcla)
+44,dates,ok,171726,media,datil deglet noor: variedad concreta pero tipica
+45,strawberries,ok,167762,alta,
+46,figs,ok,173021,alta,
+47,grapefruit_pomelo,cambiar,173033,alta,"toronja cruda: la entrada Foundation no traia proteina, grasa ni carbohidratos"
+48,blueberries,ok,2346411,alta,
+49,raspberries,ok,2346410,alta,
+50,kaki,ok,169941,alta,
+51,cherries,ok,171719,alta,
+52,kiwi,ok,327046,alta,
+53,mandarine,ok,169105,alta,
+54,mango,ok,169910,alta,
+55,sugar_melon_galia_honeydew_cantaloupe,ok,746770,media,melon tipo galia; aproximacion
+56,nectarine,ok,169914,alta,
+57,orange,ok,2709171,alta,
+58,plums,ok,169949,alta,
+59,grapes,ok,174683,alta,
+60,raisins_dried,cambiar,168165,alta,pasas oscuras: la entrada Foundation no traia macronutrientes
+61,lemon,ok,167746,alta,
+62,damson_plum,ok,169949,media,damson: se usa ciruela generica (aproximacion)
+63,peanut_butter,ok,2707537,alta,
+64,chestnuts_ch,cambiar,170190,media,castanas asadas
+65,seeds_n_s,ok,2515381,media,semillas genericas: proxy de girasol crudo
+66,pumpkin_seeds,ok,2515380,alta,
+67,pine_nuts,ok,170591,alta,
+68,sunflower_seeds,ok,170562,alta,
+69,mixed_seeds_n_s,ok,2707589,media,semillas mixtas
+70,almonds,ok,2346393,alta,
+71,walnut,ok,2346394,alta,
+72,cashew_nut,ok,2515374,alta,
+73,hazelnut,ok,2515375,alta,
+74,coconut,ok,170169,alta,
+75,pistachio,ok,2515379,alta,
+76,sesame_seeds,ok,170150,alta,
+77,green_olives,ok,169096,alta,
+78,black_olives,ok,169094,alta,
+79,kefir_drink,ok,2705394,alta,
+80,cottage_cheese,ok,2705747,alta,
+81,emmental_cheese_ch,ok,171251,alta,
+82,fresh_cheese_n_s,ok,172223,alta,
+83,gruyere_ch,ok,171242,alta,
+84,halloumi,ok,2705740,media,proxy: paneer como queso firme similar; halloumi no tiene entrada
+85,mozzarella,ok,170845,alta,
+86,parmesan,ok,170848,alta,
+87,cheese_for_raclette_ch,ok,2705720,media,proxy: Monterey como queso fundible semiduro
+88,cream_cheese_n_s,ok,173418,alta,
+89,tomme_ch,ok,2705720,media,proxy: Monterey como queso semicurado
+90,tiramisu,ok,2705702,media,
+91,rice_noodles_vermicelli,cambiar,168914,media,fideos de arroz cocidos
+92,bulgur,cambiar,170287,media,bulgur cocido
+93,couscous,ok,169700,alta,
+94,grits_polenta_maize_flour,ok,169697,baja,polenta: no hay version cocida entre los candidatos; entrada seca
+95,quinoa,ok,168917,alta,
+96,rice_wild,cambiar,168897,media,arroz salvaje cocido
+97,spaetzle,ok,169732,media,aproximacion: fideos de huevo cocidos
+98,pasta_n_s,ok,2708357,alta,
+99,pasta_hornli_ch,cambiar,2708357,media,pasta: se come cocida (no seca)
+100,pasta_in_butterfly_form_farfalle,cambiar,2708357,media,pasta: se come cocida (no seca)
+101,pasta_linguini_parpadelle_tagliatelle,cambiar,2708357,media,pasta: se come cocida (no seca)
+102,pasta_wholemeal,cambiar,168910,media,pasta integral cocida
+103,bread_fruit,ok,171714,baja,fruta del pan: normalmente se consume cocida
+104,bread_pita,ok,2707616,alta,
+105,bread_ticino_ch,ok,2707598,media,proxy: pan blanco generico para pan regional suizo
+106,bread_toast,ok,2707599,media,
+107,brioche,ok,2707682,alta,
+108,roll_of_half_white_or_white_flour_with_large_void,ok,2707655,media,
+109,roll_with_pieces_of_chocolate,ok,2707666,media,proxy: roll dulce sin glaseado
+110,white_bread_with_butter_eggs_and_milk,ok,2708335,media,
+111,focaccia,ok,167945,alta,
+112,lye_pretzel_soft,ok,169064,alta,
+113,braided_white_loaf_ch,ok,2707598,media,
+114,breadcrumbs_unspiced,ok,174928,alta,
+115,rusk_wholemeal,ok,174981,media,
+116,chicken_breast,cambiar,171477,media,pechuga de pollo cocida asada sin piel
+117,chicken_leg,cambiar,173617,media,muslo de pollo cocido asado con piel
+118,cervelat_ch,ok,172940,alta,
+119,meatloaf_ch,ok,2706579,media,
+120,dried_meat_n_s,ok,170604,alta,
+121,salami_ch,cambiar,174582,media,salchichon/salami seco: entrada SR Legacy (cerdo y res); la Foundation estaba incompleta
+122,meat_terrine_pate,ok,172930,media,
+123,tofu,ok,172476,alta,
+124,fish_n_s,ok,2706225,media,pescado generico al horno
+125,salmon,cambiar,175168,media,salmon cocido al horno (cultivo)
+126,tuna,cambiar,172006,baja,atun cocido: tipo generico; yellowfin como aproximacion
+127,egg,cambiar,748967,media,huevo entero crudo; cocido difiere poco
+128,praline_n_s,ok,168791,media,
+129,jam,ok,169641,alta,
+130,dark_chocolate,cambiar,170271,alta,
+131,hazelnut_chocolate_spread_nutella_ovomaltine_caotina,ok,168000,media,crema de avellana generica (sin marca)
+132,chocolate_egg_small,cambiar,167587,media,huevo de chocolate: chocolate con leche
+133,brownie,ok,2707903,media,
+134,cake_lemon,ok,2707879,alta,
+135,crepe_with_flour_plain,ok,2708342,alta,
+136,fruit_tart,ok,2707994,media,
+137,cake_chocolate,cambiar,2707866,alta,
+138,muffin,cambiar,2707829,alta,
+139,omelette_with_flour_thick_crepe_plain,cambiar,172185,alta,tortilla: huevo cocido tipo omelet
+140,tart_n_s,ok,2707994,media,
+141,croissant_with_chocolate_filling,ok,2707680,alta,
+142,cookies,cambiar,2707968,media,generica: proxy de galleta simple
+143,chocolate_cookies,ok,2707915,alta,
+144,smoothie,ok,2705513,media,
+145,ice_tea_on_black_tea_basis,ok,2710527,alta,
+146,aperitif_with_alcohol_n_s_aperol_spritz,cambiar,2710674,baja,sin Aperol; ponche alcoholico como aproximacion
+147,wine_red,ok,173190,alta,
+148,sauce_savoury_n_s,cambiar,171564,media,salsa salada lista para servir (tipo gravy)
+149,ketchup,cambiar,168556,alta,
+150,bolognaise_sauce,receta,,media,bolognesa: salsa de tomate + carne picada cocida + cebolla + zanahoria
+151,tomato_sauce,ok,170054,alta,
+152,oil_vinegar_salad_dressing,ok,171417,alta,
+153,guacamole,ok,2709307,alta,
+154,tartar_sauce,ok,171826,alta,
+155,tzatziki,ok,2705448,alta,
+156,basil,ok,172232,alta,
+157,parsley,ok,170416,alta,
+158,sauce_soya,ok,174277,alta,
+159,falafel_balls,ok,2707408,alta,
+160,savoury_pastry_stick,ok,2708053,media,
+161,corn_crisps,ok,2708196,media,
+162,croutons,ok,172751,alta,
+163,crisps_ch,ok,2709421,alta,
+164,spring_roll_fried,cambiar,172105,baja,rollito frito: proxy egg roll vegetal frito (no hay spring roll frito en USDA); la entrada sin freir daba 112 kcal frente a ~250
+165,ham_croissant_ch,receta,,media,croissant con jamon: croissant + jamon cocido
+166,salt_cake_ch_vegetables_filled,receta,,baja,pastel salado de verduras: masa de harina + huevo + leche + queso + verdura + mantequilla
+167,lasagne_meat_prepared,ok,2708750,alta,
+168,mashed_potatoes_prepared_with_full_fat_milk_with_butter,ok,168555,alta,
+169,sushi,ok,2708959,alta,
+170,hummus,ok,2707402,alta,
+171,greek_salad,ok,2709830,alta,
+172,chocolate_mousse,ok,168777,alta,
+173,cheesecake,ok,2707861,alta,
+174,caprese_salad_tomato_mozzarella,ok,2705818,alta,
+175,chili_con_carne_prepared,ok,2706376,media,
+176,taboule_prepared_with_couscous,ok,2709131,alta,
+177,salmon_smoked,ok,2706292,alta,
+178,glucose_drink_50g,receta,,media,"bebida de glucosa (50 g): solucion al 25 % = azucar 25 g + agua 75 g (la entrada de USDA tenia 0,12 g de carbohidratos)"
+179,chicken_curry_cream_coconut_milk_curry_spices_paste,ok,2706437,media,no incluye coco/crema; plato mas fiel disponible
+180,potatoes_au_gratin_dauphinois_prepared,ok,170442,media,
+181,birchermuesli_prepared_no_sugar_added,receta,,baja,birchermuesli: avena + yogur + manzana + avellana + leche
+182,fajita_bread_only,ok,2707824,alta,
+183,butter_spread_puree_almond,ok,2262074,alta,
+184,water_with_lemon_juice,ok,2710707,media,agua con limon: agua como base (diferencia minima)
+185,sun_dried_tomatoe,ok,168567,alta,
+186,fruit_coulis,ok,2710286,media,
+187,soup_of_lentils_dahl_dhal,ok,2707462,media,
+188,lasagne_vegetable_prepared,ok,2708759,alta,
+189,french_pizza_from_alsace_baked,receta,,baja,tarte flambee alsaciana: masa + creme fraiche + cebolla + bacon + queso
+190,vegetable_au_gratin_baked,ok,170442,media,proxy: gratinado de patata como gratinado al horno
+191,porridge_prepared_with_partially_skimmed_milk,receta,,baja,porridge con leche semidesnatada: avena cocida + leche 1%
+192,curry_vegetarian,ok,2710067,alta,
+193,banana_cake,ok,2707856,alta,
+194,cappuccino,ok,2710472,alta,
+195,pearl_onion,ok,170000,media,cebolla pequena: cebolla cruda generica
+196,nuts,ok,2707504,alta,
+197,bouillon,cambiar,171538,media,"caldo servido (listo para consumir), no caldo en polvo"
+198,ham_raw,ok,168222,baja,jamon crudo curado: revisar (la entrada es pierna de cerdo cruda)
+199,water,ok,174158,alta,
+200,risotto,receta,,media,risotto: arroz cocido + champinones + parmesano + mantequilla + caldo
+201,asparagus,cambiar,168390,media,esparrago verde: consumo cocido
+202,potato_salad,ok,2709543,alta,
+203,mixed_vegetables,ok,170472,alta,
+204,sweet_corn,ok,169214,alta,
+205,potato,ok,2709382,media,
+206,baked_potato,ok,170093,alta,
+207,fruit_mixed,ok,2709288,alta,
+208,latte_macchiato,cambiar,2710387,media,latte macchiato: latte sin grasa como aproximacion
+209,egg_scrambled,ok,172187,alta,
+210,croissant,ok,2707678,alta,
+211,wine_rose,ok,171908,alta,
+212,wine_white,ok,174837,alta,
+213,tea,ok,2710488,media,
+214,pizza_with_vegetables_baked,ok,2708630,media,
+215,pizza_with_ham_with_mushrooms_baked,cambiar,172095,baja,marca DiGiorno fuera; pizza generica con cobertura de carne
+216,pizza_margherita_baked,cambiar,170373,alta,"pizza margarita: pizza de queso fina horneada, sin marca"
+217,pizza_with_ham_baked,ok,172095,media,
+218,hamburger,ok,2706920,alta,
+219,veggie_burger,ok,2707481,alta,
+220,coffee,ok,2710375,alta,
+221,white_coffee,cambiar,2710387,media,cafe con leche: latte sin grasa como aproximacion
+222,ristretto_with_caffeine,ok,2710378,media,
+223,espresso,ok,171891,alta,
+224,broccoli,cambiar,169967,media,brocoli: consumo cocido (hervido sin sal)
+225,pancake,ok,2708294,alta,
+226,peanut,cambiar,173806,media,cacahuete tostado sin sal
+227,carrot,ok,170393,media,
+228,cordon_bleu,ok,2706418,baja,cordon bleu: entrada de ternera; el original suele ser de cerdo
+229,feta,ok,173420,alta,
+230,zucchini,cambiar,169292,media,calabacin cocido sin sal
+231,butter,ok,173410,alta,
+232,rice_whole_grain,cambiar,169704,media,arroz integral cocido
+233,rice,cambiar,168878,media,arroz blanco cocido
+234,spinach,ok,168463,media,espinaca hervida sin sal en vez de al vapor
+235,spinach_raw,ok,168462,alta,
+236,biscuit,ok,2707801,media,
+237,salad_leaf_salad_green,ok,2709792,alta,
+238,salad_rocket,ok,169387,alta,
+239,salad_lambs_ear,ok,2709789,baja,proxy: lechuga cruda para hojas tipo lamb's ear
+240,balsamic_salad_dressing,ok,2710195,baja,proxy: aliño generico para ensaladas; no es balsamico
+241,salad_dressing,ok,171019,alta,
+242,french_salad_dressing,ok,171414,alta,
+243,quiche,ok,2708733,media,
+244,juice,ok,2709316,alta,
+245,juice_apple,ok,173933,alta,
+246,juice_orange,cambiar,169100,alta,zumo de naranja refrigerado (no papilla infantil)
+247,pie_apricot,receta,,baja,tarta de albaricoque: masa de tarta + albaricoque + azucar + huevo
+248,pie_plum_baked_with_cake_dough,receta,,baja,tarta de ciruela: masa de tarta + ciruela + azucar + huevo
+249,apple_pie,ok,2707995,alta,
+250,mushroom,ok,169252,alta,
+251,mixed_milk_beverage,receta,,baja,mezcla de bebidas de leche: leche + soja + avena
+252,chocolate_milk,ok,2705466,alta,
+253,chocolate_n_s,cambiar,167587,media,chocolate con leche
+254,bread,cambiar,174924,media,pan blanco comercial; la entrada Foundation estaba incompleta
+255,bread_rye,ok,172684,alta,
+256,bread_wholemeal,ok,172688,alta,
+257,crisp_bread,ok,172739,alta,
+258,bread_grain,cambiar,168013,baja,"pan de cereales: pan multigrano; la entrada anterior era grano crudo seco (371 kcal), no pan"
+259,gluten_free_bread,ok,2707797,alta,
+260,bread_whole_wheat,ok,172688,alta,
+261,bread_white,cambiar,174924,alta,pan blanco comercial; la entrada Foundation estaba incompleta
+262,bread_black,ok,2707764,alta,
+263,bread_wholemeal_toast,ok,172689,alta,
+264,pasta_penne,cambiar,2708357,media,pasta: se come cocida (no seca)
+265,pasta_spaghetti,cambiar,2708357,media,pasta: se come cocida (no seca)
+266,pasta_twist,ok,2708357,alta,
+267,pasta_noodles,ok,2708357,media,
+268,pasta_in_conch_form,cambiar,2708357,media,pasta: se come cocida (no seca)
+269,sauce,ok,2707145,media,
+270,sauce_cocktail,ok,174067,alta,
+271,sauce_pesto,ok,2710175,alta,
+272,sauce_mushroom,receta,,baja,salsa de champinones: nata + champinones + mantequilla + harina + leche
+273,sauce_curry,ok,2710178,alta,
+274,sauce_cream,ok,2710243,alta,
+275,shrimp_prawn,ok,171971,alta,
+276,lentil_n_s,cambiar,172421,media,lentejas cocidas sin sal
+277,lentils_green_du_puy_du_berry,cambiar,172421,media,lentejas du Puy: entrada de lentejas cocidas como aproximacion
+278,mayonnaise,cambiar,171009,alta,mayonesa regular; la entrada Foundation estaba incompleta
+279,onion,ok,170000,media,
+280,cola_based_drink,ok,174852,media,cola regular; Coca-Cola Zero difiere solo en azucar
+281,bacon,cambiar,168322,media,bacon cocido
+282,beef_n_s,cambiar,174034,media,carne picada cocida
+283,bell_pepper_red_raw,ok,2258590,alta,
+284,bell_pepper_red_stewed,ok,170110,alta,
+285,honey,ok,169640,alta,
+286,beer,ok,168746,alta,
+287,brussel_sprouts,cambiar,169971,media,coles de Bruselas cocidas sin sal
+288,cheese_n_s,cambiar,2705704,media,queso generico (FNDDS)
+289,blue_mould_cheese,ok,172175,alta,
+290,semi_hard_cheese,cambiar,171241,media,queso semicurado: gouda
+291,hard_cheese,ok,170848,alta,
+292,soft_cheese,ok,173435,media,
+293,goat_cheese_soft,ok,173435,alta,
+294,chicken,cambiar,173617,media,pollo cocido asado con piel
+295,chicken_cut_into_stripes_only_meat,cambiar,171054,media,"pollo en tiras, solo carne cocida"
+296,nuggets,ok,2706092,alta,
+297,chickpeas,cambiar,173757,media,garbanzos cocidos sin sal
+298,soup,ok,2710113,media,
+299,soup_pumpkin,cambiar,2709718,media,sopa de calabaza
+300,cauliflower,cambiar,170397,media,coliflor: se come cocida (hervida sin sal)
+301,celeriac,cambiar,169987,media,apio nabo: se come cocido (hervido sin sal)
+302,crunch_muesli,ok,2708447,baja,cereal crujiente como aproximacion del muesli crujiente
+303,muesli_dry,ok,2708461,media,
+304,curds_natural,ok,2705753,media,
+305,soft_drink_with_a_taste,ok,2710551,media,
+306,fennel,ok,2747655,media,hinojo crudo: se come en ensalada
+307,flakes,ok,173904,media,
+308,fondue,ok,2705791,alta,
+309,ham_n_s,ok,2705878,alta,
+310,kolhrabi,ok,168424,media,colinabo crudo: se come en ensalada
+311,leek,cambiar,168426,media,puerro cocido sin sal
+312,meat_n_s,cambiar,174034,baja,carne generica: carne de res picada cocida como aproximacion
+313,mustard,ok,326698,alta,
+314,peach,ok,325430,alta,
+315,pear,ok,169118,alta,
+316,pork_n_s,cambiar,168374,media,cerdo picado cocido (84/16)
+317,sausage,ok,174585,media,
+318,yogurt,ok,170886,media,
+319,applesauce,ok,167772,alta,
+320,red_cabbage_raw,ok,2346408,media,
+321,cream_double_cream_heavy_cream_45,ok,2346386,alta,
+322,ice_cream_n_s,ok,2705629,alta,

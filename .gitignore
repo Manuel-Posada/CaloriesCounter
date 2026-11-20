@@ -48,3 +48,6 @@ presentación/
 .playwright-mcp/
 34g_platano_163cerdo_105papa.jpg
 .scannerwork/
+
+# Word documents (paper drafts)
+*.docx

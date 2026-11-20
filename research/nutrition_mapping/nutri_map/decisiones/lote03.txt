@@ -1,0 +1,82 @@
+160|ok|2708053|media|
+161|ok|2708196|media|
+162|ok|172751|alta|
+163|ok|2709421|alta|
+164|cambiar|172105|baja|rollito frito: proxy egg roll vegetal frito (no hay spring roll frito en USDA); la entrada sin freir daba 112 kcal frente a ~250
+165|receta|||baja|croissant con jamon: croissant + jamon cocido (ids pendientes)
+166|receta|||baja|pastel salado de verduras: masa de harina + huevo + leche + queso + verdura (ids pendientes)
+167|ok|2708750|alta|
+168|ok|168555|alta|
+169|ok|2708959|alta|
+170|ok|2707402|alta|
+171|ok|2709830|alta|
+172|ok|168777|alta|
+173|ok|2707861|alta|
+174|ok|2705818|alta|
+175|ok|2706376|media|
+176|ok|2709131|alta|
+177|ok|2706292|alta|
+178|ok|2710776|baja|solucion de glucosa 5%: kcal 0 en la entrada, valor real ~20 kcal/100 g; revisar
+179|ok|2706437|media|no incluye coco/crema; plato mas fiel disponible
+180|ok|170442|media|
+181|receta|||baja|birchermuesli: avena + yogur + manzana + frutos secos (ids pendientes)
+182|ok|2707824|alta|
+183|ok|2262074|alta|
+184|ok|2710707|media|agua con limon: agua como base (diferencia minima)
+185|ok|168567|alta|
+186|ok|2710286|media|
+187|ok|2707462|media|
+188|ok|2708759|alta|
+189|receta|||baja|tarte flambee alsaciana: masa + creme fraiche + cebolla + bacon (ids pendientes)
+190|ok|170442|media|proxy: gratinado de patata como gratinado al horno
+191|receta|||baja|porridge con leche semidesnatada: avena cocida + leche (ids pendientes)
+192|ok|2710067|alta|
+193|ok|2707856|alta|
+194|ok|2710472|alta|
+195|ok|170000|media|cebolla pequena: cebolla cruda generica
+196|ok|2707504|alta|
+197|buscar|||media|caldo servido: el borrador es caldo en polvo seco (kcal erroneas para el caldo servido)
+198|ok|168222|baja|jamon crudo curado: revisar (la entrada es pierna de cerdo cruda)
+199|ok|174158|alta|
+200|receta|||media|risotto: arroz cocido + champinones + parmesano + mantequilla + caldo (ids pendientes)
+201|cambiar|168390|media|esparrago verde: consumo cocido
+202|ok|2709543|alta|
+203|ok|170472|alta|
+204|ok|169214|alta|
+205|ok|2709382|media|
+206|ok|170093|alta|
+207|ok|2709288|alta|
+208|buscar|||media|latte macchiato: el borrador es cafe macchiato (poca leche)
+209|ok|172187|alta|
+210|ok|2707678|alta|
+211|ok|171908|alta|
+212|ok|174837|alta|
+213|ok|2710488|media|
+214|ok|2708630|media|
+215|cambiar|172095|baja|marca DiGiorno fuera; pizza generica con cobertura de carne
+216|buscar|||media|pizza margarita: sin marca, cobertura de queso
+217|ok|172095|media|
+218|ok|2706920|alta|
+219|ok|2707481|alta|
+220|ok|2710375|alta|
+221|buscar|||media|cafe con leche: el borrador es cafe solo
+222|ok|2710378|media|
+223|ok|171891|alta|
+224|cambiar|169967|media|brocoli: consumo cocido (hervido sin sal)
+225|ok|2708294|alta|
+226|buscar|||media|cacahuete: se consume tostado
+227|ok|170393|media|
+228|ok|2706418|baja|cordon bleu: entrada de ternera; el original suele ser de cerdo
+229|ok|173420|alta|
+230|buscar|||media|calabacin: se consume cocido
+231|ok|173410|alta|
+232|buscar|||media|arroz integral: se come cocido
+233|buscar|||media|arroz blanco: se come cocido
+234|ok|168463|media|espinaca hervida sin sal en vez de al vapor
+235|ok|168462|alta|
+236|ok|2707801|media|
+237|ok|2709792|alta|
+238|ok|169387|alta|
+239|ok|2709789|baja|proxy: lechuga cruda para hojas tipo lamb's ear
+240|ok|2710195|baja|proxy: aliño generico para ensaladas; no es balsamico
+241|ok|171019|alta|

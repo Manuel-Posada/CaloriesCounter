@@ -1,0 +1,4010 @@
+[
+ {
+  "idx": 0,
+  "coco_id": 1,
+  "v21_id": 50,
+  "name": "beetroot-steamed-without-addition-of-salt",
+  "old_ids": [
+   50
+  ],
+  "old_names": [
+   "beetroot-steamed-without-addition-of-salt"
+  ]
+ },
+ {
+  "idx": 1,
+  "coco_id": 2,
+  "v21_id": 100022,
+  "name": "green_bean_steamed_without_addition_of_salt",
+  "old_ids": [
+   387
+  ],
+  "old_names": [
+   "green-bean-steamed-without-addition-of-salt"
+  ]
+ },
+ {
+  "idx": 2,
+  "coco_id": 3,
+  "v21_id": 100031,
+  "name": "watermelon_fresh",
+  "old_ids": [
+   578
+  ],
+  "old_names": [
+   "watermelon-fresh"
+  ]
+ },
+ {
+  "idx": 3,
+  "coco_id": 4,
+  "v21_id": 100049,
+  "name": "tuna_in_oil_drained",
+  "old_ids": [
+   922
+  ],
+  "old_names": [
+   "tuna-in-oil-drained"
+  ]
+ },
+ {
+  "idx": 4,
+  "coco_id": 5,
+  "v21_id": 100057,
+  "name": "sweet_potato",
+  "old_ids": [
+   1004
+  ],
+  "old_names": [
+   "sweet-potato"
+  ]
+ },
+ {
+  "idx": 5,
+  "coco_id": 6,
+  "v21_id": 100059,
+  "name": "country_fries",
+  "old_ids": [
+   1007
+  ],
+  "old_names": [
+   "country-fries"
+  ]
+ },
+ {
+  "idx": 6,
+  "coco_id": 7,
+  "v21_id": 100060,
+  "name": "potato_gnocchi",
+  "old_ids": [
+   1009
+  ],
+  "old_names": [
+   "potato-gnocchi"
+  ]
+ },
+ {
+  "idx": 7,
+  "coco_id": 8,
+  "v21_id": 100063,
+  "name": "chips_french_fries",
+  "old_ids": [
+   1013
+  ],
+  "old_names": [
+   "chips-french-fries"
+  ]
+ },
+ {
+  "idx": 8,
+  "coco_id": 9,
+  "v21_id": 100064,
+  "name": "rosti_n_s",
+  "old_ids": [
+   1014
+  ],
+  "old_names": [
+   "rosti"
+  ]
+ },
+ {
+  "idx": 9,
+  "coco_id": 10,
+  "v21_id": 100067,
+  "name": "vegetable_mix_peas_and_carrots",
+  "old_ids": [
+   1019
+  ],
+  "old_names": [
+   "vegetable-mix-peas-and-carrots"
+  ]
+ },
+ {
+  "idx": 10,
+  "coco_id": 11,
+  "v21_id": 100068,
+  "name": "coleslaw_chopped_without_sauce",
+  "old_ids": [
+   1020
+  ],
+  "old_names": [
+   "coleslaw-chopped-without-sauce"
+  ]
+ },
+ {
+  "idx": 11,
+  "coco_id": 12,
+  "v21_id": 100069,
+  "name": "ratatouille",
+  "old_ids": [
+   1024
+  ],
+  "old_names": [
+   "ratatouille"
+  ]
+ },
+ {
+  "idx": 12,
+  "coco_id": 13,
+  "v21_id": 100070,
+  "name": "mixed_salad_chopped_without_sauce",
+  "old_ids": [
+   1026
+  ],
+  "old_names": [
+   "mixed-salad-chopped-without-sauce"
+  ]
+ },
+ {
+  "idx": 13,
+  "coco_id": 14,
+  "v21_id": 100072,
+  "name": "leaf_spinach",
+  "old_ids": [
+   1032
+  ],
+  "old_names": [
+   "leaf-spinach"
+  ]
+ },
+ {
+  "idx": 14,
+  "coco_id": 15,
+  "v21_id": 100073,
+  "name": "witloof_chicory",
+  "old_ids": [
+   1033
+  ],
+  "old_names": [
+   "witloof-chicory"
+  ]
+ },
+ {
+  "idx": 15,
+  "coco_id": 16,
+  "v21_id": 100076,
+  "name": "artichoke",
+  "old_ids": [
+   1054
+  ],
+  "old_names": [
+   "artichoke"
+  ]
+ },
+ {
+  "idx": 16,
+  "coco_id": 17,
+  "v21_id": 100077,
+  "name": "aubergine_eggplant",
+  "old_ids": [
+   1055
+  ],
+  "old_names": [
+   "eggplant"
+  ]
+ },
+ {
+  "idx": 17,
+  "coco_id": 18,
+  "v21_id": 100078,
+  "name": "avocado",
+  "old_ids": [
+   1056
+  ],
+  "old_names": [
+   "avocado"
+  ]
+ },
+ {
+  "idx": 18,
+  "coco_id": 19,
+  "v21_id": 100080,
+  "name": "french_beans",
+  "old_ids": [
+   1058
+  ],
+  "old_names": [
+   "french-beans"
+  ]
+ },
+ {
+  "idx": 19,
+  "coco_id": 20,
+  "v21_id": 100082,
+  "name": "cucumber_pickled_ch",
+  "old_ids": [
+   1060
+  ],
+  "old_names": [
+   "cucumber-pickled"
+  ]
+ },
+ {
+  "idx": 20,
+  "coco_id": 21,
+  "v21_id": 100083,
+  "name": "cucumber",
+  "old_ids": [
+   1061
+  ],
+  "old_names": [
+   "cucumber"
+  ]
+ },
+ {
+  "idx": 21,
+  "coco_id": 22,
+  "v21_id": 100084,
+  "name": "capers",
+  "old_ids": [
+   1062
+  ],
+  "old_names": [
+   "capers"
+  ]
+ },
+ {
+  "idx": 22,
+  "coco_id": 23,
+  "v21_id": 100086,
+  "name": "pumpkin",
+  "old_ids": [
+   1065
+  ],
+  "old_names": [
+   "pumpkin"
+  ]
+ },
+ {
+  "idx": 23,
+  "coco_id": 24,
+  "v21_id": 100089,
+  "name": "tomato",
+  "old_ids": [
+   1069
+  ],
+  "old_names": [
+   "tomato-raw"
+  ]
+ },
+ {
+  "idx": 24,
+  "coco_id": 25,
+  "v21_id": 100092,
+  "name": "red_radish",
+  "old_ids": [
+   1074
+  ],
+  "old_names": [
+   "red-radish"
+  ]
+ },
+ {
+  "idx": 25,
+  "coco_id": 26,
+  "v21_id": 100093,
+  "name": "beetroot_raw",
+  "old_ids": [
+   1075
+  ],
+  "old_names": [
+   "beetroot-raw"
+  ]
+ },
+ {
+  "idx": 26,
+  "coco_id": 27,
+  "v21_id": 100099,
+  "name": "chinese_cabbage",
+  "old_ids": [
+   1086
+  ],
+  "old_names": [
+   "chinese-cabbage"
+  ]
+ },
+ {
+  "idx": 27,
+  "coco_id": 28,
+  "v21_id": 100101,
+  "name": "sauerkraut",
+  "old_ids": [
+   1093
+  ],
+  "old_names": [
+   "sauerkraut"
+  ]
+ },
+ {
+  "idx": 28,
+  "coco_id": 29,
+  "v21_id": 100102,
+  "name": "white_cabbage",
+  "old_ids": [
+   1094
+  ],
+  "old_names": [
+   "white-cabbage"
+  ]
+ },
+ {
+  "idx": 29,
+  "coco_id": 30,
+  "v21_id": 100104,
+  "name": "peas",
+  "old_ids": [
+   1107
+  ],
+  "old_names": [
+   "peas"
+  ]
+ },
+ {
+  "idx": 30,
+  "coco_id": 31,
+  "v21_id": 100105,
+  "name": "corn",
+  "old_ids": [
+   1108
+  ],
+  "old_names": [
+   "corn"
+  ]
+ },
+ {
+  "idx": 31,
+  "coco_id": 32,
+  "v21_id": 100107,
+  "name": "spring_onion_scallion",
+  "old_ids": [
+   1111
+  ],
+  "old_names": [
+   "spring-onion-scallion"
+  ]
+ },
+ {
+  "idx": 32,
+  "coco_id": 33,
+  "v21_id": 100108,
+  "name": "garlic",
+  "old_ids": [
+   1112
+  ],
+  "old_names": [
+   "garlic"
+  ]
+ },
+ {
+  "idx": 33,
+  "coco_id": 34,
+  "v21_id": 100111,
+  "name": "swiss_chard",
+  "old_ids": [
+   1120
+  ],
+  "old_names": [
+   "swiss-chard"
+  ]
+ },
+ {
+  "idx": 34,
+  "coco_id": 35,
+  "v21_id": 100113,
+  "name": "white_asparagus",
+  "old_ids": [
+   1124
+  ],
+  "old_names": [
+   "white-asparagus"
+  ]
+ },
+ {
+  "idx": 35,
+  "coco_id": 36,
+  "v21_id": 100114,
+  "name": "shoots_n_s",
+  "old_ids": [
+   1125
+  ],
+  "old_names": [
+   "shoots"
+  ]
+ },
+ {
+  "idx": 36,
+  "coco_id": 37,
+  "v21_id": 100115,
+  "name": "alfa_sprouts",
+  "old_ids": [
+   1126
+  ],
+  "old_names": [
+   "alfa-sprouts"
+  ]
+ },
+ {
+  "idx": 37,
+  "coco_id": 38,
+  "v21_id": 100123,
+  "name": "beans_kidney",
+  "old_ids": [
+   1138
+  ],
+  "old_names": [
+   "beans-kidney"
+  ]
+ },
+ {
+  "idx": 38,
+  "coco_id": 39,
+  "v21_id": 100129,
+  "name": "pineapple",
+  "old_ids": [
+   1150
+  ],
+  "old_names": [
+   "pineapple"
+  ]
+ },
+ {
+  "idx": 39,
+  "coco_id": 40,
+  "v21_id": 100130,
+  "name": "apple",
+  "old_ids": [
+   1151
+  ],
+  "old_names": [
+   "apple"
+  ]
+ },
+ {
+  "idx": 40,
+  "coco_id": 41,
+  "v21_id": 100131,
+  "name": "pomegranate",
+  "old_ids": [
+   1152
+  ],
+  "old_names": [
+   "pomegranate"
+  ]
+ },
+ {
+  "idx": 41,
+  "coco_id": 42,
+  "v21_id": 100132,
+  "name": "apricots",
+  "old_ids": [
+   1153
+  ],
+  "old_names": [
+   "apricots"
+  ]
+ },
+ {
+  "idx": 42,
+  "coco_id": 43,
+  "v21_id": 100133,
+  "name": "banana",
+  "old_ids": [
+   1154
+  ],
+  "old_names": [
+   "banana"
+  ]
+ },
+ {
+  "idx": 43,
+  "coco_id": 44,
+  "v21_id": 100135,
+  "name": "berries_n_s",
+  "old_ids": [
+   1156
+  ],
+  "old_names": [
+   "berries"
+  ]
+ },
+ {
+  "idx": 44,
+  "coco_id": 45,
+  "v21_id": 100140,
+  "name": "dates",
+  "old_ids": [
+   1162
+  ],
+  "old_names": [
+   "dates"
+  ]
+ },
+ {
+  "idx": 45,
+  "coco_id": 46,
+  "v21_id": 100141,
+  "name": "strawberries",
+  "old_ids": [
+   1163
+  ],
+  "old_names": [
+   "strawberries"
+  ]
+ },
+ {
+  "idx": 46,
+  "coco_id": 47,
+  "v21_id": 100142,
+  "name": "figs",
+  "old_ids": [
+   1164
+  ],
+  "old_names": [
+   "figs"
+  ]
+ },
+ {
+  "idx": 47,
+  "coco_id": 48,
+  "v21_id": 100143,
+  "name": "grapefruit_pomelo",
+  "old_ids": [
+   1167
+  ],
+  "old_names": [
+   "grapefruit-pomelo"
+  ]
+ },
+ {
+  "idx": 48,
+  "coco_id": 49,
+  "v21_id": 100145,
+  "name": "blueberries",
+  "old_ids": [
+   1169
+  ],
+  "old_names": [
+   "blueberries"
+  ]
+ },
+ {
+  "idx": 49,
+  "coco_id": 50,
+  "v21_id": 100146,
+  "name": "raspberries",
+  "old_ids": [
+   1170
+  ],
+  "old_names": [
+   "raspberries"
+  ]
+ },
+ {
+  "idx": 50,
+  "coco_id": 51,
+  "v21_id": 100150,
+  "name": "kaki",
+  "old_ids": [
+   1174
+  ],
+  "old_names": [
+   "kaki"
+  ]
+ },
+ {
+  "idx": 51,
+  "coco_id": 52,
+  "v21_id": 100151,
+  "name": "cherries",
+  "old_ids": [
+   1175
+  ],
+  "old_names": [
+   "cherries"
+  ]
+ },
+ {
+  "idx": 52,
+  "coco_id": 53,
+  "v21_id": 100152,
+  "name": "kiwi",
+  "old_ids": [
+   1176
+  ],
+  "old_names": [
+   "kiwi"
+  ]
+ },
+ {
+  "idx": 53,
+  "coco_id": 54,
+  "v21_id": 100156,
+  "name": "mandarine",
+  "old_ids": [
+   1180
+  ],
+  "old_names": [
+   "mandarine"
+  ]
+ },
+ {
+  "idx": 54,
+  "coco_id": 55,
+  "v21_id": 100157,
+  "name": "mango",
+  "old_ids": [
+   1181
+  ],
+  "old_names": [
+   "mango"
+  ]
+ },
+ {
+  "idx": 55,
+  "coco_id": 56,
+  "v21_id": 100158,
+  "name": "sugar_melon_galia_honeydew_cantaloupe",
+  "old_ids": [
+   1184
+  ],
+  "old_names": [
+   "sugar-melon"
+  ]
+ },
+ {
+  "idx": 56,
+  "coco_id": 57,
+  "v21_id": 100160,
+  "name": "nectarine",
+  "old_ids": [
+   1186
+  ],
+  "old_names": [
+   "nectarine"
+  ]
+ },
+ {
+  "idx": 57,
+  "coco_id": 58,
+  "v21_id": 100161,
+  "name": "orange",
+  "old_ids": [
+   1187
+  ],
+  "old_names": [
+   "orange"
+  ]
+ },
+ {
+  "idx": 58,
+  "coco_id": 59,
+  "v21_id": 100164,
+  "name": "plums",
+  "old_ids": [
+   1191
+  ],
+  "old_names": [
+   "plums"
+  ]
+ },
+ {
+  "idx": 59,
+  "coco_id": 60,
+  "v21_id": 100171,
+  "name": "grapes",
+  "old_ids": [
+   1198
+  ],
+  "old_names": [
+   "grapes"
+  ]
+ },
+ {
+  "idx": 60,
+  "coco_id": 61,
+  "v21_id": 100172,
+  "name": "raisins_dried",
+  "old_ids": [
+   1199
+  ],
+  "old_names": [
+   "dried-raisins"
+  ]
+ },
+ {
+  "idx": 61,
+  "coco_id": 62,
+  "v21_id": 100173,
+  "name": "lemon",
+  "old_ids": [
+   1200
+  ],
+  "old_names": [
+   "lemon"
+  ]
+ },
+ {
+  "idx": 62,
+  "coco_id": 63,
+  "v21_id": 100174,
+  "name": "damson_plum",
+  "old_ids": [
+   1201
+  ],
+  "old_names": [
+   "damson-plum"
+  ]
+ },
+ {
+  "idx": 63,
+  "coco_id": 64,
+  "v21_id": 100175,
+  "name": "peanut_butter",
+  "old_ids": [
+   1203
+  ],
+  "old_names": [
+   "peanut-butter"
+  ]
+ },
+ {
+  "idx": 64,
+  "coco_id": 65,
+  "v21_id": 100176,
+  "name": "chestnuts_ch",
+  "old_ids": [
+   1204
+  ],
+  "old_names": [
+   "chestnuts"
+  ]
+ },
+ {
+  "idx": 65,
+  "coco_id": 66,
+  "v21_id": 100177,
+  "name": "seeds_n_s",
+  "old_ids": [
+   1205
+  ],
+  "old_names": [
+   "seeds"
+  ]
+ },
+ {
+  "idx": 66,
+  "coco_id": 67,
+  "v21_id": 100178,
+  "name": "pumpkin_seeds",
+  "old_ids": [
+   1206
+  ],
+  "old_names": [
+   "pumpkin-seeds"
+  ]
+ },
+ {
+  "idx": 67,
+  "coco_id": 68,
+  "v21_id": 100179,
+  "name": "pine_nuts",
+  "old_ids": [
+   1207
+  ],
+  "old_names": [
+   "pine-nuts"
+  ]
+ },
+ {
+  "idx": 68,
+  "coco_id": 69,
+  "v21_id": 100180,
+  "name": "sunflower_seeds",
+  "old_ids": [
+   1208
+  ],
+  "old_names": [
+   "sunflower-seeds"
+  ]
+ },
+ {
+  "idx": 69,
+  "coco_id": 70,
+  "v21_id": 100181,
+  "name": "mixed_seeds_n_s",
+  "old_ids": [
+   1209
+  ],
+  "old_names": [
+   "mixed-seeds"
+  ]
+ },
+ {
+  "idx": 70,
+  "coco_id": 71,
+  "v21_id": 100182,
+  "name": "almonds",
+  "old_ids": [
+   1210
+  ],
+  "old_names": [
+   "almonds"
+  ]
+ },
+ {
+  "idx": 71,
+  "coco_id": 72,
+  "v21_id": 100183,
+  "name": "walnut",
+  "old_ids": [
+   1212
+  ],
+  "old_names": [
+   "walnut"
+  ]
+ },
+ {
+  "idx": 72,
+  "coco_id": 73,
+  "v21_id": 100184,
+  "name": "cashew_nut",
+  "old_ids": [
+   1213
+  ],
+  "old_names": [
+   "cashew-nut"
+  ]
+ },
+ {
+  "idx": 73,
+  "coco_id": 74,
+  "v21_id": 100185,
+  "name": "hazelnut",
+  "old_ids": [
+   1215
+  ],
+  "old_names": [
+   "hazelnut"
+  ]
+ },
+ {
+  "idx": 74,
+  "coco_id": 75,
+  "v21_id": 100186,
+  "name": "coconut",
+  "old_ids": [
+   1216
+  ],
+  "old_names": [
+   "coconut"
+  ]
+ },
+ {
+  "idx": 75,
+  "coco_id": 76,
+  "v21_id": 100190,
+  "name": "pistachio",
+  "old_ids": [
+   1221
+  ],
+  "old_names": [
+   "pistachio"
+  ]
+ },
+ {
+  "idx": 76,
+  "coco_id": 77,
+  "v21_id": 100192,
+  "name": "sesame_seeds",
+  "old_ids": [
+   1223
+  ],
+  "old_names": [
+   "sesame-seeds"
+  ]
+ },
+ {
+  "idx": 77,
+  "coco_id": 78,
+  "v21_id": 100195,
+  "name": "green_olives",
+  "old_ids": [
+   1228
+  ],
+  "old_names": [
+   "green-olives"
+  ]
+ },
+ {
+  "idx": 78,
+  "coco_id": 79,
+  "v21_id": 100196,
+  "name": "black_olives",
+  "old_ids": [
+   1229
+  ],
+  "old_names": [
+   "black-olives"
+  ]
+ },
+ {
+  "idx": 79,
+  "coco_id": 80,
+  "v21_id": 100200,
+  "name": "kefir_drink",
+  "old_ids": [
+   1249
+  ],
+  "old_names": [
+   "kefir-drink"
+  ]
+ },
+ {
+  "idx": 80,
+  "coco_id": 81,
+  "v21_id": 100206,
+  "name": "cottage_cheese",
+  "old_ids": [
+   1264
+  ],
+  "old_names": [
+   "cottage-cheese"
+  ]
+ },
+ {
+  "idx": 81,
+  "coco_id": 82,
+  "v21_id": 100224,
+  "name": "emmental_cheese_ch",
+  "old_ids": [
+   1293
+  ],
+  "old_names": [
+   "emmental-cheese"
+  ]
+ },
+ {
+  "idx": 82,
+  "coco_id": 83,
+  "v21_id": 100229,
+  "name": "fresh_cheese_n_s",
+  "old_ids": [
+   1300
+  ],
+  "old_names": [
+   "fresh-cheese"
+  ]
+ },
+ {
+  "idx": 83,
+  "coco_id": 84,
+  "v21_id": 100234,
+  "name": "gruyere_ch",
+  "old_ids": [
+   1307
+  ],
+  "old_names": [
+   "gruyere"
+  ]
+ },
+ {
+  "idx": 84,
+  "coco_id": 85,
+  "v21_id": 100235,
+  "name": "halloumi",
+  "old_ids": [
+   1309
+  ],
+  "old_names": [
+   "halloumi"
+  ]
+ },
+ {
+  "idx": 85,
+  "coco_id": 86,
+  "v21_id": 100243,
+  "name": "mozzarella",
+  "old_ids": [
+   1321
+  ],
+  "old_names": [
+   "mozzarella"
+  ]
+ },
+ {
+  "idx": 86,
+  "coco_id": 87,
+  "v21_id": 100245,
+  "name": "parmesan",
+  "old_ids": [
+   1323
+  ],
+  "old_names": [
+   "parmesan"
+  ]
+ },
+ {
+  "idx": 87,
+  "coco_id": 88,
+  "v21_id": 100249,
+  "name": "cheese_for_raclette_ch",
+  "old_ids": [
+   1327
+  ],
+  "old_names": [
+   "cheese-for-raclette"
+  ]
+ },
+ {
+  "idx": 88,
+  "coco_id": 89,
+  "v21_id": 100250,
+  "name": "cream_cheese_n_s",
+  "old_ids": [
+   1328
+  ],
+  "old_names": [
+   "cream-cheese"
+  ]
+ },
+ {
+  "idx": 89,
+  "coco_id": 90,
+  "v21_id": 100264,
+  "name": "tomme_ch",
+  "old_ids": [
+   1348
+  ],
+  "old_names": [
+   "tomme"
+  ]
+ },
+ {
+  "idx": 90,
+  "coco_id": 91,
+  "v21_id": 100282,
+  "name": "tiramisu",
+  "old_ids": [
+   1371
+  ],
+  "old_names": [
+   "tiramisu"
+  ]
+ },
+ {
+  "idx": 91,
+  "coco_id": 92,
+  "v21_id": 100300,
+  "name": "rice_noodles_vermicelli",
+  "old_ids": [
+   1453
+  ],
+  "old_names": [
+   "rice-noodles-vermicelli"
+  ]
+ },
+ {
+  "idx": 92,
+  "coco_id": 93,
+  "v21_id": 100301,
+  "name": "bulgur",
+  "old_ids": [
+   1454
+  ],
+  "old_names": [
+   "bulgur"
+  ]
+ },
+ {
+  "idx": 93,
+  "coco_id": 94,
+  "v21_id": 100302,
+  "name": "couscous",
+  "old_ids": [
+   1455
+  ],
+  "old_names": [
+   "couscous"
+  ]
+ },
+ {
+  "idx": 94,
+  "coco_id": 95,
+  "v21_id": 100310,
+  "name": "grits_polenta_maize_flour",
+  "old_ids": [
+   1463
+  ],
+  "old_names": [
+   "grits-polenta-maize-flour"
+  ]
+ },
+ {
+  "idx": 95,
+  "coco_id": 96,
+  "v21_id": 100314,
+  "name": "quinoa",
+  "old_ids": [
+   1467
+  ],
+  "old_names": [
+   "quinoa"
+  ]
+ },
+ {
+  "idx": 96,
+  "coco_id": 97,
+  "v21_id": 100315,
+  "name": "rice_wild",
+  "old_ids": [
+   1479
+  ],
+  "old_names": [
+   "rice-wild"
+  ]
+ },
+ {
+  "idx": 97,
+  "coco_id": 98,
+  "v21_id": 100318,
+  "name": "spaetzle",
+  "old_ids": [
+   1482
+  ],
+  "old_names": [
+   "spaetzle"
+  ]
+ },
+ {
+  "idx": 98,
+  "coco_id": 99,
+  "v21_id": 100319,
+  "name": "pasta_n_s",
+  "old_ids": [
+   1483
+  ],
+  "old_names": [
+   "pasta"
+  ]
+ },
+ {
+  "idx": 99,
+  "coco_id": 100,
+  "v21_id": 100321,
+  "name": "pasta_hornli_ch",
+  "old_ids": [
+   1487
+  ],
+  "old_names": [
+   "pasta-hornli"
+  ]
+ },
+ {
+  "idx": 100,
+  "coco_id": 101,
+  "v21_id": 100322,
+  "name": "pasta_in_butterfly_form_farfalle",
+  "old_ids": [
+   1488
+  ],
+  "old_names": [
+   "pasta-in-butterfly-form-farfalle"
+  ]
+ },
+ {
+  "idx": 101,
+  "coco_id": 102,
+  "v21_id": 100324,
+  "name": "pasta_linguini_parpadelle_tagliatelle",
+  "old_ids": [
+   1490
+  ],
+  "old_names": [
+   "pasta-linguini-parpadelle-tagliatelle"
+  ]
+ },
+ {
+  "idx": 102,
+  "coco_id": 103,
+  "v21_id": 100325,
+  "name": "pasta_wholemeal",
+  "old_ids": [
+   1513
+  ],
+  "old_names": [
+   "pasta-wholemeal"
+  ]
+ },
+ {
+  "idx": 103,
+  "coco_id": 104,
+  "v21_id": 100332,
+  "name": "bread_fruit",
+  "old_ids": [
+   1533
+  ],
+  "old_names": [
+   "bread-fruit"
+  ]
+ },
+ {
+  "idx": 104,
+  "coco_id": 105,
+  "v21_id": 100333,
+  "name": "bread_pita",
+  "old_ids": [
+   1547
+  ],
+  "old_names": [
+   "bread-pita"
+  ]
+ },
+ {
+  "idx": 105,
+  "coco_id": 106,
+  "v21_id": 100334,
+  "name": "bread_ticino_ch",
+  "old_ids": [
+   1559
+  ],
+  "old_names": [
+   "bread-ticino"
+  ]
+ },
+ {
+  "idx": 106,
+  "coco_id": 107,
+  "v21_id": 100335,
+  "name": "bread_toast",
+  "old_ids": [
+   1560
+  ],
+  "old_names": [
+   "bread-toast"
+  ]
+ },
+ {
+  "idx": 107,
+  "coco_id": 108,
+  "v21_id": 100337,
+  "name": "brioche",
+  "old_ids": [
+   1568
+  ],
+  "old_names": [
+   "brioche"
+  ]
+ },
+ {
+  "idx": 108,
+  "coco_id": 109,
+  "v21_id": 100338,
+  "name": "roll_of_half_white_or_white_flour_with_large_void",
+  "old_ids": [
+   1569
+  ],
+  "old_names": [
+   "roll-of-half-white-or-white-flour-with-large-void"
+  ]
+ },
+ {
+  "idx": 109,
+  "coco_id": 110,
+  "v21_id": 100346,
+  "name": "roll_with_pieces_of_chocolate",
+  "old_ids": [
+   1580
+  ],
+  "old_names": [
+   "roll-with-pieces-of-chocolate"
+  ]
+ },
+ {
+  "idx": 110,
+  "coco_id": 111,
+  "v21_id": 100348,
+  "name": "white_bread_with_butter_eggs_and_milk",
+  "old_ids": [
+   1584
+  ],
+  "old_names": [
+   "white-bread-with-butter-eggs-and-milk"
+  ]
+ },
+ {
+  "idx": 111,
+  "coco_id": 112,
+  "v21_id": 100349,
+  "name": "focaccia",
+  "old_ids": [
+   1587
+  ],
+  "old_names": [
+   "focaccia"
+  ]
+ },
+ {
+  "idx": 112,
+  "coco_id": 113,
+  "v21_id": 100352,
+  "name": "lye_pretzel_soft",
+  "old_ids": [
+   1595
+  ],
+  "old_names": [
+   "lye-pretzel-soft"
+  ]
+ },
+ {
+  "idx": 113,
+  "coco_id": 114,
+  "v21_id": 100355,
+  "name": "braided_white_loaf_ch",
+  "old_ids": [
+   1607
+  ],
+  "old_names": [
+   "braided-white-loaf"
+  ]
+ },
+ {
+  "idx": 114,
+  "coco_id": 115,
+  "v21_id": 100360,
+  "name": "breadcrumbs_unspiced",
+  "old_ids": [
+   1614
+  ],
+  "old_names": [
+   "breadcrumbs-unspiced"
+  ]
+ },
+ {
+  "idx": 115,
+  "coco_id": 116,
+  "v21_id": 100364,
+  "name": "rusk_wholemeal",
+  "old_ids": [
+   1620
+  ],
+  "old_names": [
+   "rusk-wholemeal"
+  ]
+ },
+ {
+  "idx": 116,
+  "coco_id": 117,
+  "v21_id": 100421,
+  "name": "chicken_breast",
+  "old_ids": [
+   1789
+  ],
+  "old_names": [
+   "chicken-breast"
+  ]
+ },
+ {
+  "idx": 117,
+  "coco_id": 118,
+  "v21_id": 100423,
+  "name": "chicken_leg",
+  "old_ids": [
+   1794
+  ],
+  "old_names": [
+   "chicken-leg"
+  ]
+ },
+ {
+  "idx": 118,
+  "coco_id": 119,
+  "v21_id": 100437,
+  "name": "cervelat_ch",
+  "old_ids": [
+   1835
+  ],
+  "old_names": [
+   "cervelat"
+  ]
+ },
+ {
+  "idx": 119,
+  "coco_id": 120,
+  "v21_id": 100442,
+  "name": "meatloaf_ch",
+  "old_ids": [
+   1845
+  ],
+  "old_names": [
+   "meatloaf"
+  ]
+ },
+ {
+  "idx": 120,
+  "coco_id": 121,
+  "v21_id": 100445,
+  "name": "dried_meat_n_s",
+  "old_ids": [
+   1853
+  ],
+  "old_names": [
+   "dried-meat"
+  ]
+ },
+ {
+  "idx": 121,
+  "coco_id": 122,
+  "v21_id": 100456,
+  "name": "salami_ch",
+  "old_ids": [
+   1879
+  ],
+  "old_names": [
+   "salami"
+  ]
+ },
+ {
+  "idx": 122,
+  "coco_id": 123,
+  "v21_id": 100467,
+  "name": "meat_terrine_pate",
+  "old_ids": [
+   1919
+  ],
+  "old_names": [
+   "meat-terrine-pate"
+  ]
+ },
+ {
+  "idx": 123,
+  "coco_id": 124,
+  "v21_id": 100475,
+  "name": "tofu",
+  "old_ids": [
+   1948
+  ],
+  "old_names": [
+   "tofu"
+  ]
+ },
+ {
+  "idx": 124,
+  "coco_id": 125,
+  "v21_id": 100477,
+  "name": "fish_n_s",
+  "old_ids": [
+   1956
+  ],
+  "old_names": [
+   "fish"
+  ]
+ },
+ {
+  "idx": 125,
+  "coco_id": 126,
+  "v21_id": 100486,
+  "name": "salmon",
+  "old_ids": [
+   1967
+  ],
+  "old_names": [
+   "salmon"
+  ]
+ },
+ {
+  "idx": 126,
+  "coco_id": 127,
+  "v21_id": 100495,
+  "name": "tuna",
+  "old_ids": [
+   1980
+  ],
+  "old_names": [
+   "tuna"
+  ]
+ },
+ {
+  "idx": 127,
+  "coco_id": 128,
+  "v21_id": 100523,
+  "name": "egg",
+  "old_ids": [
+   2022
+  ],
+  "old_names": [
+   "egg"
+  ]
+ },
+ {
+  "idx": 128,
+  "coco_id": 129,
+  "v21_id": 100537,
+  "name": "praline_n_s",
+  "old_ids": [
+   2073
+  ],
+  "old_names": [
+   "praline"
+  ]
+ },
+ {
+  "idx": 129,
+  "coco_id": 130,
+  "v21_id": 100546,
+  "name": "jam",
+  "old_ids": [
+   2099
+  ],
+  "old_names": [
+   "jam"
+  ]
+ },
+ {
+  "idx": 130,
+  "coco_id": 131,
+  "v21_id": 100563,
+  "name": "dark_chocolate",
+  "old_ids": [
+   2131
+  ],
+  "old_names": [
+   "dark-chocolate"
+  ]
+ },
+ {
+  "idx": 131,
+  "coco_id": 132,
+  "v21_id": 100594,
+  "name": "hazelnut_chocolate_spread_nutella_ovomaltine_caotina",
+  "old_ids": [
+   2172
+  ],
+  "old_names": [
+   "hazelnut-chocolate-spread-nutella-ovomaltine-caotina"
+  ]
+ },
+ {
+  "idx": 132,
+  "coco_id": 133,
+  "v21_id": 100607,
+  "name": "chocolate_egg_small",
+  "old_ids": [
+   2194
+  ],
+  "old_names": [
+   "chocolate-egg-small"
+  ]
+ },
+ {
+  "idx": 133,
+  "coco_id": 134,
+  "v21_id": 100645,
+  "name": "brownie",
+  "old_ids": [
+   2254
+  ],
+  "old_names": [
+   "brownie"
+  ]
+ },
+ {
+  "idx": 134,
+  "coco_id": 135,
+  "v21_id": 100649,
+  "name": "cake_lemon",
+  "old_ids": [
+   2262
+  ],
+  "old_names": [
+   "lemon-cake"
+  ]
+ },
+ {
+  "idx": 135,
+  "coco_id": 136,
+  "v21_id": 100652,
+  "name": "crepe_with_flour_plain",
+  "old_ids": [
+   2269
+  ],
+  "old_names": [
+   "crepe-plain"
+  ]
+ },
+ {
+  "idx": 136,
+  "coco_id": 137,
+  "v21_id": 100658,
+  "name": "fruit_tart",
+  "old_ids": [
+   2278
+  ],
+  "old_names": [
+   "fruit-tart"
+  ]
+ },
+ {
+  "idx": 137,
+  "coco_id": 138,
+  "v21_id": 100674,
+  "name": "cake_chocolate",
+  "old_ids": [
+   2303
+  ],
+  "old_names": [
+   "cake-chocolate"
+  ]
+ },
+ {
+  "idx": 138,
+  "coco_id": 139,
+  "v21_id": 100681,
+  "name": "muffin",
+  "old_ids": [
+   2312
+  ],
+  "old_names": [
+   "muffin"
+  ]
+ },
+ {
+  "idx": 139,
+  "coco_id": 140,
+  "v21_id": 100687,
+  "name": "omelette_with_flour_thick_crepe_plain",
+  "old_ids": [
+   2320
+  ],
+  "old_names": [
+   "omelette-plain"
+  ]
+ },
+ {
+  "idx": 140,
+  "coco_id": 141,
+  "v21_id": 100710,
+  "name": "tart_n_s",
+  "old_ids": [
+   2350
+  ],
+  "old_names": [
+   "tart"
+  ]
+ },
+ {
+  "idx": 141,
+  "coco_id": 142,
+  "v21_id": 100719,
+  "name": "croissant_with_chocolate_filling",
+  "old_ids": [
+   2362
+  ],
+  "old_names": [
+   "croissant-with-chocolate-filling"
+  ]
+ },
+ {
+  "idx": 142,
+  "coco_id": 143,
+  "v21_id": 100725,
+  "name": "cookies",
+  "old_ids": [
+   2376
+  ],
+  "old_names": [
+   "cookies"
+  ]
+ },
+ {
+  "idx": 143,
+  "coco_id": 144,
+  "v21_id": 100742,
+  "name": "chocolate_cookies",
+  "old_ids": [
+   2413
+  ],
+  "old_names": [
+   "chocolate-cookies"
+  ]
+ },
+ {
+  "idx": 144,
+  "coco_id": 145,
+  "v21_id": 100752,
+  "name": "smoothie",
+  "old_ids": [
+   2461
+  ],
+  "old_names": [
+   "smoothie"
+  ]
+ },
+ {
+  "idx": 145,
+  "coco_id": 146,
+  "v21_id": 100757,
+  "name": "ice_tea_on_black_tea_basis",
+  "old_ids": [
+   2470
+  ],
+  "old_names": [
+   "ice-tea"
+  ]
+ },
+ {
+  "idx": 146,
+  "coco_id": 147,
+  "v21_id": 100781,
+  "name": "aperitif_with_alcohol_n_s_aperol_spritz",
+  "old_ids": [
+   2585
+  ],
+  "old_names": [
+   "aperitif-with-alcohol-aperol-spritz"
+  ]
+ },
+ {
+  "idx": 147,
+  "coco_id": 148,
+  "v21_id": 100790,
+  "name": "wine_red",
+  "old_ids": [
+   2618
+  ],
+  "old_names": [
+   "wine-red"
+  ]
+ },
+ {
+  "idx": 148,
+  "coco_id": 149,
+  "v21_id": 100826,
+  "name": "sauce_savoury_n_s",
+  "old_ids": [
+   2711
+  ],
+  "old_names": [
+   "sauce-savoury"
+  ]
+ },
+ {
+  "idx": 149,
+  "coco_id": 150,
+  "v21_id": 100834,
+  "name": "ketchup",
+  "old_ids": [
+   2734
+  ],
+  "old_names": [
+   "ketchup"
+  ]
+ },
+ {
+  "idx": 150,
+  "coco_id": 151,
+  "v21_id": 100836,
+  "name": "bolognaise_sauce",
+  "old_ids": [
+   2736
+  ],
+  "old_names": [
+   "bolognaise-sauce"
+  ]
+ },
+ {
+  "idx": 151,
+  "coco_id": 152,
+  "v21_id": 100838,
+  "name": "tomato_sauce",
+  "old_ids": [
+   2738
+  ],
+  "old_names": [
+   "tomato-sauce"
+  ]
+ },
+ {
+  "idx": 152,
+  "coco_id": 153,
+  "v21_id": 100840,
+  "name": "oil_vinegar_salad_dressing",
+  "old_ids": [
+   2747
+  ],
+  "old_names": [
+   "oil-vinegar-salad-dressing"
+  ]
+ },
+ {
+  "idx": 153,
+  "coco_id": 154,
+  "v21_id": 100842,
+  "name": "guacamole",
+  "old_ids": [
+   2749
+  ],
+  "old_names": [
+   "guacamole"
+  ]
+ },
+ {
+  "idx": 154,
+  "coco_id": 155,
+  "v21_id": 100843,
+  "name": "tartar_sauce",
+  "old_ids": [
+   2751
+  ],
+  "old_names": [
+   "tartar-sauce"
+  ]
+ },
+ {
+  "idx": 155,
+  "coco_id": 156,
+  "v21_id": 100844,
+  "name": "tzatziki",
+  "old_ids": [
+   2752
+  ],
+  "old_names": [
+   "tzatziki"
+  ]
+ },
+ {
+  "idx": 156,
+  "coco_id": 157,
+  "v21_id": 100848,
+  "name": "basil",
+  "old_ids": [
+   2760
+  ],
+  "old_names": [
+   "basil"
+  ]
+ },
+ {
+  "idx": 157,
+  "coco_id": 158,
+  "v21_id": 100859,
+  "name": "parsley",
+  "old_ids": [
+   2773
+  ],
+  "old_names": [
+   "parsley"
+  ]
+ },
+ {
+  "idx": 158,
+  "coco_id": 159,
+  "v21_id": 100883,
+  "name": "sauce_soya",
+  "old_ids": [
+   2807
+  ],
+  "old_names": [
+   "sauce-soya"
+  ]
+ },
+ {
+  "idx": 159,
+  "coco_id": 160,
+  "v21_id": 100895,
+  "name": "falafel_balls",
+  "old_ids": [
+   2873
+  ],
+  "old_names": [
+   "falafel-balls"
+  ]
+ },
+ {
+  "idx": 160,
+  "coco_id": 161,
+  "v21_id": 100907,
+  "name": "savoury_pastry_stick",
+  "old_ids": [
+   2895
+  ],
+  "old_names": [
+   "savoury-puff-pastry"
+  ]
+ },
+ {
+  "idx": 161,
+  "coco_id": 162,
+  "v21_id": 100909,
+  "name": "corn_crisps",
+  "old_ids": [
+   2898
+  ],
+  "old_names": [
+   "corn-crisps"
+  ]
+ },
+ {
+  "idx": 162,
+  "coco_id": 163,
+  "v21_id": 100911,
+  "name": "croutons",
+  "old_ids": [
+   2900
+  ],
+  "old_names": [
+   "croutons"
+  ]
+ },
+ {
+  "idx": 163,
+  "coco_id": 164,
+  "v21_id": 100916,
+  "name": "crisps_ch",
+  "old_ids": [
+   2905
+  ],
+  "old_names": [
+   "crisps"
+  ]
+ },
+ {
+  "idx": 164,
+  "coco_id": 165,
+  "v21_id": 100925,
+  "name": "spring_roll_fried",
+  "old_ids": [
+   2918
+  ],
+  "old_names": [
+   "spring-roll-fried"
+  ]
+ },
+ {
+  "idx": 165,
+  "coco_id": 166,
+  "v21_id": 100926,
+  "name": "ham_croissant_ch",
+  "old_ids": [
+   2920
+  ],
+  "old_names": [
+   "ham-croissant"
+  ]
+ },
+ {
+  "idx": 166,
+  "coco_id": 167,
+  "v21_id": 100929,
+  "name": "salt_cake_ch_vegetables_filled",
+  "old_ids": [
+   2923
+  ],
+  "old_names": [
+   "salt-cake-vegetables-filled"
+  ]
+ },
+ {
+  "idx": 167,
+  "coco_id": 168,
+  "v21_id": 100936,
+  "name": "lasagne_meat_prepared",
+  "old_ids": [
+   2934
+  ],
+  "old_names": [
+   "lasagne-meat-prepared"
+  ]
+ },
+ {
+  "idx": 168,
+  "coco_id": 169,
+  "v21_id": 100937,
+  "name": "mashed_potatoes_prepared_with_full_fat_milk_with_butter",
+  "old_ids": [
+   2935
+  ],
+  "old_names": [
+   "mashed-potatoes-prepared-with-full-fat-milk-with-butter"
+  ]
+ },
+ {
+  "idx": 169,
+  "coco_id": 170,
+  "v21_id": 100942,
+  "name": "sushi",
+  "old_ids": [
+   2944
+  ],
+  "old_names": [
+   "sushi"
+  ]
+ },
+ {
+  "idx": 170,
+  "coco_id": 171,
+  "v21_id": 100949,
+  "name": "hummus",
+  "old_ids": [
+   2952
+  ],
+  "old_names": [
+   "hummus"
+  ]
+ },
+ {
+  "idx": 171,
+  "coco_id": 172,
+  "v21_id": 100951,
+  "name": "greek_salad",
+  "old_ids": [
+   2954
+  ],
+  "old_names": [
+   "greek-salad"
+  ]
+ },
+ {
+  "idx": 172,
+  "coco_id": 173,
+  "v21_id": 100957,
+  "name": "chocolate_mousse",
+  "old_ids": [
+   2961
+  ],
+  "old_names": [
+   "chocolate-mousse"
+  ]
+ },
+ {
+  "idx": 173,
+  "coco_id": 174,
+  "v21_id": 100958,
+  "name": "cheesecake",
+  "old_ids": [
+   2962
+  ],
+  "old_names": [
+   "cheesecake"
+  ]
+ },
+ {
+  "idx": 174,
+  "coco_id": 175,
+  "v21_id": 100960,
+  "name": "caprese_salad_tomato_mozzarella",
+  "old_ids": [
+   2964
+  ],
+  "old_names": [
+   "caprese-salad-tomato-mozzarella"
+  ]
+ },
+ {
+  "idx": 175,
+  "coco_id": 176,
+  "v21_id": 100962,
+  "name": "chili_con_carne_prepared",
+  "old_ids": [
+   2966
+  ],
+  "old_names": [
+   "chili-con-carne-prepared"
+  ]
+ },
+ {
+  "idx": 176,
+  "coco_id": 177,
+  "v21_id": 100963,
+  "name": "taboule_prepared_with_couscous",
+  "old_ids": [
+   2967
+  ],
+  "old_names": [
+   "taboule-prepared-with-couscous"
+  ]
+ },
+ {
+  "idx": 177,
+  "coco_id": 178,
+  "v21_id": 100966,
+  "name": "salmon_smoked",
+  "old_ids": [
+   2973
+  ],
+  "old_names": [
+   "salmon-smoked"
+  ]
+ },
+ {
+  "idx": 178,
+  "coco_id": 179,
+  "v21_id": 100974,
+  "name": "glucose_drink_50g",
+  "old_ids": [
+   3080
+  ],
+  "old_names": [
+   "glucose-drink-50g"
+  ]
+ },
+ {
+  "idx": 179,
+  "coco_id": 180,
+  "v21_id": 100978,
+  "name": "chicken_curry_cream_coconut_milk_curry_spices_paste",
+  "old_ids": [
+   3100
+  ],
+  "old_names": [
+   "chicken-curry-cream-coconut-milk-curry-spices-paste"
+  ]
+ },
+ {
+  "idx": 180,
+  "coco_id": 181,
+  "v21_id": 100982,
+  "name": "potatoes_au_gratin_dauphinois_prepared",
+  "old_ids": [
+   3115
+  ],
+  "old_names": [
+   "potatoes-au-gratin-dauphinois-prepared"
+  ]
+ },
+ {
+  "idx": 181,
+  "coco_id": 182,
+  "v21_id": 100992,
+  "name": "birchermuesli_prepared_no_sugar_added",
+  "old_ids": [
+   3220
+  ],
+  "old_names": [
+   "birchermuesli-prepared-no-sugar-added"
+  ]
+ },
+ {
+  "idx": 182,
+  "coco_id": 183,
+  "v21_id": 100993,
+  "name": "fajita_bread_only",
+  "old_ids": [
+   3221
+  ],
+  "old_names": [
+   "fajita-bread-only"
+  ]
+ },
+ {
+  "idx": 183,
+  "coco_id": 184,
+  "v21_id": 101006,
+  "name": "butter_spread_puree_almond",
+  "old_ids": [
+   3249
+  ],
+  "old_names": [
+   "butter-spread-puree-almond"
+  ]
+ },
+ {
+  "idx": 184,
+  "coco_id": 185,
+  "v21_id": 101009,
+  "name": "water_with_lemon_juice",
+  "old_ids": [
+   3262
+  ],
+  "old_names": [
+   "water-with-lemon-juice"
+  ]
+ },
+ {
+  "idx": 185,
+  "coco_id": 186,
+  "v21_id": 101012,
+  "name": "sun_dried_tomatoe",
+  "old_ids": [
+   3293
+  ],
+  "old_names": [
+   "sun-dried-tomatoe"
+  ]
+ },
+ {
+  "idx": 186,
+  "coco_id": 187,
+  "v21_id": 101014,
+  "name": "fruit_coulis",
+  "old_ids": [
+   3308
+  ],
+  "old_names": [
+   "fruit-coulis"
+  ]
+ },
+ {
+  "idx": 187,
+  "coco_id": 188,
+  "v21_id": 101022,
+  "name": "soup_of_lentils_dahl_dhal",
+  "old_ids": [
+   3358
+  ],
+  "old_names": [
+   "soup-of-lentils-dahl-dhal"
+  ]
+ },
+ {
+  "idx": 188,
+  "coco_id": 189,
+  "v21_id": 101027,
+  "name": "lasagne_vegetable_prepared",
+  "old_ids": [
+   3415
+  ],
+  "old_names": [
+   "lasagne-vegetable-prepared"
+  ]
+ },
+ {
+  "idx": 189,
+  "coco_id": 190,
+  "v21_id": 101029,
+  "name": "french_pizza_from_alsace_baked",
+  "old_ids": [
+   3417
+  ],
+  "old_names": [
+   "french-pizza-from-alsace-baked"
+  ]
+ },
+ {
+  "idx": 190,
+  "coco_id": 191,
+  "v21_id": 101032,
+  "name": "vegetable_au_gratin_baked",
+  "old_ids": [
+   3532
+  ],
+  "old_names": [
+   "vegetable-au-gratin-baked"
+  ]
+ },
+ {
+  "idx": 191,
+  "coco_id": 192,
+  "v21_id": 101038,
+  "name": "porridge_prepared_with_partially_skimmed_milk",
+  "old_ids": [
+   3615
+  ],
+  "old_names": [
+   "porridge-prepared-with-partially-skimmed-milk"
+  ]
+ },
+ {
+  "idx": 192,
+  "coco_id": 193,
+  "v21_id": 101043,
+  "name": "curry_vegetarian",
+  "old_ids": [
+   3630
+  ],
+  "old_names": [
+   "curry-vegetarian"
+  ]
+ },
+ {
+  "idx": 193,
+  "coco_id": 194,
+  "v21_id": 101077,
+  "name": "banana_cake",
+  "old_ids": [
+   5748
+  ],
+  "old_names": [
+   "banana-cake"
+  ]
+ },
+ {
+  "idx": 194,
+  "coco_id": 195,
+  "v21_id": 101114,
+  "name": "cappuccino",
+  "old_ids": [
+   2501
+  ],
+  "old_names": [
+   "cappuccino"
+  ]
+ },
+ {
+  "idx": 195,
+  "coco_id": 196,
+  "v21_id": 101118,
+  "name": "pearl_onion",
+  "old_ids": [
+   1115
+  ],
+  "old_names": [
+   "pearl-onions"
+  ]
+ },
+ {
+  "idx": 196,
+  "coco_id": 197,
+  "v21_id": 101121,
+  "name": "nuts",
+  "old_ids": [
+   1211,
+   1220
+  ],
+  "old_names": [
+   "nuts",
+   "mixed-nuts"
+  ]
+ },
+ {
+  "idx": 197,
+  "coco_id": 198,
+  "v21_id": 101123,
+  "name": "bouillon",
+  "old_ids": [
+   2855,
+   2859
+  ],
+  "old_names": [
+   "bouillon",
+   "bouillon-vegetable"
+  ]
+ },
+ {
+  "idx": 198,
+  "coco_id": 199,
+  "v21_id": 101126,
+  "name": "ham_raw",
+  "old_ids": [
+   1893
+  ],
+  "old_names": [
+   "ham-raw"
+  ]
+ },
+ {
+  "idx": 199,
+  "coco_id": 200,
+  "v21_id": 101129,
+  "name": "water",
+  "old_ids": [
+   2578,
+   2580
+  ],
+  "old_names": [
+   "water",
+   "water-mineral"
+  ]
+ },
+ {
+  "idx": 200,
+  "coco_id": 201,
+  "v21_id": 101135,
+  "name": "risotto",
+  "old_ids": [
+   752,
+   2970
+  ],
+  "old_names": [
+   "risotto-with-mushrooms-cooked",
+   "risotto-without-cheese-cooked"
+  ]
+ },
+ {
+  "idx": 201,
+  "coco_id": 202,
+  "v21_id": 101138,
+  "name": "asparagus",
+  "old_ids": [
+   1123
+  ],
+  "old_names": [
+   "green-asparagus"
+  ]
+ },
+ {
+  "idx": 202,
+  "coco_id": 203,
+  "v21_id": 101141,
+  "name": "potato_salad",
+  "old_ids": [
+   780
+  ],
+  "old_names": [
+   "potato-salad-with-mayonnaise-yogurt-dressing"
+  ]
+ },
+ {
+  "idx": 203,
+  "coco_id": 204,
+  "v21_id": 101144,
+  "name": "mixed_vegetables",
+  "old_ids": [
+   1021,
+   1022
+  ],
+  "old_names": [
+   "vegetables",
+   "mixed-vegetables"
+  ]
+ },
+ {
+  "idx": 204,
+  "coco_id": 205,
+  "v21_id": 101147,
+  "name": "sweet_corn",
+  "old_ids": [
+   483
+  ],
+  "old_names": [
+   "sweet-corn-canned"
+  ]
+ },
+ {
+  "idx": 205,
+  "coco_id": 206,
+  "v21_id": 101148,
+  "name": "potato",
+  "old_ids": [
+   1010
+  ],
+  "old_names": [
+   "potatoes-steamed"
+  ]
+ },
+ {
+  "idx": 206,
+  "coco_id": 207,
+  "v21_id": 101149,
+  "name": "baked_potato",
+  "old_ids": [
+   10626
+  ],
+  "old_names": [
+   "baked-potato"
+  ]
+ },
+ {
+  "idx": 207,
+  "coco_id": 208,
+  "v21_id": 101150,
+  "name": "fruit_mixed",
+  "old_ids": [
+   1166
+  ],
+  "old_names": [
+   "fruit-salad"
+  ]
+ },
+ {
+  "idx": 208,
+  "coco_id": 209,
+  "v21_id": 101153,
+  "name": "latte_macchiato",
+  "old_ids": [
+   2518
+  ],
+  "old_names": [
+   "latte-macchiato-with-caffeine"
+  ]
+ },
+ {
+  "idx": 209,
+  "coco_id": 210,
+  "v21_id": 101156,
+  "name": "egg_scrambled",
+  "old_ids": [
+   3042
+  ],
+  "old_names": [
+   "egg-scrambled-prepared"
+  ]
+ },
+ {
+  "idx": 210,
+  "coco_id": 211,
+  "v21_id": 101159,
+  "name": "croissant",
+  "old_ids": [
+   1588
+  ],
+  "old_names": [
+   "croissant"
+  ]
+ },
+ {
+  "idx": 211,
+  "coco_id": 212,
+  "v21_id": 101164,
+  "name": "wine_rose",
+  "old_ids": [
+   2616
+  ],
+  "old_names": [
+   "wine-rose"
+  ]
+ },
+ {
+  "idx": 212,
+  "coco_id": 213,
+  "v21_id": 101165,
+  "name": "wine_white",
+  "old_ids": [
+   2620
+  ],
+  "old_names": [
+   "wine-white"
+  ]
+ },
+ {
+  "idx": 213,
+  "coco_id": 214,
+  "v21_id": 101166,
+  "name": "tea",
+  "old_ids": [
+   2498,
+   2530,
+   2534,
+   2543,
+   2546,
+   2548,
+   2553,
+   2555,
+   2562,
+   2563
+  ],
+  "old_names": [
+   "tea",
+   "tea-green",
+   "tea-black",
+   "tea-verveine",
+   "tea-fruit",
+   "tea-spice",
+   "tea-ginger",
+   "herbal-tea",
+   "tea-peppermint",
+   "tea-rooibos"
+  ]
+ },
+ {
+  "idx": 214,
+  "coco_id": 215,
+  "v21_id": 101168,
+  "name": "pizza_with_vegetables_baked",
+  "old_ids": [
+   633
+  ],
+  "old_names": [
+   "pizza-with-vegetables-baked"
+  ]
+ },
+ {
+  "idx": 215,
+  "coco_id": 216,
+  "v21_id": 101170,
+  "name": "pizza_with_ham_with_mushrooms_baked",
+  "old_ids": [
+   629
+  ],
+  "old_names": [
+   "pizza-with-ham-with-mushrooms-baked"
+  ]
+ },
+ {
+  "idx": 216,
+  "coco_id": 217,
+  "v21_id": 101172,
+  "name": "pizza_margherita_baked",
+  "old_ids": [
+   2939
+  ],
+  "old_names": [
+   "pizza-margherita-baked"
+  ]
+ },
+ {
+  "idx": 217,
+  "coco_id": 218,
+  "v21_id": 101173,
+  "name": "pizza_with_ham_baked",
+  "old_ids": [
+   630
+  ],
+  "old_names": [
+   "pizza-with-ham-baked"
+  ]
+ },
+ {
+  "idx": 218,
+  "coco_id": 219,
+  "v21_id": 101176,
+  "name": "hamburger",
+  "old_ids": [
+   1849,
+   2930
+  ],
+  "old_names": [
+   "hamburger",
+   "hamburger-bread-meat-ketchup"
+  ]
+ },
+ {
+  "idx": 219,
+  "coco_id": 220,
+  "v21_id": 101177,
+  "name": "veggie_burger",
+  "old_ids": [
+   1942,
+   3739
+  ],
+  "old_names": [
+   "veggie-burger",
+   "bread-meat-substitute-lettuce-sauce"
+  ]
+ },
+ {
+  "idx": 220,
+  "coco_id": 221,
+  "v21_id": 101178,
+  "name": "coffee",
+  "old_ids": [
+   2512,
+   2513
+  ],
+  "old_names": [
+   "coffee-with-caffeine",
+   "coffee-decaffeinated"
+  ]
+ },
+ {
+  "idx": 221,
+  "coco_id": 222,
+  "v21_id": 101180,
+  "name": "white_coffee",
+  "old_ids": [
+   2521
+  ],
+  "old_names": [
+   "white-coffee-with-caffeine"
+  ]
+ },
+ {
+  "idx": 222,
+  "coco_id": 223,
+  "v21_id": 101181,
+  "name": "ristretto_with_caffeine",
+  "old_ids": [
+   2524
+  ],
+  "old_names": [
+   "ristretto-with-caffeine"
+  ]
+ },
+ {
+  "idx": 223,
+  "coco_id": 224,
+  "v21_id": 101182,
+  "name": "espresso",
+  "old_ids": [
+   2504
+  ],
+  "old_names": [
+   "espresso-with-caffeine"
+  ]
+ },
+ {
+  "idx": 224,
+  "coco_id": 225,
+  "v21_id": 101183,
+  "name": "broccoli",
+  "old_ids": [
+   1085
+  ],
+  "old_names": [
+   "broccoli"
+  ]
+ },
+ {
+  "idx": 225,
+  "coco_id": 226,
+  "v21_id": 101185,
+  "name": "pancake",
+  "old_ids": [
+   2949
+  ],
+  "old_names": [
+   "pancakes"
+  ]
+ },
+ {
+  "idx": 226,
+  "coco_id": 227,
+  "v21_id": 101187,
+  "name": "peanut",
+  "old_ids": [
+   1214
+  ],
+  "old_names": [
+   "peanut"
+  ]
+ },
+ {
+  "idx": 227,
+  "coco_id": 228,
+  "v21_id": 101188,
+  "name": "carrot",
+  "old_ids": [
+   143,
+   1078
+  ],
+  "old_names": [
+   "carrot-steamed-without-addition-of-salt",
+   "carrot-raw"
+  ]
+ },
+ {
+  "idx": 228,
+  "coco_id": 229,
+  "v21_id": 101189,
+  "name": "cordon_bleu",
+  "old_ids": [
+   2932
+  ],
+  "old_names": [
+   "cordon-bleu-from-pork-schnitzel-fried"
+  ]
+ },
+ {
+  "idx": 229,
+  "coco_id": 230,
+  "v21_id": 101190,
+  "name": "feta",
+  "old_ids": [
+   1294
+  ],
+  "old_names": [
+   "feta"
+  ]
+ },
+ {
+  "idx": 230,
+  "coco_id": 231,
+  "v21_id": 101193,
+  "name": "zucchini",
+  "old_ids": [
+   232,
+   1070
+  ],
+  "old_names": [
+   "zucchini-stewed-without-addition-of-fat-without-addition-of-salt",
+   "zucchini"
+  ]
+ },
+ {
+  "idx": 231,
+  "coco_id": 232,
+  "v21_id": 101194,
+  "name": "butter",
+  "old_ids": [
+   2053
+  ],
+  "old_names": [
+   "butter"
+  ]
+ },
+ {
+  "idx": 232,
+  "coco_id": 233,
+  "v21_id": 101196,
+  "name": "rice_whole_grain",
+  "old_ids": [
+   1478
+  ],
+  "old_names": [
+   "rice-whole-grain"
+  ]
+ },
+ {
+  "idx": 233,
+  "coco_id": 234,
+  "v21_id": 101197,
+  "name": "rice",
+  "old_ids": [
+   1468,
+   1469,
+   1471
+  ],
+  "old_names": [
+   "rice",
+   "rice-basmati",
+   "rice-jasmin"
+  ]
+ },
+ {
+  "idx": 234,
+  "coco_id": 235,
+  "v21_id": 101199,
+  "name": "spinach",
+  "old_ids": [
+   281
+  ],
+  "old_names": [
+   "spinach-steamed-without-addition-of-salt"
+  ]
+ },
+ {
+  "idx": 235,
+  "coco_id": 236,
+  "v21_id": 101200,
+  "name": "spinach_raw",
+  "old_ids": [
+   282
+  ],
+  "old_names": [
+   "spinach-raw"
+  ]
+ },
+ {
+  "idx": 236,
+  "coco_id": 237,
+  "v21_id": 101201,
+  "name": "biscuit",
+  "old_ids": [
+   2388,
+   2408
+  ],
+  "old_names": [
+   "biscuits",
+   "biscuit-with-butter"
+  ]
+ },
+ {
+  "idx": 237,
+  "coco_id": 238,
+  "v21_id": 101208,
+  "name": "salad_leaf_salad_green",
+  "old_ids": [
+   1040
+  ],
+  "old_names": [
+   "salad-leaf-salad-green"
+  ]
+ },
+ {
+  "idx": 238,
+  "coco_id": 239,
+  "v21_id": 101209,
+  "name": "salad_rocket",
+  "old_ids": [
+   1038
+  ],
+  "old_names": [
+   "salad-rocket"
+  ]
+ },
+ {
+  "idx": 239,
+  "coco_id": 240,
+  "v21_id": 101210,
+  "name": "salad_lambs_ear",
+  "old_ids": [
+   1050
+  ],
+  "old_names": [
+   "salad-lambs-ear"
+  ]
+ },
+ {
+  "idx": 240,
+  "coco_id": 241,
+  "v21_id": 101212,
+  "name": "balsamic_salad_dressing",
+  "old_ids": [
+   2742
+  ],
+  "old_names": [
+   "balsamic-salad-dressing"
+  ]
+ },
+ {
+  "idx": 241,
+  "coco_id": 242,
+  "v21_id": 101213,
+  "name": "salad_dressing",
+  "old_ids": [
+   2741,
+   2744
+  ],
+  "old_names": [
+   "salad-dressing",
+   "italian-salad-dressing"
+  ]
+ },
+ {
+  "idx": 242,
+  "coco_id": 243,
+  "v21_id": 101214,
+  "name": "french_salad_dressing",
+  "old_ids": [
+   2743
+  ],
+  "old_names": [
+   "french-salad-dressing"
+  ]
+ },
+ {
+  "idx": 243,
+  "coco_id": 244,
+  "v21_id": 101215,
+  "name": "quiche",
+  "old_ids": [
+   732,
+   733
+  ],
+  "old_names": [
+   "quiche-with-cheese-baked-with-puff-pastry",
+   "quiche-with-spinach-baked-with-cake-dough"
+  ]
+ },
+ {
+  "idx": 244,
+  "coco_id": 245,
+  "v21_id": 101218,
+  "name": "juice",
+  "old_ids": [
+   2452
+  ],
+  "old_names": [
+   "juice-multifruit"
+  ]
+ },
+ {
+  "idx": 245,
+  "coco_id": 246,
+  "v21_id": 101219,
+  "name": "juice_apple",
+  "old_ids": [
+   2446
+  ],
+  "old_names": [
+   "juice-apple"
+  ]
+ },
+ {
+  "idx": 246,
+  "coco_id": 247,
+  "v21_id": 101220,
+  "name": "juice_orange",
+  "old_ids": [
+   2454
+  ],
+  "old_names": [
+   "juice-orange"
+  ]
+ },
+ {
+  "idx": 247,
+  "coco_id": 248,
+  "v21_id": 101228,
+  "name": "pie_apricot",
+  "old_ids": [
+   2990
+  ],
+  "old_names": [
+   "pie-apricot-baked-with-cake-dough"
+  ]
+ },
+ {
+  "idx": 248,
+  "coco_id": 249,
+  "v21_id": 101229,
+  "name": "pie_plum_baked_with_cake_dough",
+  "old_ids": [
+   3101
+  ],
+  "old_names": [
+   "pie-plum-baked-with-cake-dough"
+  ]
+ },
+ {
+  "idx": 249,
+  "coco_id": 250,
+  "v21_id": 101231,
+  "name": "apple_pie",
+  "old_ids": [
+   2237
+  ],
+  "old_names": [
+   "apple-pie"
+  ]
+ },
+ {
+  "idx": 250,
+  "coco_id": 251,
+  "v21_id": 101236,
+  "name": "mushroom",
+  "old_ids": [
+   158,
+   1098,
+   1102
+  ],
+  "old_names": [
+   "mushroom-average-stewed-without-addition-of-fat-without-addition-of-salt",
+   "mushroom",
+   "mushrooms"
+  ]
+ },
+ {
+  "idx": 251,
+  "coco_id": 252,
+  "v21_id": 101237,
+  "name": "mixed_milk_beverage",
+  "old_ids": [
+   1237,
+   1256,
+   3046
+  ],
+  "old_names": [
+   "milk",
+   "soya-drink-soy-milk",
+   "oat-milk"
+  ]
+ },
+ {
+  "idx": 252,
+  "coco_id": 253,
+  "v21_id": 101238,
+  "name": "chocolate_milk",
+  "old_ids": [
+   2132
+  ],
+  "old_names": [
+   "milk-chocolate"
+  ]
+ },
+ {
+  "idx": 253,
+  "coco_id": 254,
+  "v21_id": 101240,
+  "name": "chocolate_n_s",
+  "old_ids": [
+   2134
+  ],
+  "old_names": [
+   "chocolate"
+  ]
+ },
+ {
+  "idx": 254,
+  "coco_id": 255,
+  "v21_id": 101243,
+  "name": "bread",
+  "old_ids": [
+   1520,
+   1522,
+   1523,
+   1528,
+   1536,
+   1545,
+   1546,
+   1556
+  ],
+  "old_names": [
+   "bread-french-white-flour",
+   "bread",
+   "bread-5-grain",
+   "bread-spelt",
+   "bread-half-white",
+   "bread-nut",
+   "bread-olive",
+   "bread-sourdough"
+  ]
+ },
+ {
+  "idx": 255,
+  "coco_id": 256,
+  "v21_id": 101244,
+  "name": "bread_rye",
+  "old_ids": [
+   1551
+  ],
+  "old_names": [
+   "bread-rye"
+  ]
+ },
+ {
+  "idx": 256,
+  "coco_id": 257,
+  "v21_id": 101246,
+  "name": "bread_wholemeal",
+  "old_ids": [
+   1565
+  ],
+  "old_names": [
+   "bread-wholemeal"
+  ]
+ },
+ {
+  "idx": 257,
+  "coco_id": 258,
+  "v21_id": 101247,
+  "name": "crisp_bread",
+  "old_ids": [
+   1612
+  ],
+  "old_names": [
+   "crisp-bread-wasa"
+  ]
+ },
+ {
+  "idx": 258,
+  "coco_id": 259,
+  "v21_id": 101248,
+  "name": "bread_grain",
+  "old_ids": [
+   1538
+  ],
+  "old_names": [
+   "bread-grain"
+  ]
+ },
+ {
+  "idx": 259,
+  "coco_id": 260,
+  "v21_id": 101249,
+  "name": "gluten_free_bread",
+  "old_ids": [
+   3306
+  ],
+  "old_names": [
+   "gluten-free-bread"
+  ]
+ },
+ {
+  "idx": 260,
+  "coco_id": 261,
+  "v21_id": 101254,
+  "name": "bread_whole_wheat",
+  "old_ids": [
+   1554
+  ],
+  "old_names": [
+   "bread-whole-wheat"
+  ]
+ },
+ {
+  "idx": 261,
+  "coco_id": 262,
+  "v21_id": 101255,
+  "name": "bread_white",
+  "old_ids": [
+   1566
+  ],
+  "old_names": [
+   "bread-white"
+  ]
+ },
+ {
+  "idx": 262,
+  "coco_id": 263,
+  "v21_id": 101256,
+  "name": "bread_black",
+  "old_ids": [
+   1557
+  ],
+  "old_names": [
+   "bread-black"
+  ]
+ },
+ {
+  "idx": 263,
+  "coco_id": 264,
+  "v21_id": 101257,
+  "name": "bread_wholemeal_toast",
+  "old_ids": [
+   1561
+  ],
+  "old_names": [
+   "bread-wholemeal-toast"
+  ]
+ },
+ {
+  "idx": 264,
+  "coco_id": 265,
+  "v21_id": 101258,
+  "name": "pasta_penne",
+  "old_ids": [
+   1496
+  ],
+  "old_names": [
+   "pasta-penne"
+  ]
+ },
+ {
+  "idx": 265,
+  "coco_id": 266,
+  "v21_id": 101260,
+  "name": "pasta_spaghetti",
+  "old_ids": [
+   1505
+  ],
+  "old_names": [
+   "pasta-spaghetti"
+  ]
+ },
+ {
+  "idx": 266,
+  "coco_id": 267,
+  "v21_id": 101262,
+  "name": "pasta_twist",
+  "old_ids": [
+   1506
+  ],
+  "old_names": [
+   "pasta-twist"
+  ]
+ },
+ {
+  "idx": 267,
+  "coco_id": 268,
+  "v21_id": 101265,
+  "name": "pasta_noodles",
+  "old_ids": [
+   1494
+  ],
+  "old_names": [
+   "pasta-noodles"
+  ]
+ },
+ {
+  "idx": 268,
+  "coco_id": 269,
+  "v21_id": 101266,
+  "name": "pasta_in_conch_form",
+  "old_ids": [
+   1492
+  ],
+  "old_names": [
+   "pasta-in-conch-form"
+  ]
+ },
+ {
+  "idx": 269,
+  "coco_id": 270,
+  "v21_id": 101268,
+  "name": "sauce",
+  "old_ids": [
+   2714
+  ],
+  "old_names": [
+   "sauce-roast"
+  ]
+ },
+ {
+  "idx": 270,
+  "coco_id": 271,
+  "v21_id": 101271,
+  "name": "sauce_cocktail",
+  "old_ids": [
+   2718
+  ],
+  "old_names": [
+   "sauce-cocktail"
+  ]
+ },
+ {
+  "idx": 271,
+  "coco_id": 272,
+  "v21_id": 101272,
+  "name": "sauce_pesto",
+  "old_ids": [
+   2728
+  ],
+  "old_names": [
+   "sauce-pesto"
+  ]
+ },
+ {
+  "idx": 272,
+  "coco_id": 273,
+  "v21_id": 101273,
+  "name": "sauce_mushroom",
+  "old_ids": [
+   2729
+  ],
+  "old_names": [
+   "sauce-mushroom"
+  ]
+ },
+ {
+  "idx": 273,
+  "coco_id": 274,
+  "v21_id": 101274,
+  "name": "sauce_curry",
+  "old_ids": [
+   2719
+  ],
+  "old_names": [
+   "sauce-curry"
+  ]
+ },
+ {
+  "idx": 274,
+  "coco_id": 275,
+  "v21_id": 101275,
+  "name": "sauce_cream",
+  "old_ids": [
+   2730
+  ],
+  "old_names": [
+   "sauce-cream"
+  ]
+ },
+ {
+  "idx": 275,
+  "coco_id": 276,
+  "v21_id": 101279,
+  "name": "shrimp_prawn",
+  "old_ids": [
+   259,
+   1985,
+   1986
+  ],
+  "old_names": [
+   "shrimp-boiled",
+   "shrimp-prawn-small",
+   "shrimp-prawn-large"
+  ]
+ },
+ {
+  "idx": 276,
+  "coco_id": 277,
+  "v21_id": 101282,
+  "name": "lentil_n_s",
+  "old_ids": [
+   1144
+  ],
+  "old_names": [
+   "lentils"
+  ]
+ },
+ {
+  "idx": 277,
+  "coco_id": 278,
+  "v21_id": 101283,
+  "name": "lentils_green_du_puy_du_berry",
+  "old_ids": [
+   3230
+  ],
+  "old_names": [
+   "lentils-green-du-puy-du-berry"
+  ]
+ },
+ {
+  "idx": 278,
+  "coco_id": 279,
+  "v21_id": 101284,
+  "name": "mayonnaise",
+  "old_ids": [
+   2750
+  ],
+  "old_names": [
+   "mayonnaise"
+  ]
+ },
+ {
+  "idx": 279,
+  "coco_id": 280,
+  "v21_id": 101285,
+  "name": "onion",
+  "old_ids": [
+   1116
+  ],
+  "old_names": [
+   "onion"
+  ]
+ },
+ {
+  "idx": 280,
+  "coco_id": 281,
+  "v21_id": 101290,
+  "name": "cola_based_drink",
+  "old_ids": [
+   2467,
+   2468
+  ],
+  "old_names": [
+   "coca-cola",
+   "coca-cola-zero"
+  ]
+ },
+ {
+  "idx": 281,
+  "coco_id": 282,
+  "v21_id": 101291,
+  "name": "bacon",
+  "old_ids": [
+   1914,
+   1915,
+   1916,
+   1917
+  ],
+  "old_names": [
+   "bacon",
+   "bacon-frying",
+   "bacon-cooking",
+   "bacon-raw"
+  ]
+ },
+ {
+  "idx": 282,
+  "coco_id": 283,
+  "v21_id": 101292,
+  "name": "beef_n_s",
+  "old_ids": [
+   1724,
+   1725,
+   1727,
+   1728,
+   1730,
+   1731
+  ],
+  "old_names": [
+   "beef",
+   "beef-roast",
+   "beef-sirloin-steak",
+   "beef-filet",
+   "beef-minced-only-meat",
+   "beef-cut-into-stripes-only-meat"
+  ]
+ },
+ {
+  "idx": 283,
+  "coco_id": 284,
+  "v21_id": 101294,
+  "name": "bell_pepper_red_raw",
+  "old_ids": [
+   1068
+  ],
+  "old_names": [
+   "bell-pepper-red-raw"
+  ]
+ },
+ {
+  "idx": 284,
+  "coco_id": 285,
+  "v21_id": 101295,
+  "name": "bell_pepper_red_stewed",
+  "old_ids": [
+   656
+  ],
+  "old_names": [
+   "bell-pepper-red-stewed-without-addition-of-fat-without-addition-of-salt"
+  ]
+ },
+ {
+  "idx": 285,
+  "coco_id": 286,
+  "v21_id": 101296,
+  "name": "honey",
+  "old_ids": [
+   2103
+  ],
+  "old_names": [
+   "honey"
+  ]
+ },
+ {
+  "idx": 286,
+  "coco_id": 287,
+  "v21_id": 101297,
+  "name": "beer",
+  "old_ids": [
+   2634,
+   2636
+  ],
+  "old_names": [
+   "beer",
+   "light-beer"
+  ]
+ },
+ {
+  "idx": 287,
+  "coco_id": 288,
+  "v21_id": 101298,
+  "name": "brussel_sprouts",
+  "old_ids": [
+   1091
+  ],
+  "old_names": [
+   "brussel-sprouts"
+  ]
+ },
+ {
+  "idx": 288,
+  "coco_id": 289,
+  "v21_id": 101302,
+  "name": "cheese_n_s",
+  "old_ids": [
+   1311
+  ],
+  "old_names": [
+   "cheese"
+  ]
+ },
+ {
+  "idx": 289,
+  "coco_id": 290,
+  "v21_id": 101303,
+  "name": "blue_mould_cheese",
+  "old_ids": [
+   1280
+  ],
+  "old_names": [
+   "blue-mould-cheese"
+  ]
+ },
+ {
+  "idx": 290,
+  "coco_id": 291,
+  "v21_id": 101304,
+  "name": "semi_hard_cheese",
+  "old_ids": [
+   1308
+  ],
+  "old_names": [
+   "semi-hard-cheese"
+  ]
+ },
+ {
+  "idx": 291,
+  "coco_id": 292,
+  "v21_id": 101305,
+  "name": "hard_cheese",
+  "old_ids": [
+   1310
+  ],
+  "old_names": [
+   "hard-cheese"
+  ]
+ },
+ {
+  "idx": 292,
+  "coco_id": 293,
+  "v21_id": 101306,
+  "name": "soft_cheese",
+  "old_ids": [
+   1352
+  ],
+  "old_names": [
+   "soft-cheese"
+  ]
+ },
+ {
+  "idx": 293,
+  "coco_id": 294,
+  "v21_id": 101307,
+  "name": "goat_cheese_soft",
+  "old_ids": [
+   6404
+  ],
+  "old_names": [
+   "goat-cheese-soft"
+  ]
+ },
+ {
+  "idx": 294,
+  "coco_id": 295,
+  "v21_id": 101308,
+  "name": "chicken",
+  "old_ids": [
+   1788
+  ],
+  "old_names": [
+   "chicken"
+  ]
+ },
+ {
+  "idx": 295,
+  "coco_id": 296,
+  "v21_id": 101309,
+  "name": "chicken_cut_into_stripes_only_meat",
+  "old_ids": [
+   1793
+  ],
+  "old_names": [
+   "chicken-cut-into-stripes-only-meat"
+  ]
+ },
+ {
+  "idx": 296,
+  "coco_id": 297,
+  "v21_id": 101310,
+  "name": "nuggets",
+  "old_ids": [
+   1837
+  ],
+  "old_names": [
+   "chicken-nuggets"
+  ]
+ },
+ {
+  "idx": 297,
+  "coco_id": 298,
+  "v21_id": 101311,
+  "name": "chickpeas",
+  "old_ids": [
+   1143
+  ],
+  "old_names": [
+   "chickpeas"
+  ]
+ },
+ {
+  "idx": 298,
+  "coco_id": 299,
+  "v21_id": 101314,
+  "name": "soup",
+  "old_ids": [
+   2836,
+   2837,
+   2840,
+   2852
+  ],
+  "old_names": [
+   "soup-vegetable",
+   "soup-cream-of-vegetables",
+   "soup-potato",
+   "soup-tomato"
+  ]
+ },
+ {
+  "idx": 299,
+  "coco_id": 300,
+  "v21_id": 101317,
+  "name": "soup_pumpkin",
+  "old_ids": [
+   2841
+  ],
+  "old_names": [
+   "soup-pumpkin"
+  ]
+ },
+ {
+  "idx": 300,
+  "coco_id": 301,
+  "v21_id": 101322,
+  "name": "cauliflower",
+  "old_ids": [
+   1084
+  ],
+  "old_names": [
+   "cauliflower"
+  ]
+ },
+ {
+  "idx": 301,
+  "coco_id": 302,
+  "v21_id": 101323,
+  "name": "celeriac",
+  "old_ids": [
+   1082
+  ],
+  "old_names": [
+   "celeriac"
+  ]
+ },
+ {
+  "idx": 302,
+  "coco_id": 303,
+  "v21_id": 101324,
+  "name": "crunch_muesli",
+  "old_ids": [
+   1627
+  ],
+  "old_names": [
+   "crunch-muesli"
+  ]
+ },
+ {
+  "idx": 303,
+  "coco_id": 304,
+  "v21_id": 101325,
+  "name": "muesli_dry",
+  "old_ids": [
+   1670
+  ],
+  "old_names": [
+   "muesli"
+  ]
+ },
+ {
+  "idx": 304,
+  "coco_id": 305,
+  "v21_id": 101326,
+  "name": "curds_natural",
+  "old_ids": [
+   870,
+   1266
+  ],
+  "old_names": [
+   "curds-natural-with-at-most-10-fidm",
+   "curd"
+  ]
+ },
+ {
+  "idx": 305,
+  "coco_id": 306,
+  "v21_id": 101327,
+  "name": "soft_drink_with_a_taste",
+  "old_ids": [
+   2495
+  ],
+  "old_names": [
+   "syrup-diluted-ready-to-drink"
+  ]
+ },
+ {
+  "idx": 306,
+  "coco_id": 307,
+  "v21_id": 101328,
+  "name": "fennel",
+  "old_ids": [
+   1119
+  ],
+  "old_names": [
+   "fennel"
+  ]
+ },
+ {
+  "idx": 307,
+  "coco_id": 308,
+  "v21_id": 101329,
+  "name": "flakes",
+  "old_ids": [
+   1422
+  ],
+  "old_names": [
+   "flakes-oat"
+  ]
+ },
+ {
+  "idx": 308,
+  "coco_id": 309,
+  "v21_id": 101331,
+  "name": "fondue",
+  "old_ids": [
+   1295
+  ],
+  "old_names": [
+   "fondue"
+  ]
+ },
+ {
+  "idx": 309,
+  "coco_id": 310,
+  "v21_id": 101335,
+  "name": "ham_n_s",
+  "old_ids": [
+   1886,
+   1889
+  ],
+  "old_names": [
+   "ham",
+   "ham-cooked"
+  ]
+ },
+ {
+  "idx": 310,
+  "coco_id": 311,
+  "v21_id": 101338,
+  "name": "kolhrabi",
+  "old_ids": [
+   1089
+  ],
+  "old_names": [
+   "kolhrabi"
+  ]
+ },
+ {
+  "idx": 311,
+  "coco_id": 312,
+  "v21_id": 101340,
+  "name": "leek",
+  "old_ids": [
+   1113
+  ],
+  "old_names": [
+   "leek"
+  ]
+ },
+ {
+  "idx": 312,
+  "coco_id": 313,
+  "v21_id": 101341,
+  "name": "meat_n_s",
+  "old_ids": [
+   1707
+  ],
+  "old_names": [
+   "meat"
+  ]
+ },
+ {
+  "idx": 313,
+  "coco_id": 314,
+  "v21_id": 101343,
+  "name": "mustard",
+  "old_ids": [
+   2810,
+   2811
+  ],
+  "old_names": [
+   "mustard",
+   "mustard-dijon"
+  ]
+ },
+ {
+  "idx": 314,
+  "coco_id": 315,
+  "v21_id": 101346,
+  "name": "peach",
+  "old_ids": [
+   1190
+  ],
+  "old_names": [
+   "peach"
+  ]
+ },
+ {
+  "idx": 315,
+  "coco_id": 316,
+  "v21_id": 101347,
+  "name": "pear",
+  "old_ids": [
+   1157
+  ],
+  "old_names": [
+   "pear"
+  ]
+ },
+ {
+  "idx": 316,
+  "coco_id": 317,
+  "v21_id": 101349,
+  "name": "pork_n_s",
+  "old_ids": [
+   1748,
+   1749,
+   1757,
+   1760
+  ],
+  "old_names": [
+   "pork",
+   "pork-roast",
+   "pork-chop",
+   "pork-escalope"
+  ]
+ },
+ {
+  "idx": 317,
+  "coco_id": 318,
+  "v21_id": 101354,
+  "name": "sausage",
+  "old_ids": [
+   843,
+   1831,
+   1856,
+   1883,
+   1908,
+   1924
+  ],
+  "old_names": [
+   "wienerli-swiss-sausage",
+   "frying-sausage",
+   "veal-sausage",
+   "cooked-sausage",
+   "smoked-cooked-sausage-of-pork-and-beef-meat-sausag",
+   "sausage"
+  ]
+ },
+ {
+  "idx": 318,
+  "coco_id": 319,
+  "v21_id": 101355,
+  "name": "yogurt",
+  "old_ids": [
+   1257,
+   3332,
+   5641
+  ],
+  "old_names": [
+   "soya-yaourt-yahourt-yogourt-ou-yoghourt",
+   "greek-yaourt-yahourt-yogourt-ou-yoghourt",
+   "yaourt-yahourt-yogourt-ou-yoghourt-natural"
+  ]
+ },
+ {
+  "idx": 319,
+  "coco_id": 320,
+  "v21_id": 101358,
+  "name": "applesauce",
+  "old_ids": [
+   727
+  ],
+  "old_names": [
+   "applesauce-unsweetened-canned"
+  ]
+ },
+ {
+  "idx": 320,
+  "coco_id": 321,
+  "v21_id": 101360,
+  "name": "red_cabbage_raw",
+  "old_ids": [
+   1092
+  ],
+  "old_names": [
+   "red-cabbage"
+  ]
+ },
+ {
+  "idx": 321,
+  "coco_id": 322,
+  "v21_id": 101361,
+  "name": "cream_double_cream_heavy_cream_45",
+  "old_ids": [
+   1376,
+   1383,
+   1384
+  ],
+  "old_names": [
+   "cream",
+   "sour-cream",
+   "thickened-cream-35"
+  ]
+ },
+ {
+  "idx": 322,
+  "coco_id": 323,
+  "v21_id": 101363,
+  "name": "ice_cream_n_s",
+  "old_ids": [
+   1402,
+   1411
+  ],
+  "old_names": [
+   "dairy-ice-cream",
+   "sorbet"
+  ]
+ }
+]

@@ -40,8 +40,10 @@ research/
 │   └── generar_*.py
 └── nutrition_mapping/
     ├── README.md
-    ├── nutrition_wide_densidad.csv
-    └── food_names_es.csv
+    ├── 01_mapeo_nutricional.ipynb
+    ├── nutrition_wide_densidad.csv / food_names_es.csv
+    ├── classes.json / recetas.csv / requirements.txt
+    └── nutri_map/ (decisiones/, scripts/, verificacion_20.csv, validacion_coherencia.csv, REVISION.md, ...)
 ```
 
 > Core pipeline unit tests live in [`../ml/tests/test_core.py`](../ml/tests/test_core.py).
@@ -73,7 +75,7 @@ The notebooks keep their outputs where useful; if you re-run them, the results s
 - Classification: C2 reaches **top-1 0.579 / macro-F1 0.423** with 4.62 M parameters; C3 reaches **0.578 / 0.427** with 41.64 M.
 - Profiles: light (A2+C2 vs B2) and robust (A4+C3 vs B4). The robust profile improves AP50 of A by **+0.102** and AR100 by **+0.192** over the light profile, but adds **+81.3 M** parameters and **+115.2 ms** to A+C.
 - Depth/volume test: raw depth median 1.58 m → corrected ≈0.30 m with a 26 cm plate; detected total 351.3 g versus 302 g real; the pork segment is 190.6 g versus 163 g real (+17%).
-- Nutritional mapping: **323/323** classes with density, **316/323** with energy coherence, **18/20** in the manual verification, 43 geometric densities and 48 rows still pending technical review.
+- Nutritional mapping: **323/323** classes with density, **316/323** with energy coherence, **18/20** in the LLM-assisted verification (`nutrition_mapping/nutri_map/verificacion_20.csv`), 43 geometric densities and 48 rows still pending technical review.
 
 ## Excluded artifacts
 

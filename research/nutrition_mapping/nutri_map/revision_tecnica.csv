@@ -1,0 +1,49 @@
+﻿idx,clase,decision,final_usda,confianza,motivo,nota
+8,rosti_n_s,receta,,media,receta: proporciones y datos de ingredientes,ros ti: patata cocida 85 g + aceite 15 g
+10,coleslaw_chopped_without_sauce,receta,,alta,receta: proporciones y datos de ingredientes,coleslaw sin aderezo: col + zanahoria
+12,mixed_salad_chopped_without_sauce,receta,,alta,receta: proporciones y datos de ingredientes,ensalada mixta sin aderezo; la entrada del borrador lleva aguacate
+13,leaf_spinach,ok,168462,baja,confianza baja,clase ambigua (cruda o cocida); se mantiene como en la muestra
+35,shoots_n_s,ok,169210,baja,confianza baja,brotes de bambu; estado y uso poco claros
+55,sugar_melon_galia_honeydew_cantaloupe,ok,746770,media,proxy/aproximacion,melon tipo galia; aproximacion
+62,damson_plum,ok,169949,media,proxy/aproximacion,damson: se usa ciruela generica (aproximacion)
+65,seeds_n_s,ok,2515381,media,proxy/aproximacion,semillas genericas: proxy de girasol crudo
+84,halloumi,ok,2705740,media,proxy/aproximacion,proxy: paneer como queso firme similar; halloumi no tiene entrada
+87,cheese_for_raclette_ch,ok,2705720,media,proxy/aproximacion,proxy: Monterey como queso fundible semiduro
+89,tomme_ch,ok,2705720,media,proxy/aproximacion,proxy: Monterey como queso semicurado
+94,grits_polenta_maize_flour,ok,169697,baja,confianza baja,polenta: no hay version cocida entre los candidatos; entrada seca
+97,spaetzle,ok,169732,media,proxy/aproximacion,aproximacion: fideos de huevo cocidos
+103,bread_fruit,ok,171714,baja,confianza baja,fruta del pan: normalmente se consume cocida
+105,bread_ticino_ch,ok,2707598,media,proxy/aproximacion,proxy: pan blanco generico para pan regional suizo
+109,roll_with_pieces_of_chocolate,ok,2707666,media,proxy/aproximacion,proxy: roll dulce sin glaseado
+126,tuna,cambiar,172006,baja,confianza baja; proxy/aproximacion,atun cocido: tipo generico; yellowfin como aproximacion
+142,cookies,cambiar,2707968,media,proxy/aproximacion,generica: proxy de galleta simple
+146,aperitif_with_alcohol_n_s_aperol_spritz,cambiar,2710674,baja,confianza baja; proxy/aproximacion; kcal vs macros (incoherente kcal vs macros),sin Aperol; ponche alcoholico como aproximacion
+147,wine_red,ok,173190,alta,kcal vs macros (incoherente kcal vs macros),
+150,bolognaise_sauce,receta,,media,receta: proporciones y datos de ingredientes,bolognesa: salsa de tomate + carne picada cocida + cebolla + zanahoria
+164,spring_roll_fried,cambiar,172105,baja,confianza baja; proxy/aproximacion,rollito frito: proxy egg roll vegetal frito (no hay spring roll frito en USDA); la entrada sin freir daba 112 kcal frente a ~250
+165,ham_croissant_ch,receta,,media,receta: proporciones y datos de ingredientes,croissant con jamon: croissant + jamon cocido
+166,salt_cake_ch_vegetables_filled,receta,,baja,confianza baja; receta: proporciones y datos de ingredientes,pastel salado de verduras: masa de harina + huevo + leche + queso + verdura + mantequilla
+178,glucose_drink_50g,receta,,media,receta: proporciones y datos de ingredientes,"bebida de glucosa (50 g): solucion al 25 % = azucar 25 g + agua 75 g (la entrada de USDA tenia 0,12 g de carbohidratos)"
+181,birchermuesli_prepared_no_sugar_added,receta,,baja,confianza baja; receta: proporciones y datos de ingredientes,birchermuesli: avena + yogur + manzana + avellana + leche
+189,french_pizza_from_alsace_baked,receta,,baja,confianza baja; receta: proporciones y datos de ingredientes,tarte flambee alsaciana: masa + creme fraiche + cebolla + bacon + queso
+190,vegetable_au_gratin_baked,ok,170442,media,proxy/aproximacion,proxy: gratinado de patata como gratinado al horno
+191,porridge_prepared_with_partially_skimmed_milk,receta,,baja,confianza baja; receta: proporciones y datos de ingredientes,porridge con leche semidesnatada: avena cocida + leche 1%
+198,ham_raw,ok,168222,baja,confianza baja,jamon crudo curado: revisar (la entrada es pierna de cerdo cruda)
+200,risotto,receta,,media,receta: proporciones y datos de ingredientes,risotto: arroz cocido + champinones + parmesano + mantequilla + caldo
+208,latte_macchiato,cambiar,2710387,media,proxy/aproximacion,latte macchiato: latte sin grasa como aproximacion
+211,wine_rose,ok,171908,alta,kcal vs macros (incoherente kcal vs macros),
+212,wine_white,ok,174837,alta,kcal vs macros (incoherente kcal vs macros),
+215,pizza_with_ham_with_mushrooms_baked,cambiar,172095,baja,confianza baja,marca DiGiorno fuera; pizza generica con cobertura de carne
+221,white_coffee,cambiar,2710387,media,proxy/aproximacion,cafe con leche: latte sin grasa como aproximacion
+228,cordon_bleu,ok,2706418,baja,confianza baja,cordon bleu: entrada de ternera; el original suele ser de cerdo
+239,salad_lambs_ear,ok,2709789,baja,confianza baja; proxy/aproximacion,proxy: lechuga cruda para hojas tipo lamb's ear
+240,balsamic_salad_dressing,ok,2710195,baja,confianza baja; proxy/aproximacion,proxy: aliño generico para ensaladas; no es balsamico
+247,pie_apricot,receta,,baja,confianza baja; receta: proporciones y datos de ingredientes,tarta de albaricoque: masa de tarta + albaricoque + azucar + huevo
+248,pie_plum_baked_with_cake_dough,receta,,baja,confianza baja; receta: proporciones y datos de ingredientes,tarta de ciruela: masa de tarta + ciruela + azucar + huevo
+251,mixed_milk_beverage,receta,,baja,confianza baja; receta: proporciones y datos de ingredientes,mezcla de bebidas de leche: leche + soja + avena
+258,bread_grain,cambiar,168013,baja,confianza baja,"pan de cereales: pan multigrano; la entrada anterior era grano crudo seco (371 kcal), no pan"
+272,sauce_mushroom,receta,,baja,confianza baja; receta: proporciones y datos de ingredientes,salsa de champinones: nata + champinones + mantequilla + harina + leche
+277,lentils_green_du_puy_du_berry,cambiar,172421,media,proxy/aproximacion,lentejas du Puy: entrada de lentejas cocidas como aproximacion
+286,beer,ok,168746,alta,kcal vs macros (incoherente kcal vs macros),
+302,crunch_muesli,ok,2708447,baja,confianza baja; proxy/aproximacion,cereal crujiente como aproximacion del muesli crujiente
+312,meat_n_s,cambiar,174034,baja,confianza baja; proxy/aproximacion,carne generica: carne de res picada cocida como aproximacion
