@@ -33,6 +33,13 @@ The key design principle: **every number is computed deterministically; the LLM 
 
 https://github.com/user-attachments/assets/1163c97a-1a13-4e7b-ac99-c9992ca2c598
 
+### 📸 Real-World Proof of Concept (302 g Weighed Test Dish)
+
+| Live App Segmentation & Calorie Overlay | Digital Scale Ground Truth (0.1 g Resolution) |
+|:---:|:---:|
+| <img src="research/visual_resources/en/app_live_segmentation_demo.png" alt="Live app segmentation overlay showing Banana, Potato, and Pork with camera tilt badge" width="420" /> | <img src="research/visual_resources/en/real_dish_scale_ground_truth.png" alt="Digital scale ground truth: 105.0 g baked potato, 163.6 g pork, 34.0 g banana" width="420" /> |
+| *Interactive SVG masks, tilt indicator (`Top-down · 8°`), and per-item USDA calories in [caloriescounter.app](https://caloriescounter.app)* | *Each ingredient weighed individually before plating: baked potato (`105 g`), pan-broiled pork (`163 g`), and banana (`34 g`)* |
+
 ---
 
 ## 🏗️ System Architecture
